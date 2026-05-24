@@ -1,3 +1,11 @@
+## [0.18.12](https://github.com/hendripermana/permoney/compare/v0.18.11...v0.18.12) (2026-05-24)
+
+### Other Changes
+
+- deps(deps): bump lucide-rails from 0.5.1 to 0.7.4 (#128) (ef02d3c1)
+- ci: remove version key from pnpm setup to let it auto-detect from package.json (080c6816)
+- ci: sync pnpm setup action runner to version 11 (2a8fae51)
+
 ## [0.18.11](https://github.com/hendripermana/permoney/compare/v0.18.10...v0.18.11) (2026-05-24)
 
 ### Other Changes
