@@ -3,7 +3,7 @@ GEM
   specs:
     aasm (5.5.2)
       concurrent-ruby (~> 1.0)
-    action_text-trix (2.1.15)
+    action_text-trix (2.1.19)
       railties
     actioncable (8.1.1)
       actionpack (= 8.1.1)
@@ -237,7 +237,7 @@ GEM
       actioncable (>= 7.0.0)
       listen (>= 3.0.0)
       railties (>= 7.0.0)
-    hotwire_combobox (0.4.0)
+    hotwire_combobox (0.4.1)
       platform_agent (>= 1.0.1)
       rails (>= 7.0.7.2)
       stimulus-rails (>= 1.2)
@@ -342,7 +342,7 @@ GEM
       net-imap
       net-pop
       net-smtp
-    marcel (1.1.0)
+    marcel (1.2.1)
     matrix (0.4.3)
     memory_profiler (1.1.0)
     mini_histogram (0.3.1)
@@ -361,7 +361,7 @@ GEM
     mutex_m (0.3.0)
     net-http (0.7.0)
       uri
-    net-imap (0.5.12)
+    net-imap (0.6.4)
       date
       net-protocol
     net-pop (0.1.2)
@@ -440,7 +440,7 @@ GEM
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
-    prism (1.6.0)
+    prism (1.9.0)
     prometheus-client (4.2.5)
       base64
     prometheus_exporter (2.3.0)
@@ -655,7 +655,7 @@ GEM
     terminal-table (4.0.0)
       unicode-display_width (>= 1.1.1, < 4)
     thor (1.5.0)
-    timeout (0.4.4)
+    timeout (0.6.1)
     tsort (0.2.0)
     turbo-rails (2.0.20)
       actionpack (>= 7.1.0)
