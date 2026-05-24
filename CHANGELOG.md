@@ -1,3 +1,31 @@
+## [0.18.13](https://github.com/hendripermana/permoney/compare/v0.18.12...v0.18.13) (2026-05-24)
+
+### Other Changes
+
+- deps(deps): bump httparty from 0.23.2 to 0.24.0 (#131) (e97ab1c3)
+- deps(deps): bump addressable from 2.8.7 to 2.9.0 (#132) (edec7f3b)
+- deps(deps): bump jwt from 3.1.2 to 3.2.0 (#133) (9550b4f8)
+- deps(deps): bump faraday from 2.14.0 to 2.14.2 (#134) (83946a59)
+- deps(deps): bump css_parser from 1.21.1 to 1.22.0 (#135) (797b8c6d)
+- deps(deps): bump yard from 0.9.37 to 0.9.42 (#136) (6d7f7150)
+- deps-dev(deps-dev): bump ruby-lsp from 0.26.2 to 0.26.9 (#137) (592cf011)
+- deps(deps): bump view_component from 4.1.1 to 4.9.0 (#138) (0e2e49ab)
+- ci(deps): bump actions/checkout from 4 to 6 (#114) (f0152fce)
+- ci(deps): bump actions/cache from 4 to 5 (#115) (b0e300b7)
+- ci(deps): bump docker/metadata-action from 5.6.0 to 6.1.0 (#116) (96256514)
+- ci(deps): bump actions/setup-node from 4 to 6 (#117) (afd18193)
+- ci(deps): bump softprops/action-gh-release from 2 to 3 (#118) (2644fab5)
+- deps(deps): bump rails in the rails group across 1 directory (#120) (e558cef7)
+- deps-dev(deps-dev): bump selenium-webdriver in the testing group (#121) (f93c21e8)
+- deps(deps): bump the security group across 1 directory with 3 updates (#122) (f88ab808)
+- deps(deps): bump aws-sdk-s3 from 1.200.0 to 1.224.0 (#123) (a98acc7f)
+- deps(deps): bump hotwire_combobox from 0.4.0 to 0.4.1 (#124) (052eb5fe)
+- deps(deps): bump stripe from 17.2.0 to 19.1.0 (#125) (b28d02ad)
+- deps(deps): bump sentry-sidekiq from 6.1.0 to 6.5.0 (#126) (baa54be0)
+- deps(deps): bump sentry-ruby from 6.1.0 to 6.5.0 (#127) (9ee270ae)
+- deps(deps): bump rqrcode from 3.1.0 to 3.2.0 (#129) (db27fb72)
+- deps(deps): bump sidekiq-cron from 2.3.1 to 2.4.0 (#130) (15a655b6)
+
 ## [0.18.12](https://github.com/hendripermana/permoney/compare/v0.18.11...v0.18.12) (2026-05-24)
 
 ### Other Changes
