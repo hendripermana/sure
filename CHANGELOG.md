@@ -1,3 +1,17 @@
+## [0.19.0](https://github.com/hendripermana/permoney/compare/v0.18.13...v0.19.0) (2026-05-24)
+
+### Features
+
+- feat: implement split transactions (#139) (f1839107)
+
+### Bug Fixes
+
+- fix: align EOF delimiters to left margin in publish.yml (86aee190)
+
+### Refactoring
+
+- refactor: optimize docker conditions and clean up tag config logic (35143bca)
+
 ## [0.18.13](https://github.com/hendripermana/permoney/compare/v0.18.12...v0.18.13) (2026-05-24)
 
 ### Other Changes
