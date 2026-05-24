@@ -12,7 +12,7 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 # Action Cable - CRITICAL: Must be pinned for WebSocket support
 pin "@rails/actioncable", to: "actioncable.esm.js"
 pin "marked", to: "https://ga.jspm.io/npm:marked@4.3.0/lib/marked.esm.js"
-pin "dompurify", to: "https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.es.js"
+pin "dompurify" # @3.4.5
 
 # Action Cable channels - explicitly pin consumer
 pin "channels/consumer", to: "channels/consumer.js"
@@ -81,6 +81,6 @@ pin "motion-dom" # @12.23.23
 pin "motion-utils" # @12.23.6
 pin "react/jsx-runtime", to: "react--jsx-runtime.js" # @19.1.1
 pin "scheduler" # @0.26.0
-pin "lodash" # @4.17.23
+pin "lodash" # @4.18.1
 pin "motion" # @12.23.24
 pin "framer-motion/dom", to: "framer-motion--dom.js" # @12.23.24
