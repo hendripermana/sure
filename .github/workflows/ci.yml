@@ -76,7 +76,6 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11 # Diperbarui ke versi 11 agar sinkron dengan package.json
           run_install: false
 
       - name: Get pnpm store directory
