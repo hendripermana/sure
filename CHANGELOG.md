@@ -1,3 +1,9 @@
+## [0.18.11](https://github.com/hendripermana/permoney/compare/v0.18.10...v0.18.11) (2026-05-24)
+
+### Other Changes
+
+- ci: resolve all biome errors and lock secure pnpm v11 (2a3023bc)
+
 ## [0.18.10](https://github.com/hendripermana/permoney/compare/v0.18.9...v0.18.10) (2026-05-24)
 
 ### Other Changes
