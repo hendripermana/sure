@@ -27,7 +27,8 @@
         "useConst": "error"
       },
       "correctness": {
-        "noUnusedVariables": "warn"
+        "noUnusedVariables": "warn",
+        "useHookAtTopLevel": "off"
       }
     }
   },
