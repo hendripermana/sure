@@ -1,3 +1,9 @@
+## [0.18.9](https://github.com/hendripermana/permoney/compare/v0.18.8...v0.18.9) (2026-05-24)
+
+### Other Changes
+
+- ci: enhance pipeline to pnpm node24 and fix dependabot validations (4db3bda6)
+
 ## [0.18.8](https://github.com/hendripermana/permoney/compare/v0.18.7...v0.18.8) (2026-02-08)
 
 ### Other Changes
