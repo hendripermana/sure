@@ -180,14 +180,13 @@ class SimplefinAccount::ProcessorTest < ActiveSupport::TestCase
 
     account.update!(simplefin_account: simplefin_account)
 
-    # Mock the balance calculator
-    calculator = Minitest::Mock.new
-    calculator.expect(:cash_balance, 1000.00)
+    # Mock the balance calculator using mocha
+    calculator = mock("BalanceCalculator")
+    calculator.stubs(cash_balance: 1000.00)
 
-    SimplefinAccount::Investments::BalanceCalculator.stub(:new, calculator) do
-      processor = SimplefinAccount::Processor.new(simplefin_account)
-      processor.send(:process_account!)
-    end
+    SimplefinAccount::Investments::BalanceCalculator.stubs(:new).returns(calculator)
+    processor = SimplefinAccount::Processor.new(simplefin_account)
+    processor.send(:process_account!)
 
     account.reload
     assert_equal 5000.00, account.balance, "Investment balance should be set"

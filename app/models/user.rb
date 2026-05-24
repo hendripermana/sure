@@ -106,6 +106,10 @@ class User < ApplicationRecord
     show_ai_sidebar
   end
 
+  def show_split_grouped?
+    true
+  end
+
   # Safe avatar URL helper - handles missing files gracefully
   # This prevents 500 errors when profile images exist in DB but not in storage
   # (e.g., after migration from local to R2 storage)
