@@ -75,7 +75,7 @@ jobs:
         shell: bash
         run: |
           if [[ $GITHUB_EVENT_NAME == "schedule" ]]; then
-            cat << 'EOF' > tags.txt
+          cat << 'EOF' > tags.txt
           type=sha,format=long
           type=schedule,pattern=nightly
           type=schedule,pattern=nightly-{{date 'ddd'}}
@@ -83,15 +83,15 @@ jobs:
           elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
             TAG_NAME="${GITHUB_REF#refs/tags/}"
             if [[ "$TAG_NAME" == v*-alpha* ]]; then
-              cat << 'EOF' > tags.txt
-            type=semver,pattern={{version}}
-            type=raw,value=latest
-            EOF
+            cat << 'EOF' > tags.txt
+          type=semver,pattern={{version}}
+          type=raw,value=latest
+          EOF
             else
-              cat << 'EOF' > tags.txt
-            type=semver,pattern={{version}}
-            type=raw,value=stable
-            EOF
+            cat << 'EOF' > tags.txt
+          type=semver,pattern={{version}}
+          type=raw,value=stable
+          EOF
             fi
           else
             echo "type=sha,format=long" > tags.txt
