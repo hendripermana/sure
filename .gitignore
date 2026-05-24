@@ -109,3 +109,14 @@ scripts/*
 .cursor/rules/dev_workflow.mdc
 .cursor/rules/taskmaster.mdc.trae/
 .serena/project.yml
+
+# AI Agents & IDE Skills Cache
+.agents/
+.claude/
+.factory/
+.junie/
+.kilocode/
+.kiro/
+.trae/
+.windsurf/
+skills-lock.json

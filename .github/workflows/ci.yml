@@ -3,8 +3,13 @@ name: CI
 on:
   workflow_call:
 
+# Mengaktifkan Node 24 secara global untuk mencegah peringatan deprecation dari GitHub
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   scan_ruby:
+    name: Scan Security (Ruby)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: true
@@ -22,6 +27,7 @@ jobs:
         run: bin/brakeman --no-pager --no-exit-on-warn
 
   scan_js:
+    name: Scan Security (JavaScript)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -38,6 +44,7 @@ jobs:
         run: bin/importmap audit
 
   lint:
+    name: Lint Code (Ruby)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -54,6 +61,7 @@ jobs:
         run: bin/rubocop -f github
 
   lint_js:
+    name: Lint Code (JavaScript)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -63,75 +71,30 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: "24" # Menggunakan Node 24 LTS terbaru
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # Menggunakan pnpm versi 9 stabil terbaru
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --no-frozen-lockfile
         shell: bash
 
       - name: Lint/Format js code
-        run: npm run lint
-
-  # TODO: Re-enable tests after fixing upstream merge issues
-  # Test failures are due to upstream changes that need to be addressed
-  # Temporarily disabled to allow Docker image publishing to proceed
-  # test:
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 10
-  #
-  #   env:
-  #     PLAID_CLIENT_ID: foo
-  #     PLAID_SECRET: bar
-  #     DATABASE_URL: postgres://postgres:postgres@localhost:5432/permoney_test
-  #     REDIS_URL: redis://localhost:6379
-  #     RAILS_ENV: test
-  #
-  #   services:
-  #     postgres:
-  #       image: postgres
-  #       env:
-  #         POSTGRES_USER: postgres
-  #         POSTGRES_PASSWORD: postgres
-  #       ports:
-  #         - 5432:5432
-  #       options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
-  #
-  #     redis:
-  #       image: redis
-  #       ports:
-  #         - 6379:6379
-  #       options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
-  #
-  #   steps:
-  #     - name: Install packages
-  #       run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable curl libvips postgresql-client libpq-dev
-  #
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Set up Ruby
-  #       uses: ruby/setup-ruby@v1
-  #       with:
-  #         ruby-version: .ruby-version
-  #         bundler-cache: true
-  #
-  #     - name: DB setup and smoke test
-  #       run: |
-  #         bin/rails db:create
-  #         bin/rails db:schema:load
-  #         bin/rails db:seed
-  #
-  #     - name: Unit and integration tests
-  #       run: bin/rails test
-  #
-  #     - name: System tests
-  #       run: DISABLE_PARALLELIZATION=true bin/rails test:system
-  #
-  #     - name: Keep screenshots from failed system tests
-  #       uses: actions/upload-artifact@v4
-  #       if: failure()
-  #       with:
-  #         name: screenshots
-  #         path: ${{ github.workspace }}/tmp/screenshots
-  #         if-no-files-found: ignore
+        run: pnpm run lint

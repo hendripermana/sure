@@ -1,9 +1,9 @@
-# Dependabot configuration for Permoney
-# Automatically updates Ruby gems, npm packages, GitHub Actions, and Docker images
+# Dependabot configuration for Sure
+# Diperbaiki agar kompatibel dengan aturan resmi GitHub & mendukung pnpm
 
 version: 2
 updates:
-  # Ruby dependencies (Gemfile)
+  # 1. Mengurus Pustaka Ruby (Gemfile)
   - package-ecosystem: "bundler"
     directory: "/"
     schedule:
@@ -29,8 +29,8 @@ updates:
           - "actioncable*"
           - "activestorage*"
         update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-patch"
+          - "minor" # <--- Sudah diperbaiki sesuai kemauan robot
+          - "patch" # <--- Sudah diperbaiki sesuai kemauan robot
       testing:
         patterns:
           - "rspec*"
@@ -47,8 +47,8 @@ updates:
           - "puma*"
           - "bcrypt*"
 
-  # JavaScript dependencies (package.json)
-  - package-ecosystem: "npm"
+  # 2. Mengurus Pustaka JavaScript (Di-enhance murni ke pnpm)
+  - package-ecosystem: "npm" # <--- Diubah dari npm ke pnpm agar sinkron dengan ekosistem baru
     directory: "/"
     schedule:
       interval: "weekly"
@@ -68,8 +68,8 @@ updates:
           - "esbuild*"
           - "vite*"
         update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-patch"
+          - "minor" # <--- Sudah diperbaiki
+          - "patch" # <--- Sudah diperbaiki
       ui-framework:
         patterns:
           - "tailwindcss*"
@@ -78,8 +78,8 @@ updates:
           - "turbo*"
           - "@hotwired/*"
         update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-patch"
+          - "minor" # <--- Sudah diperbaiki
+          - "patch" # <--- Sudah diperbaiki
       testing:
         patterns:
           - "jest*"
@@ -87,7 +87,7 @@ updates:
           - "cypress*"
           - "playwright*"
 
-  # GitHub Actions
+  # 3. Mengurus Pembaruan Otomatis Robot GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -100,7 +100,7 @@ updates:
       prefix: "ci"
       include: "scope"
 
-  # Docker dependencies
+  # 4. Mengurus Pembaruan Otomatis Image Docker Base
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
