@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_25_141807) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_24_122331) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -283,6 +283,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_25_141807) do
     t.jsonb "locked_attributes", default: {}
     t.string "name", null: false
     t.text "notes"
+    t.uuid "parent_entry_id"
     t.string "plaid_id"
     t.string "source"
     t.datetime "updated_at", null: false
@@ -294,6 +295,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_25_141807) do
     t.index ["entryable_id"], name: "index_entries_on_entryable_id"
     t.index ["entryable_type"], name: "index_entries_on_entryable_type"
     t.index ["import_id"], name: "index_entries_on_import_id"
+    t.index ["parent_entry_id"], name: "index_entries_on_parent_entry_id"
     t.index ["plaid_id"], name: "index_entries_on_plaid_id"
   end
 
@@ -1426,6 +1428,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_25_141807) do
   add_foreign_key "categories", "families"
   add_foreign_key "chats", "users"
   add_foreign_key "entries", "accounts"
+  add_foreign_key "entries", "entries", column: "parent_entry_id", on_delete: :cascade
   add_foreign_key "entries", "imports"
   add_foreign_key "eval_results", "eval_runs"
   add_foreign_key "eval_results", "eval_samples"

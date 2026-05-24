@@ -62,7 +62,7 @@ ENV["API_RATE_LIMITING_ENABLED"] ||= "true"
 ENV["PGGSSENCMODE"] = "disable"
 
 require "rails/test_help"
-require "minitest/mock"
+# require "minitest/mock"
 require "minitest/autorun"
 require "mocha/minitest"
 require "aasm/minitest"

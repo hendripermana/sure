@@ -1,6 +1,8 @@
 class Entry < ApplicationRecord
   include Monetizable, Enrichable
 
+  attr_accessor :unsplitting
+
   monetize :amount
 
   # Receipt/document attachment for transaction documentation
@@ -23,6 +25,9 @@ class Entry < ApplicationRecord
   belongs_to :account, counter_cache: true, touch: true
   belongs_to :transfer, optional: true
   belongs_to :import, optional: true
+  belongs_to :parent_entry, class_name: "Entry", optional: true
+
+  has_many :child_entries, class_name: "Entry", foreign_key: :parent_entry_id, dependent: :destroy
 
   delegated_type :entryable, types: Entryable::TYPES, dependent: :destroy
   accepts_nested_attributes_for :entryable
@@ -31,6 +36,11 @@ class Entry < ApplicationRecord
   validates :date, uniqueness: { scope: [ :account_id, :entryable_type ] }, if: -> { valuation? }
   validates :date, comparison: { greater_than: -> { min_supported_date } }
   validates :external_id, uniqueness: { scope: [ :account_id, :source ] }, if: -> { external_id.present? && source.present? }
+
+  validate :cannot_unexclude_split_parent
+  validate :split_child_date_matches_parent
+
+  before_destroy :prevent_individual_child_deletion, if: :split_child?
 
   scope :visible, -> {
     joins(:account).where(accounts: { status: [ "draft", "active" ] })
@@ -83,6 +93,14 @@ class Entry < ApplicationRecord
     pending.where("entries.date < ?", days.days.ago.to_date)
   }
 
+  scope :excluding_split_parents, -> {
+    where(<<~SQL.squish)
+      NOT EXISTS (
+        SELECT 1 FROM entries ce WHERE ce.parent_entry_id = entries.id
+      )
+    SQL
+  }
+
   def classification
     amount.negative? ? "income" : "expense"
   end
@@ -108,6 +126,58 @@ class Entry < ApplicationRecord
 
   def linked?
     external_id.present?
+  end
+
+  def split_parent?
+    child_entries.exists?
+  end
+
+  def split_child?
+    parent_entry_id.present?
+  end
+
+  TRUTHY_VALUES = [ true, "true", "1", 1 ].freeze
+
+  def split!(splits)
+    total = splits.sum { |s| s[:amount].to_d }
+    unless total == amount
+      raise ActiveRecord::RecordInvalid.new(self), "Split amounts must sum to parent amount (expected #{amount}, got #{total})"
+    end
+
+    self.class.transaction do
+      children = splits.map do |split_attrs|
+        child_transaction = Transaction.new(
+          category_id: split_attrs[:category_id],
+          merchant_id: entryable.try(:merchant_id),
+          kind: entryable.try(:kind)
+        )
+
+        child_entries.create!(
+          account: account,
+          date: date,
+          name: split_attrs[:name],
+          amount: split_attrs[:amount],
+          currency: currency,
+          excluded: TRUTHY_VALUES.include?(split_attrs[:excluded]),
+          entryable: child_transaction
+        )
+      end
+
+      update!(excluded: true)
+      lock_saved_attributes!
+
+      children
+    end
+  end
+
+  def unsplit!
+    self.class.transaction do
+      child_entries.each do |child|
+        child.unsplitting = true
+        child.destroy!
+      end
+      update!(excluded: false)
+    end
   end
 
   class << self
@@ -316,5 +386,25 @@ class Entry < ApplicationRecord
         errors.add(:receipt, :invalid_file_size, max_megabytes: 10, message: "must be less than 10MB")
         # Don't purge here - let Rails clean up unattached blobs automatically
       end
+    end
+
+    def cannot_unexclude_split_parent
+      return unless excluded_changed?(from: true, to: false) && split_parent?
+
+      errors.add(:excluded, "cannot be toggled off for a split transaction")
+    end
+
+    def split_child_date_matches_parent
+      return unless split_child? && date_changed?
+      return unless parent_entry.present?
+      return if date == parent_entry.date
+
+      errors.add(:date, "must match the parent transaction date for split children")
+    end
+
+    def prevent_individual_child_deletion
+      return if destroyed_by_association || unsplitting
+
+      throw :abort
     end
 end

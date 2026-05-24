@@ -65,6 +65,10 @@ class Transaction < ApplicationRecord
     transfer? || one_time?
   end
 
+  def splittable?
+    !transfer? && !entry.split_child? && !entry.split_parent? && !pending? && !entry.excluded?
+  end
+
   # Check if transaction is Sharia compliant
   def sharia_compliant?
     return is_sharia_compliant unless is_sharia_compliant.nil?

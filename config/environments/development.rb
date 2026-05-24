@@ -93,6 +93,7 @@ Rails.application.configure do
   config.hosts << "eminent-cuddly-shark.ngrok-free.app" if ENV["PORT"] == "3002"
   config.hosts << ".ngrok-free.app" if ENV["PORT"] == "3002"
   config.hosts << ".ngrok.io" if ENV["PORT"] == "3002"
+  config.hosts << "finance.permana.icu"
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true

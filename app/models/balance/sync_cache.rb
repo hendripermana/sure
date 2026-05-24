@@ -22,7 +22,7 @@ class Balance::SyncCache
 
     def converted_entries
       @converted_entries ||= begin
-        scope = account.entries.order(:date)
+        scope = account.entries.excluding_split_parents.order(:date)
         scope = scope.where("date >= ?", min_date) if min_date
         scope = scope.where("date <= ?", max_date) if max_date
 
