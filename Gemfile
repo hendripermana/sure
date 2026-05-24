@@ -73,7 +73,7 @@ gem "stripe"
 gem "plaid"
 gem "httparty"
 gem "rotp", "~> 6.3"
-gem "rqrcode", "~> 3.0"
+gem "rqrcode", "~> 3.2"
 gem "activerecord-import"
 gem "rubyzip", "~> 3.2"
 
