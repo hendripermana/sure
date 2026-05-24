@@ -1,3 +1,9 @@
+## [0.18.10](https://github.com/hendripermana/permoney/compare/v0.18.9...v0.18.10) (2026-05-24)
+
+### Other Changes
+
+- ci: fix biome schema, upgrade brakeman, and patch dompurify/lodash security flaws (3fa38c65)
+
 ## [0.18.9](https://github.com/hendripermana/permoney/compare/v0.18.8...v0.18.9) (2026-05-24)
 
 ### Other Changes
