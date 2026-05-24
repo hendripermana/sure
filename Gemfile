@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby file: ".ruby-version"
 
 # Rails 8.1 - Latest stable with new features
-gem "rails", "~> 8.1.0"
+gem "rails", "~> 8.1.3"
 
 # Drivers
 gem "pg", "~> 1.5"
