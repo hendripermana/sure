@@ -88,8 +88,8 @@ GEM
     ast (2.4.3)
     attr_required (1.0.2)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1181.0)
-    aws-sdk-core (3.236.0)
+    aws-partitions (1.1253.0)
+    aws-sdk-core (3.249.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -97,11 +97,11 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.117.0)
-      aws-sdk-core (~> 3, >= 3.234.0)
+    aws-sdk-kms (1.128.0)
+      aws-sdk-core (~> 3, >= 3.248.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.200.0)
-      aws-sdk-core (~> 3, >= 3.231.0)
+    aws-sdk-s3 (1.224.0)
+      aws-sdk-core (~> 3, >= 3.248.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
@@ -116,7 +116,7 @@ GEM
       erubi (~> 1.4)
       parser (>= 2.4)
       smart_properties
-    bigdecimal (3.3.1)
+    bigdecimal (4.1.2)
     bindata (2.5.1)
     bindex (0.8.1)
     bootsnap (1.18.6)
@@ -352,8 +352,8 @@ GEM
     mocha (2.7.1)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.8.0)
-    multi_xml (0.7.2)
-      bigdecimal (~> 3.1)
+    multi_xml (0.9.1)
+      bigdecimal (>= 3.1, < 5)
     multipart-post (2.4.1)
     mutex_m (0.3.0)
     net-http (0.7.0)
@@ -712,7 +712,7 @@ DEPENDENCIES
   aasm
   activerecord-import
   after_commit_everywhere (~> 1.0)
-  aws-sdk-s3 (~> 1.200.0)
+  aws-sdk-s3 (~> 1.224.0)
   bcrypt (~> 3.1)
   benchmark-ips
   bootsnap
