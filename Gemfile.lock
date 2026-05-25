@@ -108,7 +108,7 @@ GEM
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
     bcrypt (3.1.22)
-    benchmark-ips (2.14.0)
+    benchmark-ips (2.15.1)
     better_html (2.2.0)
       actionview (>= 7.0)
       activesupport (>= 7.0)
