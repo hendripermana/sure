@@ -314,7 +314,7 @@ GEM
     logtail-rack (0.2.6)
       logtail (~> 0.1)
       rack (>= 1.2, < 4.0)
-    logtail-rails (0.2.11)
+    logtail-rails (0.2.12)
       actionpack (>= 5.0.0)
       activerecord (>= 5.0.0)
       logtail (~> 0.1, >= 0.1.14)
