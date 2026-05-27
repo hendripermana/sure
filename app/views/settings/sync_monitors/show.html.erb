@@ -1,0 +1,143 @@
+<%# content_for :page_title, "Sync Monitor" %>
+
+<header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-primary text-xl font-medium">Sync Monitor</h1>
+    <p class="text-sm text-secondary mt-1">Manage and trigger sync operations for all accounts.</p>
+  </div>
+  
+  <div class="flex items-center gap-2">
+    <%= form_with url: sync_target_settings_sync_monitor_path, method: :post, class: "flex items-center gap-2" do |f| %>
+      <%= f.select :syncable_key,
+            options_for_select(sync_target_options),
+            { prompt: "Select target to sync..." },
+            class: "text-sm rounded-xl border border-primary bg-container text-primary px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+      <%= f.button type: :submit, class: "inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl border border-primary bg-container text-primary hover:bg-surface-hover transition-colors" do %>
+        <%= icon "play", class: "w-4 h-4 text-secondary" %>
+        <span>Sync</span>
+      <% end %>
+    <% end %>
+
+    <%= render DS::Button.new(
+      text: "Force Sync All",
+      variant: "primary",
+      icon: "refresh-cw",
+      href: sync_all_settings_sync_monitor_path
+    ) %>
+  </div>
+</header>
+
+<%= turbo_frame_tag "sync_monitor_frame" do %>
+  <div class="section-card space-y-6" data-controller="sync-monitor" data-sync-monitor-active-value="<%= @summary[:pending] > 0 || @summary[:syncing] > 0 %>">
+    
+    <!-- Action Bar -->
+    <div class="flex flex-wrap items-center justify-end gap-2">
+      <% if @summary[:failed] > 0 %>
+        <%= button_to retry_all_failed_settings_sync_monitor_path, method: :post, class: "inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl border border-primary bg-container text-primary hover:bg-surface-hover transition-colors" do %>
+          <%= icon "rotate-ccw", class: "w-4 h-4 text-secondary" %>
+          <span>Retry All Failed</span>
+        <% end %>
+      <% end %>
+
+      <% if @summary[:stale] > 0 || @summary[:failed] > 0 %>
+        <%= button_to dismiss_all_stale_settings_sync_monitor_path, method: :post, class: "inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl border border-red-200 bg-container text-red-600 hover:bg-red-50 transition-colors", data: { confirm: "Are you sure you want to clear all stale and failed syncs?" } do %>
+          <%= icon "trash-2", class: "w-4 h-4 text-red-600" %>
+          <span>Dismiss Stale/Failed</span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <%= render "settings/sync_monitors/summary_card",
+                 title: "Pending",
+                 count: @summary[:pending],
+                 icon_name: "clock",
+                 color_classes: "bg-gray-100 text-gray-600 theme-dark:bg-gray-800 theme-dark:text-gray-400" %>
+
+      <%= render "settings/sync_monitors/summary_card",
+                 title: "Syncing",
+                 count: @summary[:syncing],
+                 icon_name: "refresh-cw",
+                 color_classes: "bg-blue-100 text-blue-600 theme-dark:bg-blue-900/30 theme-dark:text-blue-400" %>
+
+      <%= render "settings/sync_monitors/summary_card",
+                 title: "Failed",
+                 count: @summary[:failed],
+                 icon_name: "alert-triangle",
+                 color_classes: "bg-red-100 text-red-600 theme-dark:bg-red-950/30 theme-dark:text-red-400" %>
+
+      <%= render "settings/sync_monitors/summary_card",
+                 title: "Stale",
+                 count: @summary[:stale],
+                 icon_name: "alert-circle",
+                 color_classes: "bg-amber-100 text-amber-600 theme-dark:bg-amber-950/30 theme-dark:text-amber-400" %>
+
+      <%= render "settings/sync_monitors/summary_card",
+                 title: "Completed (24h)",
+                 count: @summary[:completed],
+                 icon_name: "check-circle",
+                 color_classes: "bg-green-100 text-green-600 theme-dark:bg-green-950/30 theme-dark:text-green-400" %>
+    </div>
+
+    <!-- Sync History -->
+    <div class="bg-container rounded-xl overflow-hidden border border-primary">
+      <!-- Status Tabs -->
+      <div class="border-b border-primary px-4 py-3 bg-surface-default flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-1 bg-surface-inset p-1 rounded-xl">
+          <button type="button" data-action="click->sync-monitor#filter" data-sync-monitor-target="tab" data-filter="all" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-container text-primary shadow-xs transition-colors">
+            All (<%= @syncs.size %>)
+          </button>
+          <button type="button" data-action="click->sync-monitor#filter" data-sync-monitor-target="tab" data-filter="pending" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-secondary hover:text-primary transition-colors">
+            Pending (<%= @summary[:pending] %>)
+          </button>
+          <button type="button" data-action="click->sync-monitor#filter" data-sync-monitor-target="tab" data-filter="syncing" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-secondary hover:text-primary transition-colors">
+            Syncing (<%= @summary[:syncing] %>)
+          </button>
+          <button type="button" data-action="click->sync-monitor#filter" data-sync-monitor-target="tab" data-filter="completed" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-secondary hover:text-primary transition-colors">
+            Completed (<%= @syncs.count { |s| s.status == "completed" } %>)
+          </button>
+          <button type="button" data-action="click->sync-monitor#filter" data-sync-monitor-target="tab" data-filter="failed" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-secondary hover:text-primary transition-colors">
+            Failed (<%= @summary[:failed] %>)
+          </button>
+          <button type="button" data-action="click->sync-monitor#filter" data-sync-monitor-target="tab" data-filter="stale" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-secondary hover:text-primary transition-colors">
+            Stale (<%= @summary[:stale] %>)
+          </button>
+        </div>
+
+        <% if @summary[:pending] > 0 || @summary[:syncing] > 0 %>
+          <div class="flex items-center gap-1.5 text-xs text-secondary">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+            <span>Sync active... updates live</span>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Sync History Table -->
+      <div class="overflow-x-auto">
+        <% if @syncs.any? %>
+          <table class="w-full">
+            <thead>
+              <tr class="bg-surface-default border-b border-primary text-xs text-secondary font-medium uppercase tracking-wider">
+                <th class="px-4 py-3 text-left">Status</th>
+                <th class="px-4 py-3 text-left">Target</th>
+                <th class="px-4 py-3 text-left">Error Message</th>
+                <th class="px-4 py-3 text-left">Duration</th>
+                <th class="px-4 py-3 text-left">Started At</th>
+                <th class="px-4 py-3 text-left">Ended At</th>
+                <th class="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody data-sync-monitor-target="tbody">
+              <%= render partial: "settings/sync_monitors/sync_row", collection: @syncs, as: :sync %>
+            </tbody>
+          </table>
+        <% else %>
+          <div class="p-8 text-center bg-container">
+            <p class="text-secondary">No sync entries found</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

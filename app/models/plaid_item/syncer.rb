@@ -8,6 +8,10 @@ class PlaidItem::Syncer
   end
 
   def perform_sync(sync)
+    unless Setting.plaid_enabled
+      raise "Plaid sync is disabled in settings"
+    end
+
     # Phase 1: Import data from Plaid API
     sync.update!(status_text: "Importing accounts from Plaid...") if sync.respond_to?(:status_text)
     plaid_item.import_latest_plaid_data

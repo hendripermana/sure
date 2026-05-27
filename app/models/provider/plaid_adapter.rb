@@ -28,13 +28,13 @@ class Provider::PlaidAdapter < Provider::Base
 
     field :client_id,
           label: "Client ID",
-          required: false,
+          required: true,
           env_key: "PLAID_CLIENT_ID",
           description: "Your Plaid Client ID from the Plaid Dashboard"
 
     field :secret,
           label: "Secret Key",
-          required: false,
+          required: true,
           secret: true,
           env_key: "PLAID_SECRET",
           description: "Your Plaid Secret from the Plaid Dashboard"

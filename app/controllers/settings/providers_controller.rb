@@ -1,9 +1,7 @@
 class Settings::ProvidersController < ApplicationController
   layout "settings"
 
-  guard_feature unless: -> { self_hosted? }
-
-  before_action :ensure_admin, only: [ :show, :update ]
+  before_action :ensure_admin, only: [ :show, :update, :test_connection ]
 
   def show
     @breadcrumbs = [
@@ -31,7 +29,17 @@ class Settings::ProvidersController < ApplicationController
 
     # Perform all updates within a transaction for consistency
     Setting.transaction do
+      # Handle global toggles first
+      %w[plaid_enabled simplefin_enabled lunchflow_enabled].each do |toggle|
+        next unless provider_params.key?(toggle)
+        value = provider_params[toggle] == "1"
+        Setting.public_send("#{toggle}=", value)
+        updated_fields << toggle
+      end
+
       provider_params.each do |param_key, param_value|
+        # Skip toggle params as we handled them above
+        next if %w[plaid_enabled simplefin_enabled lunchflow_enabled].include?(param_key.to_s)
         # Only process keys that exist in the configuration registry
         field = valid_fields[param_key.to_s]
         next unless field
@@ -98,11 +106,139 @@ class Settings::ProvidersController < ApplicationController
     render :show, status: :unprocessable_entity
   end
 
+  def test_connection
+    provider_key = params[:provider_key].to_s.downcase
+
+    success = false
+    message = ""
+
+    case provider_key
+    when "plaid"
+      client_id = Setting["plaid_client_id"].presence || ENV["PLAID_CLIENT_ID"]
+      secret = Setting["plaid_secret"].presence || ENV["PLAID_SECRET"]
+      env = Setting["plaid_environment"].presence || ENV["PLAID_ENV"] || "sandbox"
+
+      if client_id.blank? || secret.blank?
+        message = "Client ID and Secret Key are not configured."
+      else
+        begin
+          config = Plaid::Configuration.new
+          config.server_index = Plaid::Configuration::Environment[env]
+          config.api_key["PLAID-CLIENT-ID"] = client_id
+          config.api_key["PLAID-SECRET"] = secret
+
+          client = Plaid::PlaidApi.new(Plaid::ApiClient.new(config))
+          client.categories_get({})
+          success = true
+          message = "Connection successful! Plaid US API credentials are valid."
+        rescue Plaid::ApiError => e
+          body = JSON.parse(e.response_body || "{}")
+          error_message = body["error_message"] || body["error_code"] || e.message
+          message = "Plaid API error: #{error_message}"
+        rescue => e
+          message = "Connection failed: #{e.message}"
+        end
+      end
+
+    when "plaid_eu"
+      client_id = Setting["plaid_eu_client_id"].presence || ENV["PLAID_EU_CLIENT_ID"]
+      secret = Setting["plaid_eu_secret"].presence || ENV["PLAID_EU_SECRET"]
+      env = Setting["plaid_eu_environment"].presence || ENV["PLAID_EU_ENV"] || "sandbox"
+
+      if client_id.blank? || secret.blank?
+        message = "Client ID and Secret Key are not configured."
+      else
+        begin
+          config = Plaid::Configuration.new
+          config.server_index = Plaid::Configuration::Environment[env]
+          config.api_key["PLAID-CLIENT-ID"] = client_id
+          config.api_key["PLAID-SECRET"] = secret
+
+          client = Plaid::PlaidApi.new(Plaid::ApiClient.new(config))
+          client.categories_get({})
+          success = true
+          message = "Connection successful! Plaid EU API credentials are valid."
+        rescue Plaid::ApiError => e
+          body = JSON.parse(e.response_body || "{}")
+          error_message = body["error_message"] || body["error_code"] || e.message
+          message = "Plaid API error: #{error_message}"
+        rescue => e
+          message = "Connection failed: #{e.message}"
+        end
+      end
+
+    when "lunchflow"
+      api_key = Setting["lunchflow_api_key"].presence || ENV["LUNCHFLOW_API_KEY"]
+      base_url = Setting["lunchflow_base_url"].presence || ENV["LUNCHFLOW_BASE_URL"] || "https://lunchflow.app/api/v1"
+
+      if api_key.blank?
+        message = "API Key is not configured."
+      else
+        begin
+          provider = Provider::Lunchflow.new(api_key, base_url: base_url)
+          provider.get_accounts
+          success = true
+          message = "Connection successful! Lunch Flow API key is valid."
+        rescue Provider::Lunchflow::LunchflowError => e
+          message = "Lunch Flow error: #{e.message}"
+        rescue => e
+          message = "Connection failed: #{e.message}"
+        end
+      end
+
+    when "simplefin"
+      items = Current.family.simplefin_items.active
+      if items.empty?
+        message = "No active SimpleFIN connections found to test. Please add a connection first."
+      else
+        success_count = 0
+        failed_messages = []
+
+        items.each do |item|
+          begin
+            next if item.access_url.blank?
+            uri = URI.parse(item.access_url)
+            http = Net::HTTP.new(uri.host, uri.port)
+            http.use_ssl = (uri.scheme == "https")
+            http.open_timeout = 10
+            http.read_timeout = 10
+
+            request = Net::HTTP::Get.new(uri.request_uri)
+            if uri.user.present? && uri.password.present?
+              request.basic_auth(uri.user, uri.password)
+            end
+
+            response = http.request(request)
+            if response.code.to_i == 200
+              success_count += 1
+            else
+              failed_messages << "#{item.name}: HTTP #{response.code}"
+            end
+          rescue => e
+            failed_messages << "#{item.name}: #{e.message}"
+          end
+        end
+
+        if success_count == items.count
+          success = true
+          message = "Connection successful! All #{success_count} SimpleFIN connections are active."
+        else
+          message = "Connection partially failed: #{success_count} succeeded, #{items.count - success_count} failed. Errors: #{failed_messages.join(', ')}"
+        end
+      end
+
+    else
+      message = "Unknown provider: #{provider_key}"
+    end
+
+    render json: { success: success, message: message }
+  end
+
   private
     def provider_params
       # Dynamically permit all provider configuration fields
       Provider::Factory.ensure_adapters_loaded
-      permitted_fields = []
+      permitted_fields = [ :plaid_enabled, :simplefin_enabled, :lunchflow_enabled ]
 
       Provider::ConfigurationRegistry.all.each do |config|
         config.fields.each do |field|
@@ -142,9 +278,12 @@ class Settings::ProvidersController < ApplicationController
 
     def prepare_show_context
       Provider::Factory.ensure_adapters_loaded
-      @provider_configurations = Provider::ConfigurationRegistry.all.reject do |config|
-        config.provider_key.to_s.casecmp("simplefin").zero?
-      end
-      @simplefin_items = Current.family.simplefin_items.ordered.select(:id)
+      @plaid_config = Provider::ConfigurationRegistry.get("plaid")
+      @plaid_eu_config = Provider::ConfigurationRegistry.get("plaid_eu")
+      @lunchflow_config = Provider::ConfigurationRegistry.get("lunchflow")
+
+      @plaid_items = Current.family.plaid_items.active.ordered
+      @simplefin_items = Current.family.simplefin_items.active.ordered
+      @lunchflow_items = Current.family.lunchflow_items.active.ordered
     end
 end

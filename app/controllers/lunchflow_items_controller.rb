@@ -1,4 +1,5 @@
 class LunchflowItemsController < ApplicationController
+  before_action :ensure_lunchflow_enabled, only: [ :index, :show, :edit, :update, :new, :create, :destroy, :sync, :preload_accounts, :select_accounts, :link_accounts, :select_existing_account, :link_existing_account ]
   before_action :set_lunchflow_item, only: [ :show, :edit, :update, :destroy, :sync ]
 
   def index
@@ -332,7 +333,10 @@ class LunchflowItemsController < ApplicationController
   end
 
   def new
-    @lunchflow_item = Current.family.lunchflow_items.build
+    redirect_to select_accounts_lunchflow_items_path(
+      accountable_type: params[:accountable_type],
+      return_to: params[:return_to]
+    )
   end
 
   def create
@@ -379,6 +383,10 @@ class LunchflowItemsController < ApplicationController
   end
 
   private
+    def ensure_lunchflow_enabled
+      redirect_to settings_providers_path, alert: "Lunch Flow integration is disabled." unless Setting.lunchflow_enabled
+    end
+
     def set_lunchflow_item
       @lunchflow_item = Current.family.lunchflow_items.find(params[:id])
     end

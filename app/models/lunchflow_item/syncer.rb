@@ -8,6 +8,10 @@ class LunchflowItem::Syncer
   end
 
   def perform_sync(sync)
+    unless Setting.lunchflow_enabled
+      raise "Lunch Flow sync is disabled in settings"
+    end
+
     # Phase 1: Import data from Lunchflow API
     sync.update!(status_text: "Importing accounts from Lunchflow...") if sync.respond_to?(:status_text)
     lunchflow_item.import_latest_lunchflow_data
