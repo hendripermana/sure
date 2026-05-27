@@ -392,7 +392,7 @@ export default class extends Controller {
           return false;
         }
 
-        if (!counterpartyName.value || !counterpartyName.value.trim()) {
+        if (!counterpartyName.value?.trim()) {
           this.showError("Please enter the lender name");
           this.highlightField(counterpartyName);
           return false;

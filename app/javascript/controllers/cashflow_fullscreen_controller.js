@@ -18,7 +18,7 @@ export default class extends Controller {
     this.isUnmounted = false;
 
     // Ensure we have required data
-    if (!this.sankeyDataValue || !this.sankeyDataValue.nodes || !this.sankeyDataValue.links) {
+    if (!this.sankeyDataValue?.nodes || !this.sankeyDataValue.links) {
       console.warn("Cashflow fullscreen: Missing required sankey data");
       this.element.style.display = "none";
     }

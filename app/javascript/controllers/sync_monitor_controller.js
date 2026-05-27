@@ -1,9 +1,9 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = [ "tab", "tbody" ];
+  static targets = ["tab", "tbody"];
   static values = {
-    active: Boolean
+    active: Boolean,
   };
 
   connect() {
@@ -48,7 +48,7 @@ export default class extends Controller {
     const inactiveClasses = ["text-secondary", "hover:text-primary"];
 
     // Update active state of tabs
-    this.tabTargets.forEach(tab => {
+    this.tabTargets.forEach((tab) => {
       const isSelected = tab.dataset.filter === filter;
       if (isSelected) {
         tab.classList.add(...activeClasses);
@@ -62,7 +62,7 @@ export default class extends Controller {
     // Filter table rows
     if (this.hasTbodyTarget) {
       const rows = this.tbodyTarget.querySelectorAll("tr");
-      rows.forEach(row => {
+      rows.forEach((row) => {
         const status = row.dataset.status;
         if (filter === "all" || status === filter) {
           row.classList.remove("hidden");

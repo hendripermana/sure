@@ -1,10 +1,10 @@
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["status", "button"]
+  static targets = ["status", "button"];
   static values = {
-    providerKey: String
-  }
+    providerKey: String,
+  };
 
   async test() {
     this.statusTarget.innerHTML = `
@@ -15,20 +15,20 @@ export default class extends Controller {
         </svg>
         <span>Testing connection...</span>
       </div>
-    `
-    this.buttonTarget.disabled = true
+    `;
+    this.buttonTarget.disabled = true;
 
     try {
       const response = await fetch("/settings/providers/test_connection", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
         },
-        body: JSON.stringify({ provider_key: this.providerKeyValue })
-      })
+        body: JSON.stringify({ provider_key: this.providerKeyValue }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success) {
         this.statusTarget.innerHTML = `
@@ -39,7 +39,7 @@ export default class extends Controller {
               <p class="text-xs opacity-90 mt-0.5">${data.message}</p>
             </div>
           </div>
-        `
+        `;
       } else {
         this.statusTarget.innerHTML = `
           <div class="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-400 text-sm">
@@ -49,9 +49,9 @@ export default class extends Controller {
               <p class="text-xs opacity-90 mt-0.5">${data.message}</p>
             </div>
           </div>
-        `
+        `;
       }
-    } catch (error) {
+    } catch (_error) {
       this.statusTarget.innerHTML = `
         <div class="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-400 text-sm">
           <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -60,9 +60,9 @@ export default class extends Controller {
             <p class="text-xs opacity-90 mt-0.5">Failed to contact the test endpoint.</p>
           </div>
         </div>
-      `
+      `;
     } finally {
-      this.buttonTarget.disabled = false
+      this.buttonTarget.disabled = false;
     }
   }
 }
