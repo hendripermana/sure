@@ -235,4 +235,51 @@ class SyncTest < ActiveSupport::TestCase
     assert_equal new_start, sync.window_start_date
     assert_equal new_end,   sync.window_end_date
   end
+
+  test "for_family scope returns correct scoped syncs" do
+    family = families(:dylan_family)
+    account = accounts(:depository)
+    sync_family = Sync.create!(syncable: family)
+    sync_account = Sync.create!(syncable: account)
+
+    syncs = Sync.for_family(family)
+    assert_includes syncs, sync_family
+    assert_includes syncs, sync_account
+  end
+
+  test "retry! resets state and re-enqueues sync job" do
+    sync = Sync.create!(syncable: accounts(:depository), status: "failed", error: "Fatal error", failed_at: Time.current)
+
+    assert_enqueued_with(job: SyncJob, args: [ sync.id ]) do
+      sync.retry!
+    end
+
+    sync.reload
+    assert_equal "pending", sync.status
+    assert_nil sync.error
+    assert_nil sync.failed_at
+  end
+
+  test "dismiss! destroys failed or stale sync" do
+    sync = Sync.create!(syncable: accounts(:depository), status: "failed")
+    assert_difference "Sync.count", -1 do
+      sync.dismiss!
+    end
+  end
+
+  test "duration calculates correct difference" do
+    sync = Sync.create!(syncable: accounts(:depository), status: "syncing", syncing_at: 10.seconds.ago)
+    sync.update_columns(completed_at: Time.current)
+    assert_equal 10, sync.duration
+  end
+
+  test "syncable_label returns human readable labels" do
+    family = families(:dylan_family)
+    sync_family = Sync.new(syncable: family)
+    assert_equal "Family Sync", sync_family.syncable_label
+
+    account = accounts(:depository)
+    sync_account = Sync.new(syncable: account)
+    assert_match(/checking/i, sync_account.syncable_label)
+  end
 end

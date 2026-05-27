@@ -8,6 +8,10 @@ class SimplefinItem::Syncer
   end
 
   def perform_sync(sync)
+    unless Setting.simplefin_enabled
+      raise "SimpleFIN sync is disabled in settings"
+    end
+
     if sync.respond_to?(:sync_stats) && (sync.sync_stats || {})["balances_only"]
       sync.update!(status_text: "Refreshing balances only...") if sync.respond_to?(:status_text)
       mark_import_started(sync)

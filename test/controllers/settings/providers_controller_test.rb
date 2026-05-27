@@ -8,13 +8,10 @@ class Settings::ProvidersControllerTest < ActionDispatch::IntegrationTest
     Provider::Factory.ensure_adapters_loaded
   end
 
-  test "cannot access when self hosting is disabled" do
+  test "should get show regardless of hosting mode (managed)" do
     with_env_overrides(SELF_HOSTED: "false") do
       get settings_providers_url
-      assert_response :forbidden
-
-      patch settings_providers_url, params: { setting: { plaid_client_id: "test123" } }
-      assert_response :forbidden
+      assert_response :success
     end
   end
 
@@ -331,5 +328,52 @@ class Settings::ProvidersControllerTest < ActionDispatch::IntegrationTest
       # Both methods currently return the same result, but singleton_class.method_defined?
       # is more explicit and reliable for checking if a method is actually defined
     end
+  end
+
+  test "updates global activation toggles" do
+    with_self_hosting do
+      # Set initial states
+      Setting.plaid_enabled = true
+      Setting.simplefin_enabled = true
+      Setting.lunchflow_enabled = true
+
+      patch settings_providers_url, params: {
+        setting: {
+          plaid_enabled: "0",
+          simplefin_enabled: "0",
+          lunchflow_enabled: "0"
+        }
+      }
+
+      assert_redirected_to settings_providers_url
+      assert_equal false, Setting.plaid_enabled
+      assert_equal false, Setting.simplefin_enabled
+      assert_equal false, Setting.lunchflow_enabled
+    end
+  end
+
+  test "test_connection fails if credentials are not configured" do
+    Setting.dynamic_fields = {}
+    with_env_overrides(PLAID_CLIENT_ID: nil, PLAID_SECRET: nil) do
+      post test_connection_settings_providers_url, params: { provider_key: "plaid" }
+      assert_response :success
+      json = JSON.parse(response.body)
+      assert_equal false, json["success"]
+      assert_match /not configured/, json["message"]
+    end
+  end
+
+  test "test_connection success for Plaid when client call succeeds" do
+    Setting.dynamic_fields = { "plaid_client_id" => "test_client", "plaid_secret" => "test_secret" }
+
+    mock_api = mock("plaid_api")
+    mock_api.expects(:categories_get).with({}).returns(true)
+    Plaid::PlaidApi.stubs(:new).returns(mock_api)
+
+    post test_connection_settings_providers_url, params: { provider_key: "plaid" }
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal true, json["success"]
+    assert_match /Connection successful/, json["message"]
   end
 end

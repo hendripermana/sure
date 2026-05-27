@@ -1,5 +1,6 @@
 class SimplefinItemsController < ApplicationController
   include SimplefinItems::MapsHelper
+  before_action :ensure_simplefin_enabled, only: [ :index, :show, :edit, :update, :new, :create, :destroy, :sync, :balances, :setup_accounts, :complete_account_setup, :errors, :select_existing_account, :link_existing_account ]
   before_action :set_simplefin_item, only: [ :show, :edit, :update, :destroy, :sync, :balances, :setup_accounts, :complete_account_setup, :errors ]
 
   def index
@@ -470,6 +471,9 @@ class SimplefinItemsController < ApplicationController
 
 
   private
+    def ensure_simplefin_enabled
+      redirect_to settings_providers_path, alert: "SimpleFIN integration is disabled." unless Setting.simplefin_enabled
+    end
 
     def set_simplefin_item
       @simplefin_item = Current.family.simplefin_items.find(params[:id])

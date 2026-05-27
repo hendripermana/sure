@@ -6,7 +6,7 @@ module Family::SimplefinConnectable
   end
 
   def can_connect_simplefin?
-    true # SimpleFin doesn't have regional restrictions like Plaid
+    Setting.simplefin_enabled
   end
 
   def create_simplefin_item!(setup_token:, item_name: nil)

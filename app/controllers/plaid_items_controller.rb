@@ -1,4 +1,5 @@
 class PlaidItemsController < ApplicationController
+  before_action :ensure_plaid_enabled, only: %i[new edit create destroy sync select_existing_account link_existing_account]
   before_action :set_plaid_item, only: %i[edit destroy sync]
 
   def new
@@ -91,6 +92,10 @@ class PlaidItemsController < ApplicationController
   end
 
   private
+    def ensure_plaid_enabled
+      redirect_to settings_providers_path, alert: "Plaid integration is disabled." unless Setting.plaid_enabled
+    end
+
     def set_plaid_item
       @plaid_item = Current.family.plaid_items.find(params[:id])
     end

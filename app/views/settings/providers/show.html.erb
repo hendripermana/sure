@@ -1,22 +1,380 @@
-<%= content_for :page_title, "Bank Sync Providers" %>
+<%= content_for :page_title, "Bank Sync" %>
 
 <div class="space-y-8">
+
+  <%# ─── INTRO ─────────────────────────────────────────────────────────────── %>
   <div>
-    <p class="text-secondary mb-4">
-      Configure credentials for third-party bank sync providers. Settings configured here will override environment variables.
+    <p class="text-secondary text-sm">
+      Manage which bank sync providers are available to your family and configure their API credentials.
+      Disabled providers are hidden throughout the app. Settings here override environment variables.
     </p>
   </div>
 
-  <% @provider_configurations.each do |config| %>
-    <% next if config.provider_key.to_s.casecmp("simplefin").zero? %>
-    <%= settings_section title: config.provider_key.titleize do %>
-      <%= render "settings/providers/provider_form", configuration: config %>
-    <% end %>
+  <%# ─── PROVIDER CARDS ────────────────────────────────────────────────────── %>
+  <%= settings_section title: "Sync Providers" do %>
+    <div class="space-y-6">
+
+      <%# ── Plaid (US & Canada) ── %>
+      <div class="rounded-2xl border border-primary bg-container-inset overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
+        <div class="p-5 flex items-start justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #4da568">
+              <span class="text-white text-sm font-bold">P</span>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-primary">Plaid (US &amp; Canada)</h3>
+              <p class="text-sm text-secondary mt-1">US &amp; Canada bank connections with transactions, investments, and liabilities.</p>
+              
+              <div class="mt-2 flex items-center gap-3">
+                <%
+                  client_id = @plaid_config&.get_value(:client_id).to_s
+                  secret = @plaid_config&.get_value(:secret).to_s
+                  plaid_us_configured = client_id.present? && secret.present? && !client_id.include?("your_") && !secret.include?("your_")
+                %>
+                <% if Setting.plaid_enabled %>
+                  <% if plaid_us_configured %>
+                    <%= link_to "Connect accounts →", new_plaid_item_path(region: :us), data: { turbo_frame: "modal" }, class: "text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline" %>
+                  <% else %>
+                    <span class="text-xs text-warning inline-flex items-center gap-1 font-medium">
+                      <%= icon "alert-triangle", size: "xs", color: "warning" %> Credentials required
+                    </span>
+                  <% end %>
+                <% else %>
+                  <span class="text-xs text-secondary italic">Disabled — toggle on to configure</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <%= styled_form_with model: Setting.new,
+                               url: settings_providers_path,
+                               method: :patch,
+                               data: { controller: "auto-submit-form", auto_submit_form_trigger_event_value: "change" } do |form| %>
+            <div class="flex-shrink-0">
+              <%= form.toggle :plaid_enabled, { data: { auto_submit_form_target: "auto" } } %>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if Setting.plaid_enabled %>
+          <div class="border-t border-primary/40 bg-container p-5 space-y-4"
+               data-controller="connection-tester"
+               data-connection-tester-provider-key-value="plaid">
+            <%= render "settings/providers/provider_form", configuration: @plaid_config %>
+            
+            <div class="flex items-center gap-3 pt-2">
+              <button type="button"
+                      data-action="click->connection-tester#test"
+                      data-connection-tester-target="button"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-primary button-bg-secondary hover:button-bg-secondary-hover border border-primary transition-all duration-200">
+                <%= icon "activity", size: "xs" %>
+                Test Connection
+              </button>
+              <div data-connection-tester-target="status" class="flex-1"></div>
+            </div>
+            
+            <%# Active Connections %>
+            <% active_us_items = @plaid_items.select { |item| item.plaid_region == "us" } %>
+            <% if active_us_items.any? %>
+              <div class="pt-4 border-t border-primary/30">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-secondary mb-3">Active Connections</h4>
+                <div class="space-y-3">
+                  <% active_us_items.each do |item| %>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-primary/50 bg-container-inset">
+                      <div class="flex items-center gap-2">
+                        <%= icon "link", size: "sm", class: "text-secondary" %>
+                        <div>
+                          <p class="text-sm font-medium text-primary"><%= item.name %></p>
+                          <p class="text-xs text-secondary">
+                            <%= item.last_synced_at ? "Synced #{time_ago_in_words(item.last_synced_at)} ago" : "Never synced" %>
+                          </p>
+                        </div>
+                      </div>
+                      <%= link_to "Disconnect", plaid_item_path(item),
+                                  data: { turbo_method: :delete, turbo_confirm: CustomConfirm.for_resource_deletion(item.name, high_severity: true) },
+                                  class: "text-xs font-semibold text-destructive hover:underline" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# ── Plaid (Europe) ── %>
+      <div class="rounded-2xl border border-primary bg-container-inset overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
+        <div class="p-5 flex items-start justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #108080">
+              <span class="text-white text-sm font-bold">PE</span>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-primary">Plaid (Europe)</h3>
+              <p class="text-sm text-secondary mt-1">European bank connections via open banking APIs.</p>
+              
+              <div class="mt-2 flex items-center gap-3">
+                <%
+                  client_id = @plaid_eu_config&.get_value(:client_id).to_s
+                  secret = @plaid_eu_config&.get_value(:secret).to_s
+                  plaid_eu_configured = client_id.present? && secret.present? && !client_id.include?("your_") && !secret.include?("your_")
+                %>
+                <% if Setting.plaid_enabled %>
+                  <% if plaid_eu_configured %>
+                    <%= link_to "Connect accounts →", new_plaid_item_path(region: :eu), data: { turbo_frame: "modal" }, class: "text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline" %>
+                  <% else %>
+                    <span class="text-xs text-warning inline-flex items-center gap-1 font-medium">
+                      <%= icon "alert-triangle", size: "xs", color: "warning" %> Credentials required
+                    </span>
+                  <% end %>
+                <% else %>
+                  <span class="text-xs text-secondary italic">Disabled — toggle on to configure</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <%= styled_form_with model: Setting.new,
+                               url: settings_providers_path,
+                               method: :patch,
+                               data: { controller: "auto-submit-form", auto_submit_form_trigger_event_value: "change" } do |form| %>
+            <div class="flex-shrink-0">
+              <%= form.toggle :plaid_enabled, { data: { auto_submit_form_target: "auto" } } %>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if Setting.plaid_enabled %>
+          <div class="border-t border-primary/40 bg-container p-5 space-y-4"
+               data-controller="connection-tester"
+               data-connection-tester-provider-key-value="plaid_eu">
+            <%= render "settings/providers/provider_form", configuration: @plaid_eu_config %>
+            
+            <div class="flex items-center gap-3 pt-2">
+              <button type="button"
+                      data-action="click->connection-tester#test"
+                      data-connection-tester-target="button"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-primary button-bg-secondary hover:button-bg-secondary-hover border border-primary transition-all duration-200">
+                <%= icon "activity", size: "xs" %>
+                Test Connection
+              </button>
+              <div data-connection-tester-target="status" class="flex-1"></div>
+            </div>
+            
+            <%# Active Connections %>
+            <% active_eu_items = @plaid_items.select { |item| item.plaid_region == "eu" } %>
+            <% if active_eu_items.any? %>
+              <div class="pt-4 border-t border-primary/30">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-secondary mb-3">Active Connections</h4>
+                <div class="space-y-3">
+                  <% active_eu_items.each do |item| %>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-primary/50 bg-container-inset">
+                      <div class="flex items-center gap-2">
+                        <%= icon "link", size: "sm", class: "text-secondary" %>
+                        <div>
+                          <p class="text-sm font-medium text-primary"><%= item.name %></p>
+                          <p class="text-xs text-secondary">
+                            <%= item.last_synced_at ? "Synced #{time_ago_in_words(item.last_synced_at)} ago" : "Never synced" %>
+                          </p>
+                        </div>
+                      </div>
+                      <%= link_to "Disconnect", plaid_item_path(item),
+                                  data: { turbo_method: :delete, turbo_confirm: CustomConfirm.for_resource_deletion(item.name, high_severity: true) },
+                                  class: "text-xs font-semibold text-destructive hover:underline" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# ── SimpleFIN ── %>
+      <div class="rounded-2xl border border-primary bg-container-inset overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
+        <div class="p-5 flex items-start justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #e99537">
+              <span class="text-white text-sm font-bold">SF</span>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-primary">SimpleFIN</h3>
+              <p class="text-sm text-secondary mt-1">US &amp; Canada bank connections via SimpleFIN Bridge protocol.</p>
+              
+              <div class="mt-2 flex items-center gap-3">
+                <% if Setting.simplefin_enabled %>
+                  <% if @simplefin_items.any? %>
+                    <%= link_to "Manage connections →", simplefin_items_path, class: "text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline" %>
+                  <% else %>
+                    <span class="text-xs text-warning inline-flex items-center gap-1 font-medium">
+                      <%= icon "alert-triangle", size: "xs", color: "warning" %> Setup required
+                    </span>
+                  <% end %>
+                <% else %>
+                  <span class="text-xs text-secondary italic">Disabled — toggle on to configure</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <%= styled_form_with model: Setting.new,
+                               url: settings_providers_path,
+                               method: :patch,
+                               data: { controller: "auto-submit-form", auto_submit_form_trigger_event_value: "change" } do |form| %>
+            <div class="flex-shrink-0">
+              <%= form.toggle :simplefin_enabled, { data: { auto_submit_form_target: "auto" } } %>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if Setting.simplefin_enabled %>
+          <div class="border-t border-primary/40 bg-container p-5 space-y-4"
+               data-controller="connection-tester"
+               data-connection-tester-provider-key-value="simplefin">
+            <turbo-frame id="simplefin-providers-panel">
+              <%= render "settings/providers/simplefin_panel" %>
+            </turbo-frame>
+            
+            <% if @simplefin_items.any? %>
+              <div class="flex items-center gap-3 pt-2">
+                <button type="button"
+                        data-action="click->connection-tester#test"
+                        data-connection-tester-target="button"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-primary button-bg-secondary hover:button-bg-secondary-hover border border-primary transition-all duration-200">
+                  <%= icon "activity", size: "xs" %>
+                  Test Connections
+                </button>
+                <div data-connection-tester-target="status" class="flex-1"></div>
+              </div>
+            <% end %>
+            
+            <%# Active Connections %>
+            <% if @simplefin_items.any? %>
+              <div class="pt-4 border-t border-primary/30">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-secondary mb-3">Active Connections</h4>
+                <div class="space-y-3">
+                  <% @simplefin_items.each do |item| %>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-primary/50 bg-container-inset">
+                      <div class="flex items-center gap-2">
+                        <%= icon "link", size: "sm", class: "text-secondary" %>
+                        <div>
+                          <p class="text-sm font-medium text-primary"><%= item.name %></p>
+                          <p class="text-xs text-secondary">
+                            <%= item.last_synced_at ? "Synced #{time_ago_in_words(item.last_synced_at)} ago" : "Never synced" %>
+                          </p>
+                        </div>
+                      </div>
+                      <%= link_to "Disconnect", simplefin_item_path(item),
+                                  data: { turbo_method: :delete, turbo_confirm: CustomConfirm.for_resource_deletion(item.name, high_severity: true) },
+                                  class: "text-xs font-semibold text-destructive hover:underline" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# ── Lunch Flow ── %>
+      <div class="rounded-2xl border border-primary bg-container-inset overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
+        <div class="p-5 flex items-start justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #6471eb">
+              <span class="text-white text-sm font-bold">LF</span>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-primary">Lunch Flow</h3>
+              <p class="text-sm text-secondary mt-1">Global connections through multiple open banking providers (UK, EU, Brazil, Asia, etc.).</p>
+              
+              <div class="mt-2 flex items-center gap-3">
+                <%
+                  api_key = @lunchflow_config&.get_value(:api_key).to_s
+                  lunchflow_configured = api_key.present? && !api_key.include?("your_")
+                %>
+                <% if Setting.lunchflow_enabled %>
+                  <% if lunchflow_configured %>
+                    <%= link_to "Connect accounts →", select_accounts_lunchflow_items_path(return_to: settings_providers_path), data: { turbo_frame: "modal" }, class: "text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline" %>
+                  <% else %>
+                    <span class="text-xs text-warning inline-flex items-center gap-1 font-medium">
+                      <%= icon "alert-triangle", size: "xs", color: "warning" %> Credentials required
+                    </span>
+                  <% end %>
+                <% else %>
+                  <span class="text-xs text-secondary italic">Disabled — toggle on to configure</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <%= styled_form_with model: Setting.new,
+                               url: settings_providers_path,
+                               method: :patch,
+                               data: { controller: "auto-submit-form", auto_submit_form_trigger_event_value: "change" } do |form| %>
+            <div class="flex-shrink-0">
+              <%= form.toggle :lunchflow_enabled, { data: { auto_submit_form_target: "auto" } } %>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if Setting.lunchflow_enabled %>
+          <div class="border-t border-primary/40 bg-container p-5 space-y-4"
+               data-controller="connection-tester"
+               data-connection-tester-provider-key-value="lunchflow">
+            <%= render "settings/providers/provider_form", configuration: @lunchflow_config %>
+            
+            <div class="flex items-center gap-3 pt-2">
+              <button type="button"
+                      data-action="click->connection-tester#test"
+                      data-connection-tester-target="button"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-primary button-bg-secondary hover:button-bg-secondary-hover border border-primary transition-all duration-200">
+                <%= icon "activity", size: "xs" %>
+                Test Connection
+              </button>
+              <div data-connection-tester-target="status" class="flex-1"></div>
+            </div>
+            
+            <%# Active Connections %>
+            <% if @lunchflow_items.any? %>
+              <div class="pt-4 border-t border-primary/30">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-secondary mb-3">Active Connections</h4>
+                <div class="space-y-3">
+                  <% @lunchflow_items.each do |item| %>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-primary/50 bg-container-inset">
+                      <div class="flex items-center gap-2">
+                        <%= icon "link", size: "sm", class: "text-secondary" %>
+                        <div>
+                          <p class="text-sm font-medium text-primary"><%= item.name %></p>
+                          <p class="text-xs text-secondary">
+                            <%= item.last_synced_at ? "Synced #{time_ago_in_words(item.last_synced_at)} ago" : "Never synced" %>
+                          </p>
+                        </div>
+                      </div>
+                      <%= link_to "Disconnect", lunchflow_item_path(item),
+                                  data: { turbo_method: :delete, turbo_confirm: CustomConfirm.for_resource_deletion(item.name, high_severity: true) },
+                                  class: "text-xs font-semibold text-destructive hover:underline" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+    </div>
   <% end %>
 
-  <%= settings_section title: "Simplefin" do %>
-    <turbo-frame id="simplefin-providers-panel">
-      <%= render "settings/providers/simplefin_panel" %>
-    </turbo-frame>
+  <%# ─── MANUAL ENTRY NOTE ────────────────────────────────────────────────── %>
+  <%= settings_section title: "Manual Entry" do %>
+    <div class="flex items-start gap-3 p-4 rounded-xl bg-container-inset border border-primary">
+      <%= icon "pencil", class: "w-5 h-5 text-secondary flex-shrink-0 mt-0.5" %>
+      <div>
+        <p class="text-sm font-medium text-primary">No bank sync needed</p>
+        <p class="text-secondary text-sm mt-1">
+          All accounts support manual transaction entry at any time. Use the
+          <%= link_to "Accounts", accounts_path, class: "link" %> page to add transactions manually.
+          To recalculate balances after a bulk import, use
+          <%= link_to "Sync Monitor", settings_sync_monitor_path, class: "link" %> → Force Sync All.
+        </p>
+      </div>
+    </div>
   <% end %>
+
 </div>

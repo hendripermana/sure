@@ -28,8 +28,6 @@
 <% end %>
 
 <div class="w-full space-y-6 pb-24">
-  <%= render "shared/sync_health_banner" %>
-
   <% if Current.family.accounts.any? %>
     <%# KPI Cards Section - Overview Metrics %>
     <%= render "pages/dashboard/kpi_cards", 

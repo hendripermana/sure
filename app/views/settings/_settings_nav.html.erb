@@ -5,7 +5,7 @@ nav_sections = [
     items: [
       { label: t(".accounts_label"), path: accounts_path, icon: "layers" },
       { label: "Providers", path: settings_provider_directories_path, icon: "building-2" },
-      { label: t(".bank_sync_label"), path: settings_bank_sync_path, icon: "banknote" },
+      { label: "Bank Sync", path: settings_providers_path, icon: "banknote" },
       { label: t(".preferences_label"), path: settings_preferences_path, icon: "bolt" },
       { label: t(".profile_label"), path: settings_profile_path, icon: "circle-user" },
       { label: t(".security_label"), path: settings_security_path, icon: "shield-check" },
@@ -28,11 +28,10 @@ nav_sections = [
       items: [
         { label: t(".ai_prompts_label"), path: settings_ai_prompts_path, icon: "bot" },
         { label: "LLM Usage", path: settings_llm_usage_path, icon: "activity" },
+        { label: "Sync Monitor", path: settings_sync_monitor_path, icon: "monitor" },
         { label: t(".api_keys_label"), path: settings_api_key_path, icon: "key" },
         { label: t(".self_hosting_label"), path: settings_hosting_path, icon: "database", if: self_hosted? },
-        { label: "Bank Sync Providers", path: settings_providers_path, icon: "plug" },
-        { label: t(".imports_label"), path: imports_path, icon: "download" },
-        { label: "SimpleFin", path: simplefin_items_path, icon: "building-2" }
+        { label: t(".imports_label"), path: imports_path, icon: "download" }
       ]
     } : nil
   ),
@@ -46,6 +45,7 @@ nav_sections = [
   }
 ]
 %>
+
 
 <div class="space-y-4">
   <div class="hidden lg:flex items-center gap-2 p-1.5">

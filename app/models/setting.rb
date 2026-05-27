@@ -16,6 +16,11 @@ class Setting < RailsSettings::Base
   pending_env = ENV["SIMPLEFIN_INCLUDE_PENDING"].to_s.strip.downcase
   field :syncs_include_pending, type: :boolean, default: pending_env.blank? ? true : !%w[0 false no off].include?(pending_env)
 
+  # Sync provider global enable/disable toggles
+  field :plaid_enabled, type: :boolean, default: ENV["DISABLE_PLAID"] != "true"
+  field :simplefin_enabled, type: :boolean, default: ENV["DISABLE_SIMPLEFIN"] != "true"
+  field :lunchflow_enabled, type: :boolean, default: ENV["DISABLE_LUNCHFLOW"] != "true"
+
   # Upstream: Single hash field for all dynamic provider credentials and other dynamic settings
   # This allows unlimited dynamic fields without declaring them upfront
   field :dynamic_fields, type: :hash, default: {}

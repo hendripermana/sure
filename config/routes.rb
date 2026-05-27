@@ -107,9 +107,19 @@ Rails.application.routes.draw do
     resource :llm_usage, only: :show
     resource :guides, only: :show
     resource :bank_sync, only: :show, controller: "bank_sync"
-    resource :providers, only: %i[show update]
+    resource :providers, only: %i[show update] do
+      post :test_connection, on: :collection
+    end
     resources :provider_directories, path: "providers-directory", except: :show do
       patch :restore, on: :member
+    end
+    resource :sync_monitor, only: :show, controller: "sync_monitors" do
+      post :sync_target, on: :member
+      post :retry_sync, on: :member
+      post :retry_all_failed, on: :collection
+      post :dismiss_sync, on: :member
+      post :dismiss_all_stale, on: :collection
+      post :sync_all, on: :collection
     end
   end
 

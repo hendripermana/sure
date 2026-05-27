@@ -5,7 +5,7 @@
 # Web server with YJIT enabled
 # OBJC_DISABLE_INITIALIZE_FORK_SAFETY fixes macOS fork issues with Puma workers
 # PORT=3000 ensures Rails uses port 3000 (foreman defaults to 5000)
-web: OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES RUBY_YJIT_ENABLE=1 WEB_CONCURRENCY=0 PORT=3000 bundle exec ${DEBUG:+rdbg -O -n -c --} bin/rails server -b 0.0.0.0
+web: OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES RUBY_YJIT_ENABLE=1 WEB_CONCURRENCY=0 PORT=${PORT:-3000} bundle exec ${DEBUG:+rdbg -O -n -c --} bin/rails server -b 0.0.0.0
 
 # CSS watcher - use [always] to keep watching even with no changes
 css: bundle exec bin/rails tailwindcss:watch[always]

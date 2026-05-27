@@ -24,13 +24,13 @@ class Provider::PlaidEuAdapter
 
     field :client_id,
           label: "Client ID",
-          required: false,
+          required: true,
           env_key: "PLAID_EU_CLIENT_ID",
           description: "Your Plaid Client ID from the Plaid Dashboard for EU region"
 
     field :secret,
           label: "Secret Key",
-          required: false,
+          required: true,
           secret: true,
           env_key: "PLAID_EU_SECRET",
           description: "Your Plaid Secret from the Plaid Dashboard for EU region"

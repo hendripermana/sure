@@ -6,12 +6,12 @@ module Family::PlaidConnectable
   end
 
   def can_connect_plaid_us?
-    plaid(:us).present?
+    Setting.plaid_enabled && plaid(:us).present?
   end
 
   # If Plaid provider is configured and user is in the EU region
   def can_connect_plaid_eu?
-    plaid(:eu).present? && self.eu?
+    Setting.plaid_enabled && plaid(:eu).present? && self.eu?
   end
 
   def create_plaid_item!(public_token:, item_name:, region:)

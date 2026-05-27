@@ -17,6 +17,7 @@ module SettingsHelper
     # Advanced section
     { name: "AI Prompts", path: :settings_ai_prompts_path, condition: :admin_user? },
     { name: "LLM Usage", path: :settings_llm_usage_path, condition: :admin_user? },
+    { name: "Sync Monitor", path: :settings_sync_monitor_path, condition: :admin_user? },
     { name: "API Key", path: :settings_api_key_path, condition: :admin_user? },
     { name: "Self-Hosting", path: :settings_hosting_path, condition: :self_hosted_and_admin? },
     { name: "Bank Sync Providers", path: :settings_providers_path, condition: :admin_user? },
@@ -67,6 +68,31 @@ module SettingsHelper
       concat(previous_setting)
       concat(next_setting)
     end
+  end
+
+  def sync_target_options
+    options = [ [ "Family Sync (All Accounts)", "Family:#{Current.family.id}" ] ]
+
+    # Add items/connections
+    items = []
+    Current.family.plaid_items.each { |item| items << [ "Plaid - #{item.name.presence || item.institution_id || 'Active'}", "PlaidItem:#{item.id}" ] }
+    Current.family.simplefin_items.each { |item| items << [ "SimpleFIN - #{item.name.presence || item.institution_name.presence || 'Active'}", "SimpleFinItem:#{item.id}" ] }
+    Current.family.lunchflow_items.each { |item| items << [ "Lunchflow - #{item.name.presence || item.institution_name.presence || 'Active'}", "LunchflowItem:#{item.id}" ] }
+
+    options << [ "-- Connections --", "", { disabled: true } ] if items.any?
+    options += items
+
+    # Add accounts
+    accounts = Current.family.accounts.order(:name).map do |account|
+      provider = account.account_providers.first&.adapter&.item
+      provider_name = provider&.class&.name&.gsub("Item", "") || "Manual"
+      [ "#{provider_name} - #{account.name}", "Account:#{account.id}" ]
+    end
+
+    options << [ "-- Accounts --", "", { disabled: true } ] if accounts.any?
+    options += accounts
+
+    options
   end
 
   private

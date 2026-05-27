@@ -6,7 +6,6 @@ module Family::LunchflowConnectable
   end
 
   def can_connect_lunchflow?
-    # Check if the API key is configured
-    Provider::LunchflowAdapter.configured?
+    Setting.lunchflow_enabled && Provider::LunchflowAdapter.configured?
   end
 end

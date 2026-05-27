@@ -18,6 +18,25 @@ class Sync < ApplicationRecord
   scope :ordered, -> { order(created_at: :desc) }
   scope :incomplete, -> { where("syncs.status IN (?)", %w[pending syncing]) }
   scope :visible, -> { incomplete.where("syncs.created_at > ?", VISIBLE_FOR.ago) }
+  scope :recent, -> { order(created_at: :desc).limit(100) }
+  scope :with_status, ->(status) { where(status: status) }
+
+  # Returns syncs belonging to the given family — either directly (Family syncable)
+  # or through accounts and provider items owned by the family.
+  scope :for_family, ->(family) {
+    where(
+      "(syncs.syncable_type = 'Family' AND syncs.syncable_id = :family_id) OR " \
+      "(syncs.syncable_type = 'Account' AND syncs.syncable_id IN (:account_ids)) OR " \
+      "(syncs.syncable_type = 'PlaidItem' AND syncs.syncable_id IN (:plaid_item_ids)) OR " \
+      "(syncs.syncable_type = 'SimpleFinItem' AND syncs.syncable_id IN (:simplefin_item_ids)) OR " \
+      "(syncs.syncable_type = 'LunchflowItem' AND syncs.syncable_id IN (:lunchflow_item_ids))",
+      family_id: family.id,
+      account_ids: family.accounts.select(:id),
+      plaid_item_ids: family.plaid_items.select(:id),
+      simplefin_item_ids: family.simplefin_items.select(:id),
+      lunchflow_item_ids: family.lunchflow_items.select(:id)
+    )
+  }
 
   after_commit :update_family_sync_timestamp
   after_commit :enqueue_sync_job, on: :create
@@ -202,6 +221,46 @@ class Sync < ApplicationRecord
       window_start_date: earliest_start_date,
       window_end_date: latest_end_date
     )
+  end
+
+  def retry!
+    return false unless failed? || stale?
+    update!(status: "pending", error: nil, failed_at: nil, syncing_at: nil, pending_at: Time.current)
+    enqueue_sync_job
+    true
+  end
+
+  def dismiss!
+    return false unless failed? || stale?
+    destroy!
+    true
+  end
+
+  def duration
+    return nil unless syncing_at
+    end_time = completed_at || failed_at || Time.current
+    (end_time - syncing_at).round
+  end
+
+  def syncable_label
+    return "#{syncable_type} (Deleted)" if syncable.nil?
+
+    case syncable_type
+    when "Family"
+      "Family Sync"
+    when "Account"
+      provider = syncable.account_providers.first&.adapter&.item
+      provider_name = provider&.class&.name&.gsub("Item", "") || "Manual"
+      "#{provider_name} - #{syncable.name}"
+    when "PlaidItem"
+      "Plaid Connection (#{syncable.name.presence || syncable.institution_id || 'Active'})"
+    when "SimpleFinItem"
+      "SimpleFIN Connection (#{syncable.name.presence || syncable.institution_name.presence || 'Active'})"
+    when "LunchflowItem"
+      "Lunchflow Connection (#{syncable.name.presence || syncable.institution_name.presence || 'Active'})"
+    else
+      "#{syncable_type} #{syncable_id}"
+    end
   end
 
   private
