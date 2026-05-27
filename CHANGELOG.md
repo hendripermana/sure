@@ -1,3 +1,9 @@
+## [0.20.0](https://github.com/hendripermana/permoney/compare/v0.19.0...v0.20.0) (2026-05-27)
+
+### Features
+
+- feat: Redesign Sync Monitor and Enforce Provider Configs (#155) (a341c34b)
+
 ## [0.19.0](https://github.com/hendripermana/permoney/compare/v0.18.13...v0.19.0) (2026-05-24)
 
 ### Features
