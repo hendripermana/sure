@@ -1,3 +1,24 @@
+## [0.20.1](https://github.com/hendripermana/permoney/compare/v0.20.0...v0.20.1) (2026-05-31)
+
+### Other Changes
+
+- Improve split group transaction links and keyboard accessibility (#156) (b5d027c2)
+- ci(deps): bump docker/setup-buildx-action from 3.10.0 to 4.1.0 (#154) (1265a23c)
+- ci(deps): bump actions/upload-artifact from 4.6.2 to 7.0.1 (#153) (cea3cec5)
+- ci(deps): bump actions/download-artifact from 4.3.0 to 8.0.1 (#152) (9ff5c75a)
+- ci(deps): bump pnpm/action-setup from 4 to 6 (#151) (278d1759)
+- ci(deps): bump docker/login-action from 3.3.0 to 4.2.0 (#150) (b20158b4)
+- deps(deps): bump doorkeeper from 5.8.2 to 5.9.1 (#149) (76d7bbff)
+- deps(deps): bump sidekiq from 8.0.9 to 8.1.5 (#148) (da145509)
+- deps-dev(deps-dev): bump mocha from 2.7.1 to 3.1.0 (#147) (35317ed0)
+- deps(deps): bump turbo-rails from 2.0.20 to 2.0.23 (#146) (8738cb1e)
+- deps-dev(deps-dev): bump dotenv-rails from 3.1.8 to 3.2.0 (#145) (f1163a8d)
+- deps-dev(deps-dev): bump faker from 3.5.2 to 3.8.0 (#144) (03a9875d)
+- deps(deps): bump logtail-rails from 0.2.11 to 0.2.12 (#143) (1fb25ff5)
+- deps-dev(deps-dev): bump benchmark-ips from 2.14.0 to 2.15.1 (#142) (0a9be775)
+- deps(deps): bump jbuilder from 2.14.1 to 2.15.0 (#141) (f88a9e60)
+- deps(deps): bump importmap-rails from 2.2.2 to 2.2.3 (#140) (d11a6106)
+
 ## [0.20.0](https://github.com/hendripermana/permoney/compare/v0.19.0...v0.20.0) (2026-05-27)
 
 ### Features
