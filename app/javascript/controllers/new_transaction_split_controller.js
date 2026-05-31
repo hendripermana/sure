@@ -22,6 +22,8 @@ export default class extends Controller {
     "remaining", // Text display for remaining amount
     "remainingIcon", // Icon inside the remaining card
     "remainingContainer", // Remaining card wrapper
+    "statusText", // Dynamic balanced/unbalanced status text
+    "proportionalBar", // Live split proportion visualization
     "error", // Error message wrapper
     "submitButton", // Form submit button
   ];
@@ -137,8 +139,13 @@ export default class extends Controller {
         this.addRow();
       }
       this.updateRemaining();
-    } else if (this.hasSubmitButtonTarget) {
-      this.submitButtonTarget.disabled = false;
+    } else {
+      if (this.hasSubmitButtonTarget) {
+        this.submitButtonTarget.disabled = false;
+      }
+      if (this.hasProportionalBarTarget) {
+        this.proportionalBarTarget.innerHTML = "";
+      }
     }
   }
 
@@ -164,7 +171,15 @@ export default class extends Controller {
     const container = this.rowsContainerTarget;
 
     const row = document.createElement("div");
-    row.classList.add("p-3", "md:p-4", "rounded-xl", "border", "border-secondary", "bg-container", "shadow-xs");
+    row.classList.add(
+      "p-3",
+      "md:p-4",
+      "rounded-xl",
+      "border",
+      "border-secondary",
+      "bg-container",
+      "shadow-xs"
+    );
     row.dataset.newTransactionSplitTarget = "row";
 
     // Clone the category custom-select from the template/first row.
@@ -302,6 +317,12 @@ export default class extends Controller {
         : this.constructor.UNBALANCED_ICON_SVG;
     }
 
+    if (this.hasStatusTextTarget) {
+      this.statusTextTarget.textContent = balanced
+        ? this.t("balanced_label", "Balanced")
+        : this.t("unbalanced_label", "Unbalanced");
+    }
+
     if (this.hasErrorTarget) {
       this.errorTarget.classList.toggle("hidden", balanced);
     }
@@ -309,5 +330,45 @@ export default class extends Controller {
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = !balanced;
     }
+
+    if (this.hasProportionalBarTarget) {
+      this.updateProportionalBar(total);
+    }
+
+    if (balanced && container) {
+      container.classList.add("balanced-pop");
+      if (this._balancedPopTimeout) clearTimeout(this._balancedPopTimeout);
+      this._balancedPopTimeout = setTimeout(() => {
+        container.classList.remove("balanced-pop");
+      }, 700);
+    }
+  }
+
+  updateProportionalBar(total) {
+    if (total <= 0) {
+      this.proportionalBarTarget.innerHTML = "";
+      return;
+    }
+
+    const colors = [
+      "var(--color-primary)",
+      "var(--color-secondary)",
+      "var(--color-positive)",
+      "var(--color-caution)",
+      "var(--color-negative)",
+    ];
+
+    const segments = this.rowTargets
+      .map((row, index) => {
+        const input = row.querySelector("input[type='number']");
+        const amount = Math.abs(Number.parseFloat(input?.value) || 0);
+        const width = total ? Math.max(0, Math.min(100, (amount / total) * 100)) : 0;
+        const color = colors[index % colors.length];
+
+        return `<div class="split-proportional-segment" style="width:${width}%;background-color:${color};" aria-label="${amount.toFixed(2)} (${width.toFixed(0)}%)"></div>`;
+      })
+      .join("");
+
+    this.proportionalBarTarget.innerHTML = segments;
   }
 }

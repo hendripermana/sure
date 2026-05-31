@@ -11,7 +11,7 @@
      data-testid="split-group-<%= parent.id %>">
 
   <%# ---- Parent summary header (click to expand/collapse) ---- %>
-  <div class="split-group__header group flex lg:grid lg:grid-cols-12 items-center gap-3 lg:gap-4 p-3 lg:p-4 cursor-pointer select-none hover:bg-surface-hover transition-colors"
+  <div class="split-group__header group flex lg:grid lg:grid-cols-12 items-center gap-3 lg:gap-4 p-3 lg:p-4 cursor-pointer select-none hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors"
        role="button"
        tabindex="0"
        aria-expanded="true"
@@ -43,20 +43,35 @@
         <div class="text-secondary text-xs mt-1 min-w-0">
           <%# Desktop: account subtitle (category preview lives in the category column) %>
           <span class="hidden md:inline truncate">
-            <% if transaction.merchant&.present? %><%= transaction.merchant.name %> • <% end %><%= parent.account.name %>
+            <% if transaction.merchant&.present? %><%= transaction.merchant.name %> • <% end %>
+            <%= link_to parent.account.name,
+                account_path(parent.account, tab: "transactions"),
+                class: "split-group__account-link truncate inline-block",
+                title: parent.account.name,
+                aria: { label: t("transactions.split_group.account_transactions_label", account_name: parent.account.name) },
+                data: { action: "click->split-group#stop keydown.enter->split-group#stop keydown.space->split-group#stop", turbo_frame: "_top" } %>
           </span>
-          <%# Mobile: category preview (category column is hidden on small screens) %>
-          <span class="md:hidden flex items-center gap-x-2 gap-y-1 flex-wrap">
-            <% if child_categories.any? %>
-              <% child_categories.first(4).each do |cat| %>
-                <span class="inline-flex items-center gap-1 min-w-0">
-                  <span class="w-2 h-2 rounded-full shrink-0" style="background-color: <%= sanitize_category_color(cat.color) %>"></span>
-                  <span class="truncate"><%= cat.name %></span>
-                </span>
+
+          <%# Mobile: account subtitle + category preview %>
+          <span class="md:hidden flex flex-col gap-1">
+            <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <% if child_categories.any? %>
+                <% child_categories.first(4).each do |cat| %>
+                  <span class="inline-flex items-center gap-1 min-w-0">
+                    <span class="w-2 h-2 rounded-full shrink-0" style="background-color: <%= sanitize_category_color(cat.color) %>"></span>
+                    <span class="truncate"><%= cat.name %></span>
+                  </span>
+                <% end %>
+              <% else %>
+                <span><%= t("transactions.split_group.across_categories", count: children.size) %></span>
               <% end %>
-            <% else %>
-              <span><%= t("transactions.split_group.across_categories", count: children.size) %></span>
-            <% end %>
+            </span>
+            <%= link_to parent.account.name,
+                account_path(parent.account, tab: "transactions"),
+                class: "split-group__account-link text-sm truncate block",
+                title: parent.account.name,
+                aria: { label: t("transactions.split_group.account_transactions_label", account_name: parent.account.name) },
+                data: { action: "click->split-group#stop keydown.enter->split-group#stop keydown.space->split-group#stop", turbo_frame: "_top" } %>
           </span>
         </div>
       </div>
@@ -126,7 +141,7 @@
 
   <%# ---- Children (connected, collapsible) ---- %>
   <div class="split-group__children" data-split-group-target="children">
-    <div class="ml-6 lg:ml-9 border-l border-dashed border-secondary">
+    <div class="ml-6 lg:ml-9 border-l border-dashed border-secondary/20 pl-4">
       <% children.each do |child_entry| %>
         <% if child_entry.entryable.present? %>
           <% share = parent.amount.abs.zero? ? nil : (child_entry.amount.abs.to_f / parent.amount.abs.to_f * 100).round %>

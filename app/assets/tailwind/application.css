@@ -76,7 +76,9 @@
 
 /* Gentle pulse for the unbalanced split indicator icon */
 @keyframes pulse-gentle {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
 
@@ -232,21 +234,66 @@
   }
 }
 
-.split-group__children.just-expanded > div > * {
+.split-group__children.just-expanded>div>* {
   animation: split-stagger 0.32s ease both;
 }
 
-.split-group__children.just-expanded > div > *:nth-child(1) { animation-delay: 0.02s; }
-.split-group__children.just-expanded > div > *:nth-child(2) { animation-delay: 0.06s; }
-.split-group__children.just-expanded > div > *:nth-child(3) { animation-delay: 0.10s; }
-.split-group__children.just-expanded > div > *:nth-child(4) { animation-delay: 0.14s; }
-.split-group__children.just-expanded > div > *:nth-child(n+5) { animation-delay: 0.18s; }
+.split-group__children.just-expanded>div>*:nth-child(1) {
+  animation-delay: 0.02s;
+}
+
+.split-group__children.just-expanded>div>*:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.split-group__children.just-expanded>div>*:nth-child(3) {
+  animation-delay: 0.10s;
+}
+
+.split-group__children.just-expanded>div>*:nth-child(4) {
+  animation-delay: 0.14s;
+}
+
+.split-group__children.just-expanded>div>*:nth-child(n+5) {
+  animation-delay: 0.18s;
+}
+
+/* Split group account link styling */
+.split-group__account-link {
+  display: inline-block !important;
+  max-width: 100% !important;
+  color: var(--color-secondary) !important;
+  transition: color 0.2s ease !important;
+  text-decoration-skip-ink: auto !important;
+}
+
+.split-group__account-link:hover,
+.split-group__account-link:focus-visible {
+  color: var(--color-primary) !important;
+  text-decoration: underline !important;
+}
+
+.split-group__account-link:focus-visible {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: 4px !important;
+}
 
 /* One-shot "balanced" celebration for the split form indicator */
 @keyframes balanced-pop {
-  0% { transform: scale(0.6); opacity: 0; }
-  60% { transform: scale(1.18); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .balanced-pop {
@@ -258,13 +305,14 @@
     transition: none;
   }
 
-  .split-group__children.just-expanded > div > *,
+  .split-group__children.just-expanded>div>*,
   .balanced-pop {
     animation: none;
   }
 }
 
 @layer components {
+
   /* Wise Form Design System theme (DESIGN.md) */
   .wise-form {
     --color-canvas-soft: #e8ebe6;
@@ -302,6 +350,7 @@
       transform: none !important;
       transition: all 0.3s ease !important;
     }
+
     .section-card:hover {
       transform: none !important;
       box-shadow: 0 4px 20px rgba(14, 15, 12, 0.03) !important;
@@ -313,20 +362,20 @@
       border-radius: 9999px !important;
       padding: 4px !important;
       border: none !important;
-      
+
       a {
         border-radius: 9999px !important;
         font-weight: 600 !important;
         transition: all 0.2s ease-in-out !important;
         color: var(--color-body) !important;
       }
-      
+
       a.bg-container {
         background-color: var(--color-canvas) !important;
         color: var(--color-ink) !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
       }
-      
+
       a:not(.bg-container):hover {
         background-color: rgba(14, 15, 12, 0.05) !important;
         color: var(--color-ink) !important;
@@ -344,7 +393,7 @@
       display: flex !important;
       flex-direction: column !important;
       gap: 4px !important;
-      
+
       .form-field__label {
         font-size: 11px !important;
         color: var(--color-body) !important;
@@ -353,7 +402,7 @@
         letter-spacing: 0.05em !important;
         margin-bottom: 2px !important;
       }
-      
+
       .form-field__input {
         color: var(--color-ink) !important;
         font-size: 16px !important;
@@ -414,26 +463,26 @@
       background-color: var(--color-canvas-soft) !important;
       border: 1.5px solid transparent !important;
       padding: 18px 22px !important;
-      
+
       .form-field__label {
         font-size: 12px !important;
         color: var(--color-body) !important;
       }
-      
+
       .form-field__input {
         font-size: 28px !important;
         font-weight: 700 !important;
         letter-spacing: -0.02em !important;
         color: var(--color-ink) !important;
       }
-      
+
       span[data-money-field-target="symbol"] {
         font-size: 28px !important;
         font-weight: 700 !important;
         color: var(--color-body) !important;
         margin-right: 4px !important;
       }
-      
+
       select[data-money-field-target="currency"] {
         font-size: 18px !important;
         font-weight: 700 !important;
@@ -458,7 +507,7 @@
         color-scheme: light;
       }
     }
-    
+
     .form-field[data-controller="money-field"]:focus-within {
       background-color: var(--color-canvas) !important;
       border-color: var(--color-ink) !important;
@@ -538,6 +587,23 @@
     .split-remove-btn:focus-visible {
       outline: none !important;
       box-shadow: 0 0 0 3px rgba(208, 50, 56, 0.35) !important;
+    }
+
+    .split-proportional-bar {
+      width: 100% !important;
+      min-height: 10px !important;
+      border-radius: 9999px !important;
+      overflow: hidden !important;
+      background-color: var(--color-surface-inset) !important;
+      border: 1px solid rgba(14, 15, 12, 0.08) !important;
+      margin-bottom: 1rem !important;
+      display: flex !important;
+      transition: background-color 0.2s ease !important;
+    }
+
+    .split-proportional-segment {
+      min-width: 4px !important;
+      transition: width 0.25s ease, background-color 0.25s ease !important;
     }
 
     /* Dynamic remaining box indicator styling */
@@ -632,7 +698,7 @@
     input[type="submit"]:hover {
       background-color: var(--color-primary-hover) !important;
     }
-    
+
     .btn--primary:active,
     input[type="submit"]:active {
       transform: scale(0.985) !important;

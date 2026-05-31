@@ -16,7 +16,7 @@ en:
       split_amounts_error: Split amounts must equal the total transaction amount.
       split_amounts_unbalanced_message: Adjust the amounts above so the remaining balance is zero.
       split_row_amount_label: Amount
-      split_row_amount_placeholder: '0.00'
+      split_row_amount_placeholder: "0.00"
       split_row_category_label: Category
       split_row_category_prompt: Select category
       split_row_name_label: Name
@@ -41,6 +41,7 @@ en:
       across_categories:
         one: across 1 category
         other: across %{count} categories
+      account_transactions_label: Open %{account_name} transactions
       edit_splits: Edit splits
       excluded_tooltip: Excluded from balance — counted across its splits
       parts:
@@ -55,7 +56,8 @@ en:
       category_label: Category
       date_label: Date
       delete: Delete
-      delete_subtitle: This permanently deletes the transaction, affects your historical
+      delete_subtitle:
+        This permanently deletes the transaction, affects your historical
         balances, and cannot be undone.
       delete_title: Delete transaction
       details: Details
@@ -87,7 +89,7 @@ en:
           equal_to: Equal to
           greater_than: Greater than
           less_than: Less than
-          placeholder: '0'
+          placeholder: "0"
         badge:
           expense: Expense
           income: Income

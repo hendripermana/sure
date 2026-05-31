@@ -18,6 +18,9 @@ export default class extends Controller {
 
   toggle(event) {
     if (event && event.type === "keydown") {
+      if (event.target !== this.headerTarget) {
+        return;
+      }
       event.preventDefault();
     }
 
@@ -26,7 +29,7 @@ export default class extends Controller {
     this._persist(willCollapse);
   }
 
-  // Prevents header toggle when interacting with the actions menu.
+  // Prevents header toggle when interacting with the actions menu or account link.
   stop(event) {
     event.stopPropagation();
   }
