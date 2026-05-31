@@ -3,9 +3,11 @@
 <% children = split_group.children %>
 <% transaction = parent.entryable %>
 <% child_categories = children.filter_map { |c| c.entryable.try(:category) }.uniq %>
+<% split_total = parent.amount.abs %>
 
 <div class="split-group rounded-xl overflow-hidden"
      data-controller="split-group"
+     data-split-group-id-value="<%= parent.id %>"
      data-testid="split-group-<%= parent.id %>">
 
   <%# ---- Parent summary header (click to expand/collapse) ---- %>
@@ -106,6 +108,19 @@
                 data: { turbo_confirm: t("transactions.split_group.unsplit_confirm") }) %>
         <% end %>
       </div>
+    </div>
+  </div>
+
+  <%# ---- Proportional category bar (always visible) ---- %>
+  <div class="px-3 lg:px-4 pb-3">
+    <div class="flex h-1.5 w-full rounded-full overflow-hidden bg-surface-inset gap-0.5">
+      <% children.each do |child_entry| %>
+        <% pct = split_total.zero? ? 0 : (child_entry.amount.abs.to_f / split_total.to_f * 100) %>
+        <% bar_color = sanitize_category_color(child_entry.entryable.try(:category)&.color || "#737373") %>
+        <div class="h-full first:rounded-l-full last:rounded-r-full"
+             style="width: <%= pct.round(2) %>%; background-color: <%= bar_color %>;"
+             title="<%= child_entry.entryable.try(:category)&.name || child_entry.name %> · <%= pct.round %>%"></div>
+      <% end %>
     </div>
   </div>
 
