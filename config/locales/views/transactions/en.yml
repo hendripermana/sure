@@ -37,6 +37,18 @@ en:
       transfer: Transfer
     new:
       new_transaction: New transaction
+    split_group:
+      across_categories:
+        one: across 1 category
+        other: across %{count} categories
+      edit_splits: Edit splits
+      excluded_tooltip: Excluded from balance — counted across its splits
+      parts:
+        one: 1 part
+        other: "%{count} parts"
+      split_badge: Split
+      unsplit: Unsplit
+      unsplit_confirm: Remove the split and restore the original transaction?
     show:
       account_label: Account
       amount: Amount

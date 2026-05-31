@@ -511,4 +511,40 @@ end
     assert_equal "Updated split name", parent.name
     assert_equal original_children_count, parent.child_entries.count
   end
+
+  test "renders split transactions as a grouped collapsible card on the index" do
+    post transactions_url, params: {
+      split_transaction: "1",
+      entry: {
+        account_id: @entry.account_id,
+        name: "Grouped Split Parent",
+        date: Date.current,
+        currency: "USD",
+        amount: 100,
+        nature: "outflow",
+        entryable_type: @entry.entryable_type,
+        entryable_attributes: { category_id: "" },
+        splits: {
+          "0" => { name: "Groceries Split", amount: "60", category_id: categories(:food_and_drink).id },
+          "1" => { name: "Soap Split", amount: "40", category_id: categories(:subcategory).id }
+        }
+      }
+    }
+
+    parent = Entry.where(name: "Grouped Split Parent").last
+
+    get transactions_url
+    assert_response :success
+
+    # Cohesive split-group card with collapse controller + children container
+    assert_select "[data-testid='split-group-#{parent.id}'][data-controller='split-group']"
+    assert_select "[data-testid='split-group-#{parent.id}'] .split-group__children"
+    # Header shows the parent name and the split chip
+    assert_match "Grouped Split Parent", @response.body
+    # Children render inside the group
+    assert_match "Groceries Split", @response.body
+    assert_match "Soap Split", @response.body
+    # Unsplit action is available
+    assert_select "form[action='#{transaction_split_path(parent)}']"
+  end
 end

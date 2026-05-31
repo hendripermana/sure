@@ -38,3 +38,15 @@ Form uses the self-contained "wise-form" design system (DESIGN.md → CSS variab
 - P1: Live browser e2e of the split UI (toggle, add/remove rows, balance turns green, submit) once a dev server + seeded login are available.
 - P2: Edit/unsplit flow UX on an existing split transaction.
 - P2: Translate new keys into other present locales (currently English only; others fall back).
+
+## Implemented (2026-01) — Split DISPLAY redesign (transactions list + account activity)
+- Redesigned split rendering into a cohesive **collapsible card** (`app/views/entries/_split_group.html.erb`):
+  - Parent summary header (chevron toggle, merchant logo, name, strong "Split · N" chip, child-category color-dot preview, muted total + tooltip "Excluded from balance — counted across its splits").
+  - Hover actions: Edit splits (turbo modal → splits#edit) + Unsplit (DELETE → splits#destroy, confirm).
+  - Children connected via dashed vertical connector, indented, with redundant account name removed.
+- New Stimulus controller `split_group_controller.js` (collapse/expand, default expanded, chevron rotate, a11y aria-expanded + keyboard enter/space; `stop` guards action clicks).
+- Grouping is DEFAULT ON (`user.show_split_grouped?` already true) and now also applied on the **account activity page** (`app/components/UI/account/activity_date.html.erb`).
+- `entries_helper#group_split_entries` hardened to skip the standalone parent row when its children are present (safe reuse on account page where parent lives in the same list).
+- CSS: color-agnostic collapse animation (`.split-group__children` / `.is-collapsed`, respects reduced-motion). Contrast improved by replacing faded `opacity-50` parent with proper `text-secondary`/`text-primary` tokens (dark-mode safe).
+- Tests: added index render test (`split-group` card markup, children, unsplit form). Full suite: 21 transactions tests + 8 accounts tests pass, 0 failures.
+- NOTE: still validated via Rails test suite + lint (no live browser screenshot — Rails app has no running preview server/auth session in sandbox; sandbox also resets apt packages between sessions, so Postgres was reinstalled to run tests).

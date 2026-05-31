@@ -1,10 +1,100 @@
-<%# locals: (split_group:) %>
-<div class="split-group border-l-2 border-primary pl-4 ml-2 my-2 space-y-1">
-  <%= render "transactions/split_parent_row", entry: split_group.parent %>
-  <% split_group.children.each do |child_entry| %>
-    <% if child_entry.entryable.present? %>
-      <%= render partial: child_entry.entryable.to_partial_path,
-                locals: { entry: child_entry, in_split_group: true } %>
-    <% end %>
-  <% end %>
+<%# locals: (split_group:, view_ctx: "global") %>
+<% parent = split_group.parent %>
+<% children = split_group.children %>
+<% transaction = parent.entryable %>
+<% child_categories = children.filter_map { |c| c.entryable.try(:category) }.uniq %>
+
+<div class="split-group rounded-xl overflow-hidden"
+     data-controller="split-group"
+     data-testid="split-group-<%= parent.id %>">
+
+  <%# ---- Parent summary header (click to expand/collapse) ---- %>
+  <div class="split-group__header group flex lg:grid lg:grid-cols-12 items-center gap-3 lg:gap-4 p-3 lg:p-4 cursor-pointer select-none hover:bg-surface-hover transition-colors"
+       role="button"
+       tabindex="0"
+       aria-expanded="true"
+       data-split-group-target="header"
+       data-action="click->split-group#toggle keydown.enter->split-group#toggle keydown.space->split-group#toggle">
+
+    <div class="flex items-center gap-2 lg:gap-3 col-span-8 min-w-0">
+      <span class="shrink-0 text-secondary transition-transform duration-200" data-split-group-target="chevron">
+        <%= icon "chevron-down", size: "sm", color: "current" %>
+      </span>
+
+      <div class="hidden lg:flex shrink-0">
+        <% if transaction.merchant&.logo_url.present? %>
+          <%= image_tag transaction.merchant.logo_url, class: "w-9 h-9 rounded-full border border-secondary", loading: "lazy" %>
+        <% else %>
+          <%= render DS::FilledIcon.new(variant: :text, text: parent.name, size: "lg", rounded: true) %>
+        <% end %>
+      </div>
+
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="font-semibold text-primary truncate"><%= parent.name %></span>
+          <span class="inline-flex items-center gap-1 shrink-0 text-xs font-semibold rounded-full px-2 py-0.5 bg-surface-inset text-primary border border-secondary">
+            <%= icon "split", size: "sm", color: "current" %>
+            <%= t("transactions.split_group.split_badge") %> · <%= children.size %>
+          </span>
+        </div>
+
+        <div class="text-secondary text-xs mt-1 flex items-center gap-x-2 gap-y-1 flex-wrap min-w-0">
+          <% if child_categories.any? %>
+            <% child_categories.first(4).each do |cat| %>
+              <span class="inline-flex items-center gap-1 min-w-0">
+                <span class="w-2 h-2 rounded-full shrink-0" style="background-color: <%= cat.color %>"></span>
+                <span class="truncate"><%= cat.name %></span>
+              </span>
+            <% end %>
+            <% if child_categories.size > 4 %>
+              <span>+<%= child_categories.size - 4 %></span>
+            <% end %>
+          <% else %>
+            <span><%= t("transactions.split_group.across_categories", count: children.size) %></span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden md:flex col-span-2"></div>
+
+    <div class="shrink-0 col-span-4 lg:col-span-2 ml-auto flex items-center justify-end gap-1.5">
+      <%# Hover actions: edit splits + unsplit %>
+      <div class="flex items-center opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
+           data-action="click->split-group#stop">
+        <%= link_to edit_transaction_split_path(parent),
+              data: { turbo_frame: "modal", turbo_prefetch: false },
+              class: "p-1.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-inset transition-colors",
+              title: t("transactions.split_group.edit_splits"),
+              aria: { label: t("transactions.split_group.edit_splits") } do %>
+          <%= icon "pencil", size: "sm", color: "current" %>
+        <% end %>
+        <%= button_to transaction_split_path(parent),
+              method: :delete,
+              form: { data: { turbo_confirm: t("transactions.split_group.unsplit_confirm") } },
+              class: "p-1.5 rounded-lg text-secondary hover:text-destructive hover:bg-destructive/10 transition-colors",
+              title: t("transactions.split_group.unsplit"),
+              aria: { label: t("transactions.split_group.unsplit") } do %>
+          <%= icon "git-merge", size: "sm", color: "current" %>
+        <% end %>
+      </div>
+
+      <span class="text-secondary font-medium privacy-sensitive"
+            title="<%= t("transactions.split_group.excluded_tooltip") %>">
+        <%= format_money(-parent.amount_money) %>
+      </span>
+    </div>
+  </div>
+
+  <%# ---- Children (connected, collapsible) ---- %>
+  <div class="split-group__children" data-split-group-target="children">
+    <div class="ml-6 lg:ml-9 border-l border-dashed border-secondary">
+      <% children.each do |child_entry| %>
+        <% if child_entry.entryable.present? %>
+          <%= render partial: child_entry.entryable.to_partial_path,
+                    locals: { entry: child_entry, in_split_group: true, view_ctx: view_ctx } %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
 </div>

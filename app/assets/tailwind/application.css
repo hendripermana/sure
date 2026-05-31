@@ -206,6 +206,25 @@
   scrollbar-width: none;
 }
 
+/* Split-transaction group (transactions list + account activity) */
+.split-group__children {
+  overflow: hidden;
+  max-height: 4000px;
+  opacity: 1;
+  transition: max-height 0.35s ease, opacity 0.2s ease;
+}
+
+.split-group__children.is-collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split-group__children {
+    transition: none;
+  }
+}
+
 @layer components {
   /* Wise Form Design System theme (DESIGN.md) */
   .wise-form {

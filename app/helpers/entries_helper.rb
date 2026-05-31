@@ -4,6 +4,15 @@ module EntriesHelper
   def group_split_entries(entries, split_parents)
     return entries if split_parents.blank?
 
+    # Parent ids that have at least one child present in this list — these
+    # parents are shown as the split-group header, so we must not also render
+    # them as a standalone row (relevant on the account page where the parent
+    # entry lives in the same list as its children).
+    grouped_parent_ids = entries.select(&:split_child?)
+                                .map(&:parent_entry_id)
+                                .select { |pid| split_parents[pid] }
+                                .to_set
+
     result = []
     seen_parent_ids = Set.new
 
@@ -15,6 +24,8 @@ module EntriesHelper
         seen_parent_ids.add(parent_id)
         children = entries.select { |e| e.parent_entry_id == parent_id }
         result << SplitGroup.new(parent: split_parents[parent_id], children: children)
+      elsif entry.split_parent? && grouped_parent_ids.include?(entry.id)
+        next # rendered as the group header instead of a standalone row
       else
         result << entry
       end
