@@ -38,51 +38,74 @@
           </span>
         </div>
 
-        <div class="text-secondary text-xs mt-1 flex items-center gap-x-2 gap-y-1 flex-wrap min-w-0">
-          <% if child_categories.any? %>
-            <% child_categories.first(4).each do |cat| %>
-              <span class="inline-flex items-center gap-1 min-w-0">
-                <span class="w-2 h-2 rounded-full shrink-0" style="background-color: <%= cat.color %>"></span>
-                <span class="truncate"><%= cat.name %></span>
-              </span>
+        <div class="text-secondary text-xs mt-1 min-w-0">
+          <%# Desktop: account subtitle (category preview lives in the category column) %>
+          <span class="hidden md:inline truncate">
+            <% if transaction.merchant&.present? %><%= transaction.merchant.name %> • <% end %><%= parent.account.name %>
+          </span>
+          <%# Mobile: category preview (category column is hidden on small screens) %>
+          <span class="md:hidden flex items-center gap-x-2 gap-y-1 flex-wrap">
+            <% if child_categories.any? %>
+              <% child_categories.first(4).each do |cat| %>
+                <span class="inline-flex items-center gap-1 min-w-0">
+                  <span class="w-2 h-2 rounded-full shrink-0" style="background-color: <%= sanitize_category_color(cat.color) %>"></span>
+                  <span class="truncate"><%= cat.name %></span>
+                </span>
+              <% end %>
+            <% else %>
+              <span><%= t("transactions.split_group.across_categories", count: children.size) %></span>
             <% end %>
-            <% if child_categories.size > 4 %>
-              <span>+<%= child_categories.size - 4 %></span>
-            <% end %>
-          <% else %>
-            <span><%= t("transactions.split_group.across_categories", count: children.size) %></span>
-          <% end %>
+          </span>
         </div>
       </div>
     </div>
 
-    <div class="hidden md:flex col-span-2"></div>
+    <%# Category column: stacked mini-badges of the child categories (desktop) %>
+    <div class="hidden md:flex col-span-2 items-center">
+      <% if child_categories.any? %>
+        <div class="flex items-center -space-x-2">
+          <% child_categories.first(3).each do |cat| %>
+            <% c = sanitize_category_color(cat.color) %>
+            <span class="w-7 h-7 rounded-full border-2 border-container flex items-center justify-center shrink-0"
+                  style="background-color: color-mix(in oklab, <%= c %> 15%, transparent); color: <%= c %>;"
+                  title="<%= cat.name %>">
+              <%= icon (cat.lucide_icon.presence || "circle-dashed"), size: "sm", color: "current" %>
+            </span>
+          <% end %>
+          <% if child_categories.size > 3 %>
+            <span class="w-7 h-7 rounded-full border-2 border-container flex items-center justify-center shrink-0 bg-surface-inset text-secondary text-xs font-semibold"
+                  title="+<%= child_categories.size - 3 %>">
+              +<%= child_categories.size - 3 %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
 
     <div class="shrink-0 col-span-4 lg:col-span-2 ml-auto flex items-center justify-end gap-1.5">
-      <%# Hover actions: edit splits + unsplit %>
-      <div class="flex items-center opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
-           data-action="click->split-group#stop">
-        <%= link_to edit_transaction_split_path(parent),
-              data: { turbo_frame: "modal", turbo_prefetch: false },
-              class: "p-1.5 rounded-lg text-secondary hover:text-primary hover:bg-surface-inset transition-colors",
-              title: t("transactions.split_group.edit_splits"),
-              aria: { label: t("transactions.split_group.edit_splits") } do %>
-          <%= icon "pencil", size: "sm", color: "current" %>
-        <% end %>
-        <%= button_to transaction_split_path(parent),
-              method: :delete,
-              form: { data: { turbo_confirm: t("transactions.split_group.unsplit_confirm") } },
-              class: "p-1.5 rounded-lg text-secondary hover:text-destructive hover:bg-destructive/10 transition-colors",
-              title: t("transactions.split_group.unsplit"),
-              aria: { label: t("transactions.split_group.unsplit") } do %>
-          <%= icon "git-merge", size: "sm", color: "current" %>
-        <% end %>
-      </div>
-
       <span class="text-secondary font-medium privacy-sensitive"
             title="<%= t("transactions.split_group.excluded_tooltip") %>">
         <%= format_money(-parent.amount_money) %>
       </span>
+
+      <%# Always-visible actions menu (works on touch, unlike hover) %>
+      <div data-action="click->split-group#stop">
+        <%= render DS::Menu.new(variant: :icon, testid: "split-group-menu-#{parent.id}") do |menu| %>
+          <% menu.with_item(
+                variant: :link,
+                text: t("transactions.split_group.edit_splits"),
+                icon: "pencil",
+                href: edit_transaction_split_path(parent),
+                frame: :modal) %>
+          <% menu.with_item(
+                variant: :button,
+                text: t("transactions.split_group.unsplit"),
+                icon: "git-merge",
+                href: transaction_split_path(parent),
+                method: :delete,
+                data: { turbo_confirm: t("transactions.split_group.unsplit_confirm") }) %>
+        <% end %>
+      </div>
     </div>
   </div>
 
@@ -91,8 +114,9 @@
     <div class="ml-6 lg:ml-9 border-l border-dashed border-secondary">
       <% children.each do |child_entry| %>
         <% if child_entry.entryable.present? %>
+          <% share = parent.amount.abs.zero? ? nil : (child_entry.amount.abs.to_f / parent.amount.abs.to_f * 100).round %>
           <%= render partial: child_entry.entryable.to_partial_path,
-                    locals: { entry: child_entry, in_split_group: true, view_ctx: view_ctx } %>
+                    locals: { entry: child_entry, in_split_group: true, view_ctx: view_ctx, split_share: share } %>
         <% end %>
       <% end %>
     </div>

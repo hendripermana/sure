@@ -544,6 +544,11 @@ end
     # Children render inside the group
     assert_match "Groceries Split", @response.body
     assert_match "Soap Split", @response.body
+    # Per-child share percentage (60 / 40 of 100)
+    assert_match "60%", @response.body
+    assert_match "40%", @response.body
+    # Always-visible actions menu (kebab) is present
+    assert_select "[data-testid='split-group-menu-#{parent.id}']"
     # Unsplit action is available
     assert_select "form[action='#{transaction_split_path(parent)}']"
   end

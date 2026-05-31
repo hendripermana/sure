@@ -1,4 +1,4 @@
-<%# locals: (entry:, balance_trend: nil, view_ctx: "global", in_split_group: false) %>
+<%# locals: (entry:, balance_trend: nil, view_ctx: "global", in_split_group: false, split_share: nil) %>
 
 <% transaction = entry.entryable %>
 
@@ -132,7 +132,7 @@
                     </span>
                   <% else %>
                     <% if transaction.merchant&.present? %>
-                      <span class="hidden lg:inline truncate"><%= transaction.merchant.name %> • </span>
+                      <span class="hidden lg:inline truncate"><%= transaction.merchant.name %><%= " • " unless in_split_group %></span>
                     <% end %>
                     <% unless in_split_group %>
                       <span class="text-secondary hidden lg:inline">
@@ -180,6 +180,9 @@
         end %>
 
         <%= content_tag :p, amount_label, class: ["text-green-600": entry.amount.negative?] %>
+        <% if split_share %>
+          <p class="text-secondary text-xs font-normal mt-0.5" title="Share of split"><%= split_share %>%</p>
+        <% end %>
       </div>
     </div>
   <% end %>

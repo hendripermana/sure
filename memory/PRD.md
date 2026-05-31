@@ -50,3 +50,10 @@ Form uses the self-contained "wise-form" design system (DESIGN.md → CSS variab
 - CSS: color-agnostic collapse animation (`.split-group__children` / `.is-collapsed`, respects reduced-motion). Contrast improved by replacing faded `opacity-50` parent with proper `text-secondary`/`text-primary` tokens (dark-mode safe).
 - Tests: added index render test (`split-group` card markup, children, unsplit form). Full suite: 21 transactions tests + 8 accounts tests pass, 0 failures.
 - NOTE: still validated via Rails test suite + lint (no live browser screenshot — Rails app has no running preview server/auth session in sandbox; sandbox also resets apt packages between sessions, so Postgres was reinstalled to run tests).
+
+## Implemented (2026-01) — Split card polish (pkg 1a/b/c + 2a)
+- 1a: Fixed dangling "merchant •" bullet on split child rows (bullet only when account follows; hidden inside groups).
+- 1b: Edit/Unsplit moved into an ALWAYS-VISIBLE kebab menu (DS::Menu :icon, testid `split-group-menu-<id>`) — now reachable on touch/mobile (was hover-only). Wrapped in `split-group#stop` so it doesn't toggle collapse.
+- 1c: Parent CATEGORY column now filled with stacked overlapping category mini-badges (lucide icon + color-mix tint, `border-container` ring, "+N" overflow); desktop shows account subtitle under name, mobile keeps text category dots.
+- 2a: Per-child share % (e.g., 60% / 40%) shown under each child amount; computed in `_split_group` from child/parent abs amount and passed via strict local `split_share`.
+- Tests: render test extended (asserts 60%/40%, kebab testid, unsplit form) → 29 tests / 127 assertions, 0 failures. Tailwind build + erb_lint + ESLint clean.
