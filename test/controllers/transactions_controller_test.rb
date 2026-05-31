@@ -30,9 +30,56 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
 
     created_entry = Entry.order(:created_at).last
 
-    assert_redirected_to account_url(created_entry.account)
+    assert_redirected_to transactions_url
     assert_equal "Transaction created", flash[:notice]
     assert_enqueued_with(job: SyncJob)
+  end
+
+  test "creates transaction and redirects to transactions_url when referer is not account page" do
+    assert_difference [ "Entry.count", "Transaction.count" ], 1 do
+      post transactions_url, headers: { "HTTP_REFERER" => root_url }, params: {
+        entry: {
+          account_id: @entry.account_id,
+          name: "New transaction",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "inflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: {
+            tag_ids: [ Tag.first.id ],
+            category_id: Category.first.id,
+            merchant_id: Merchant.first.id
+          }
+        }
+      }
+    end
+
+    assert_redirected_to transactions_url
+  end
+
+  test "creates transaction and redirects back to account page when referer is account page" do
+    account = @entry.account
+    assert_difference [ "Entry.count", "Transaction.count" ], 1 do
+      post transactions_url, headers: { "HTTP_REFERER" => account_url(account) }, params: {
+        entry: {
+          account_id: account.id,
+          name: "New transaction",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "inflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: {
+            tag_ids: [ Tag.first.id ],
+            category_id: Category.first.id,
+            merchant_id: Merchant.first.id
+          }
+        }
+      }
+    end
+
+    assert_redirected_to account_url(account)
   end
 
   test "updates with transaction details" do
@@ -317,5 +364,40 @@ end
 
     get transactions_url(q: { categories: [ "Food" ], types: [ "expense" ] })
     assert_response :success
+  end
+
+  test "creates a split transaction" do
+    assert_difference "Entry.count", 3 do # Parent + 2 children
+      post transactions_url, params: {
+        split_transaction: "1",
+        entry: {
+          account_id: @entry.account_id,
+          name: "Split Parent",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "outflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: {
+            category_id: "",
+            merchant_id: ""
+          },
+          splits: {
+            "0" => { name: "Groceries", amount: "70", category_id: Category.first.id },
+            "1" => { name: "Household", amount: "30", category_id: "" }
+          }
+        }
+      }
+    end
+
+    created_parent = Entry.where(name: "Split Parent").last
+    assert created_parent.excluded?
+    assert created_parent.split_parent?
+
+    children = created_parent.child_entries.order(:amount)
+    assert_equal 2, children.count
+    assert_equal 30, children.first.amount
+    assert_equal 70, children.last.amount
+    assert_nil created_parent.entryable.category_id
   end
 end

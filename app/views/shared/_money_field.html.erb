@@ -10,7 +10,7 @@
 <div class="form-field <%= options[:container_class] %>" data-controller="money-field">
   <% if options[:label_tooltip] %>
     <div class="form-field__header">
-      <%= form.label options[:label] || t(".label"), class: "form-field__label", for: "account_#{amount_method}" do %>
+      <%= form.label amount_method, options[:label] || t(".label"), class: "form-field__label" do %>
         <%= options[:label] || t(".label") %>
         <% if options[:required] %>
           <span class="text-red-500 ml-0.5">*</span>
@@ -29,7 +29,7 @@
 
   <div class="form-field__body">
     <% unless options[:label_tooltip] %>
-      <%= form.label options[:label] || t(".label"), class: "form-field__label", for: "account_#{amount_method}" do %>
+      <%= form.label amount_method, options[:label] || t(".label"), class: "form-field__label" do %>
         <%= options[:label] || t(".label") %>
         <% if options[:required] %>
           <span class="text-red-500 ml-0.5">*</span>
@@ -47,7 +47,6 @@
           class: "form-field__input",
           inline: true,
           placeholder: "100",
-          id: "account_#{amount_method}",
           value: if options[:value]
             sprintf("%.#{options[:precision].presence || currency.default_precision}f", options[:value])
           elsif form.object && form.object.respond_to?(amount_method)
@@ -66,7 +65,7 @@
       </div>
 
       <% unless options[:hide_currency] %>
-        <div>
+        <div class="shrink-0 flex items-center">
           <%= form.select currency_method,
                         Money::Currency.as_options.map(&:iso_code),
                         { inline: true, selected: currency.iso_code },

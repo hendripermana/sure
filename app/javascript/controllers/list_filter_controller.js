@@ -5,7 +5,12 @@ export default class extends Controller {
   static targets = ["input", "list", "emptyMessage"];
 
   connect() {
-    this.inputTarget.focus();
+    // Only auto-focus if the element is visible. When DS::Menu moves content
+    // to document.body, this controller reconnects while the content is still
+    // hidden, and focusing a hidden input steals focus from the active element.
+    if (this.element.offsetParent !== null) {
+      this.inputTarget.focus();
+    }
   }
 
   filter() {

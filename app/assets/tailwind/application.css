@@ -196,6 +196,344 @@
 }
 
 @layer components {
+  /* Wise Form Design System theme (DESIGN.md) */
+  .wise-form {
+    --color-canvas-soft: #e8ebe6;
+    --color-canvas: #ffffff;
+    --color-ink: #0e0f0c;
+    --color-body: #454745;
+    --color-primary: #9fe870;
+    --color-primary-hover: #cdffad;
+    --color-border-field: rgba(14, 15, 12, 0.15);
+    --color-border-soft-row: rgba(14, 15, 12, 0.2);
+
+    /* Semantic Colors */
+    --color-positive: #2ead4b;
+    --color-positive-deep: #054d28;
+    --color-positive-pale: #e2f6d5;
+
+    --color-negative: #d03238;
+    --color-negative-deep: #a72027;
+    --color-negative-darkest: #a7000d;
+    --color-negative-pale: #fdf2f2;
+
+    background-color: var(--color-canvas-soft);
+    color: var(--color-ink);
+    padding: 24px;
+    border-radius: 24px;
+    transition: background-color 0.3s, color 0.3s;
+
+    .section-card {
+      background-color: var(--color-canvas) !important;
+      border-radius: 24px !important;
+      border: 1.5px solid var(--color-border-field) !important;
+      box-shadow: 0 4px 20px rgba(14, 15, 12, 0.03) !important;
+      padding: 24px !important;
+      transform: none !important;
+      transition: all 0.3s ease !important;
+    }
+    .section-card:hover {
+      transform: none !important;
+      box-shadow: 0 4px 20px rgba(14, 15, 12, 0.03) !important;
+    }
+
+    /* Segmented Controls tabs */
+    fieldset {
+      background-color: var(--color-canvas-soft) !important;
+      border-radius: 9999px !important;
+      padding: 4px !important;
+      border: none !important;
+      
+      a {
+        border-radius: 9999px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease-in-out !important;
+        color: var(--color-body) !important;
+      }
+      
+      a.bg-container {
+        background-color: var(--color-canvas) !important;
+        color: var(--color-ink) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+      }
+      
+      a:not(.bg-container):hover {
+        background-color: rgba(14, 15, 12, 0.05) !important;
+        color: var(--color-ink) !important;
+      }
+    }
+
+    /* Form Fields */
+    .form-field {
+      border: 1.5px solid var(--color-border-field) !important;
+      border-radius: 16px !important;
+      background-color: var(--color-canvas) !important;
+      padding: 14px 18px !important;
+      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s !important;
+      box-shadow: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4px !important;
+      
+      .form-field__label {
+        font-size: 11px !important;
+        color: var(--color-body) !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        margin-bottom: 2px !important;
+      }
+      
+      .form-field__input {
+        color: var(--color-ink) !important;
+        font-size: 16px !important;
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        font-weight: 500 !important;
+      }
+
+      .form-field__input:focus {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+    }
+
+    .form-field:hover {
+      border-color: rgba(14, 15, 12, 0.4) !important;
+    }
+
+    .form-field:focus-within {
+      border-color: var(--color-ink) !important;
+      box-shadow: 0 0 0 4px rgba(159, 232, 112, 0.25) !important;
+    }
+
+    /* Dropdown/Select Styling */
+    select.form-field__input {
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23868685' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+      background-position: right 0px center !important;
+      background-repeat: no-repeat !important;
+      background-size: 1.25rem 1.25rem !important;
+      padding-right: 28px !important;
+      cursor: pointer !important;
+      background-color: transparent !important;
+      color: var(--color-ink) !important;
+      width: 100% !important;
+      color-scheme: light;
+    }
+
+    select.wise-split-row-input {
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23868685' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+      background-position: right 12px center !important;
+      background-repeat: no-repeat !important;
+      background-size: 1.25rem 1.25rem !important;
+      padding-right: 36px !important;
+      cursor: pointer !important;
+      color-scheme: light;
+    }
+
+    /* Premium Converter styling for Money Fields */
+    .form-field[data-controller="money-field"] {
+      background-color: var(--color-canvas-soft) !important;
+      border: 1.5px solid transparent !important;
+      padding: 18px 22px !important;
+      
+      .form-field__label {
+        font-size: 12px !important;
+        color: var(--color-body) !important;
+      }
+      
+      .form-field__input {
+        font-size: 28px !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.02em !important;
+        color: var(--color-ink) !important;
+      }
+      
+      span[data-money-field-target="symbol"] {
+        font-size: 28px !important;
+        font-weight: 700 !important;
+        color: var(--color-body) !important;
+        margin-right: 4px !important;
+      }
+      
+      select[data-money-field-target="currency"] {
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        background-color: var(--color-canvas) !important;
+        border: 1.5px solid var(--color-border-soft-row) !important;
+        border-radius: 9999px !important;
+        padding: 10px 36px 10px 16px !important;
+        color: var(--color-ink) !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+        height: 48px !important;
+        line-height: 28px !important;
+        min-width: 96px !important;
+        flex-shrink: 0 !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23868685' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+        background-position: right 14px center !important;
+        background-repeat: no-repeat !important;
+        background-size: 1.25rem 1.25rem !important;
+        cursor: pointer !important;
+        color-scheme: light;
+      }
+    }
+    
+    .form-field[data-controller="money-field"]:focus-within {
+      background-color: var(--color-canvas) !important;
+      border-color: var(--color-ink) !important;
+    }
+
+    /* Collapsible items & transitions */
+    .collapsible-hidden {
+      max-height: 0 !important;
+      opacity: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      border-width: 0 !important;
+      border-color: transparent !important;
+      pointer-events: none !important;
+      transform: scaleY(0.95);
+    }
+
+    .collapsible-visible {
+      max-height: 1200px !important;
+      opacity: 1 !important;
+    }
+
+    /* Split rows inputs */
+    .wise-split-row-input {
+      border: 1.5px solid var(--color-border-soft-row) !important;
+      border-radius: 10px !important;
+      padding: 8px 12px !important;
+      font-size: 14px !important;
+      color: var(--color-ink) !important;
+      background-color: var(--color-canvas) !important;
+      transition: border-color 0.2s, box-shadow 0.2s !important;
+      width: 100% !important;
+    }
+    
+    .wise-split-row-input:hover {
+      border-color: rgba(14, 15, 12, 0.4) !important;
+    }
+    
+    .wise-split-row-input:focus {
+      outline: none !important;
+      border-color: var(--color-ink) !important;
+      box-shadow: 0 0 0 3px rgba(159, 232, 112, 0.2) !important;
+    }
+
+    /* Dynamic remaining box indicator styling */
+    .remaining-box {
+      border-radius: 12px !important;
+      padding: 14px !important;
+      transition: all 0.3s ease !important;
+    }
+    
+    .remaining-box--balanced {
+      background-color: var(--color-positive-pale) !important;
+      border: 1.5px solid var(--color-positive) !important;
+      color: var(--color-positive-deep) !important;
+      
+      .text-destructive,
+      .text-secondary {
+        color: var(--color-positive-deep) !important;
+      }
+    }
+    
+    .remaining-box--unbalanced {
+      background-color: var(--color-negative-pale) !important;
+      border: 1.5px solid var(--color-negative) !important;
+      color: var(--color-negative-darkest) !important;
+      
+      .text-destructive,
+      .text-secondary {
+        color: var(--color-negative-darkest) !important;
+      }
+    }
+
+    /* Primary and secondary button overrides */
+    .btn--primary,
+    input[type="submit"] {
+      background-color: var(--color-primary) !important;
+      color: var(--color-ink) !important;
+      border-radius: 24px !important;
+      font-weight: 600 !important;
+      padding: 14px 28px !important;
+      font-size: 16px !important;
+      box-shadow: none !important;
+      border: none !important;
+      transition: background-color 0.2s, transform 0.1s !important;
+      cursor: pointer !important;
+      width: 100% !important;
+      display: inline-flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+    }
+
+    .btn--primary:hover,
+    input[type="submit"]:hover {
+      background-color: var(--color-primary-hover) !important;
+    }
+    
+    .btn--primary:active,
+    input[type="submit"]:active {
+      transform: scale(0.985) !important;
+    }
+
+    .btn--outline {
+      border: 1.5px solid var(--color-ink) !important;
+      color: var(--color-ink) !important;
+      border-radius: 24px !important;
+      background-color: var(--color-canvas) !important;
+      font-weight: 600 !important;
+      padding: 12px 24px !important;
+    }
+
+    /* Disclosures & toggle buttons */
+    .disclosure__trigger {
+      font-weight: 600 !important;
+      color: var(--color-ink) !important;
+    }
+  }
+
+  [data-theme="dark"] .wise-form {
+    --color-canvas-soft: #171717;
+    --color-canvas: #242424;
+    --color-ink: #f5f5f5;
+    --color-body: #a3a3a3;
+    --color-border-field: rgba(245, 245, 245, 0.15);
+    --color-border-soft-row: rgba(245, 245, 245, 0.2);
+
+    --color-positive: #2ead4b;
+    --color-positive-deep: #aeeea6;
+    --color-positive-pale: #153118;
+
+    --color-negative: #ef4444;
+    --color-negative-deep: #fca5a5;
+    --color-negative-darkest: #fee2e2;
+    --color-negative-pale: #3b1616;
+
+    select.form-field__input,
+    select.wise-split-row-input,
+    select[data-money-field-target="currency"] {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a3a3a3' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+      color-scheme: dark !important;
+    }
+  }
+
   .pcr-app {
     position: static !important;
     background: none !important;

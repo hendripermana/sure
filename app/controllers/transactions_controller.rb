@@ -90,9 +90,61 @@ class TransactionsController < ApplicationController
 
   def create
     account = Current.family.accounts.find(params.dig(:entry, :account_id))
-    @entry = account.entries.new(entry_params)
 
-    if @entry.save
+    # Extract splits from entry params so we don't pass it to the new entry initializer
+    params_for_entry = entry_params
+    splits_params = params_for_entry.delete(:splits)
+
+    @entry = account.entries.new(params_for_entry)
+
+    is_split = params[:split_transaction] == "1" && splits_params.present?
+
+    if is_split
+      raw_splits = splits_params
+      raw_splits = raw_splits.values if raw_splits.respond_to?(:values)
+
+      # Inflow (income) is stored as negative in DB, outflow (expense) is positive.
+      # Splits are entered as positive values in the form, so we adjust based on nature.
+      multiplier = @entry.amount.negative? ? -1 : 1
+
+      normalized_splits = raw_splits.map do |s|
+        {
+          name: s[:name],
+          amount: s[:amount].to_d * multiplier,
+          category_id: s[:category_id].presence,
+          excluded: s[:excluded]
+        }
+      end
+
+      # Clear parent category since it's split
+      if @entry.entryable.is_a?(Transaction)
+        @entry.entryable.category_id = nil
+      end
+    end
+
+    success = false
+    Entry.transaction do
+      if @entry.save
+        if is_split
+          begin
+            @entry.split!(normalized_splits)
+            success = true
+          rescue ActiveRecord::RecordInvalid => e
+            # Copy validation errors onto the parent entry to display in the UI
+            e.record.errors.each do |error|
+              @entry.errors.add(error.attribute, error.message)
+            end
+            raise ActiveRecord::Rollback
+          end
+        else
+          success = true
+        end
+      else
+        raise ActiveRecord::Rollback
+      end
+    end
+
+    if success
       # OPTIMISTIC UPDATE: Immediate balance update for smooth UI experience
       # This prevents delay while waiting for async sync job
       entry_amount = @entry.amount
@@ -160,9 +212,15 @@ class TransactionsController < ApplicationController
       flash[:notice] = "Transaction created"
       link_subscription_payment(@entry)
 
+      redirect_target = if request.referer.present? && request.referer.include?("/accounts/")
+        request.referer
+      else
+        transactions_path
+      end
+
       respond_to do |format|
         format.html do
-          redirect_back_or_to account_path(@entry.account)
+          redirect_to redirect_target
         end
 
         # TURBO STREAM: Close modal + redirect (keeps optimistic balance)
@@ -170,7 +228,7 @@ class TransactionsController < ApplicationController
         format.turbo_stream do
           render turbo_stream: [
             turbo_stream.update("modal", ""),
-            build_stream_redirect_back_or_to(account_path(@entry.account)),
+            build_stream_redirect_to(redirect_target),
             *flash_notification_stream_items
           ]
         end
@@ -429,7 +487,8 @@ class TransactionsController < ApplicationController
     def entry_params
       entry_params = params.require(:entry).permit(
         :name, :date, :amount, :currency, :excluded, :notes, :nature, :entryable_type, :receipt,
-        entryable_attributes: [ :id, :category_id, :merchant_id, :kind, { tag_ids: [] } ]
+        entryable_attributes: [ :id, :category_id, :merchant_id, :kind, { tag_ids: [] } ],
+        splits: [ :name, :amount, :category_id, :excluded ]
       )
 
       nature = entry_params.delete(:nature)

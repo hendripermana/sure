@@ -1,76 +1,502 @@
 <%# locals: (entry:, income_categories:, expense_categories:) %>
 
-<%= styled_form_with model: entry, url: transactions_path, class: "space-y-4" do |f| %>
-  <% if entry.errors.any? %>
-    <%= render "shared/form_errors", model: entry %>
-  <% end %>
+<div class="wise-form">
+  <%= styled_form_with model: entry, url: transactions_path, class: "space-y-4", data: { controller: "new-transaction-split" } do |f| %>
+    <%
+      categories = params[:nature] == "inflow" ? income_categories : expense_categories
+      category_options = Category::Group.for(categories).flat_map do |group|
+        root = group.category
+        root_style = "color: #{root.color}; font-weight: 600;"
+        options = [[root.name, root.id, { style: root_style }]]
+        
+        group.subcategories.each do |sub|
+          sub_style = "color: #{sub.color}; padding-left: 12px;"
+          options << ["  ↳ #{sub.name}", sub.id, { style: sub_style }]
+        end
+        options
+      end
 
-  <section class="section-card">
-    <%= render "shared/transaction_type_tabs", active_tab: params[:nature] == "inflow" ? "income" : "expense", account_id: params[:account_id] %>
-
-    <%= f.hidden_field :nature, value: params[:nature] || "outflow" %>
-    <%= f.hidden_field :entryable_type, value: "Transaction" %>
-  </section>
-
-  <section class="section-card space-y-4">
-    <%= f.text_field :name, label: t(".description"), placeholder: t(".description_placeholder"), required: true %>
-
-    <% if @entry.account_id %>
-      <%= f.hidden_field :account_id %>
-    <% else %>
-      <%= f.collection_select :account_id, Current.family.accounts.manual.active.alphabetically, :id, :name, { prompt: t(".account_prompt"), label: t(".account") }, required: true, class: "form-field__input text-ellipsis" %>
+      split_category_options = Category::Group.for(categories).flat_map do |group|
+        root = group.category
+        options = [[root.name, root.id]]
+        
+        group.subcategories.each do |sub|
+          options << ["  ↳ #{sub.name}", sub.id]
+        end
+        options
+      end
+    %>
+    <% if entry.errors.any? %>
+      <%= render "shared/form_errors", model: entry %>
     <% end %>
 
-    <%= f.money_field :amount, label: t(".amount"), required: true %>
-    <%= f.fields_for :entryable do |ef| %>
-      <% categories = params[:nature] == "inflow" ? income_categories : expense_categories %>
-      <%= ef.collection_select :category_id, categories, :id, :name, { prompt: t(".category_prompt"), label: t(".category") } %>
-    <% end %>
-    <%= f.date_field :date,
-                     label: t(".date"),
-                     required: true,
-                     min: Entry.min_supported_date,
-                     max: Date.current,
-                     value: (entry.date || Date.current) %>
-  </section>
+    <section class="section-card">
+      <%= render "shared/transaction_type_tabs", active_tab: params[:nature] == "inflow" ? "income" : "expense", account_id: params[:account_id] %>
 
-  <%# Preserve subscription context so the controller can link the payment back to the plan %>
-  <% if params[:subscription_plan_id].present? %>
-    <%= hidden_field_tag :subscription_plan_id, params[:subscription_plan_id] %>
-  <% end %>
+      <%= f.hidden_field :nature, value: params[:nature] || "outflow" %>
+      <%= f.hidden_field :entryable_type, value: "Transaction" %>
+    </section>
 
-  <section class="section-card space-y-4">
-    <%= render DS::Disclosure.new(title: t(".details")) do %>
-      <div class="space-y-4 pt-4">
-        <%= f.fields_for :entryable do |ef| %>
-          <%= ef.select :tag_ids,
-                        Current.family.tags.alphabetically.pluck(:name, :id),
-                        {
-                          include_blank: t(".none"),
-                          multiple: true,
-                          label:    t(".tags_label")
-                        },
-                        { "data-controller": "multi-select" } %>
+    <section class="section-card">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="md:col-span-2">
+          <%= f.money_field :amount, label: t(".amount"), required: true %>
+        </div>
+
+        <div class="md:col-span-2">
+          <%= f.text_field :name, label: t(".description"), placeholder: t(".description_placeholder"), required: true %>
+        </div>
+
+        <% if @entry.account_id %>
+          <%= f.hidden_field :account_id %>
+          <div class="md:col-span-2">
+            <%= f.date_field :date,
+                             label: t(".date"),
+                             required: true,
+                             min: Entry.min_supported_date,
+                             max: Date.current,
+                             value: (entry.date || Date.current) %>
+          </div>
+        <% else %>
+          <div class="form-field" data-controller="custom-select">
+            <div class="form-field__body relative">
+              <label class="form-field__label" id="account_dropdown_label">
+                <%= t(".account") %>
+              </label>
+              <input type="hidden" name="entry[account_id]" value="<%= entry.account_id %>" data-custom-select-target="hiddenInput" required>
+
+              <%# Trigger button — managed by custom-select controller, NOT DS::Menu %>
+              <button type="button"
+                      aria-labelledby="account_dropdown_label"
+                      class="form-field__input w-full flex items-center justify-between text-left focus:outline-none cursor-pointer h-6 min-w-0"
+                      data-custom-select-target="trigger"
+                      data-action="click->custom-select#toggle">
+                <span data-custom-select-target="triggerContent" class="flex items-center gap-2 min-w-0">
+                  <% current_account = Current.family.accounts.find_by(id: entry.account_id) %>
+                  <% if current_account %>
+                    <%= render "accounts/logo", account: current_account, size: "sm" %>
+                    <span class="text-sm font-medium text-primary truncate"><%= current_account.name %></span>
+                  <% else %>
+                    <span class="text-secondary text-sm font-medium"><%= t(".account_prompt") %></span>
+                  <% end %>
+                </span>
+                <%= icon("chevron-down", class: "w-4 h-4 text-secondary shrink-0") %>
+              </button>
+
+              <%# Dropdown panel — stays in DOM under this controller's element %>
+              <div data-custom-select-target="dropdown"
+                   class="hidden z-50 min-w-[200px] shadow-border-xs bg-container rounded-lg">
+                <div class="p-1.5 flex flex-col gap-0.5">
+                  <div class="p-1">
+                    <div class="relative flex items-center bg-container border border-secondary rounded-lg">
+                      <input placeholder="<%= t(".search_placeholder", default: "Search") %>"
+                             autocomplete="nope"
+                             type="search"
+                             class="bg-container placeholder:text-sm placeholder:text-secondary font-normal h-9 relative pl-9 w-full border-none rounded-lg focus:outline-hidden focus:ring-0 text-sm"
+                             data-custom-select-target="filterInput"
+                             data-action="input->custom-select#filter">
+                      <%= icon("search", class: "absolute inset-0 ml-2 transform top-1/2 -translate-y-1/2 w-4 h-4 text-secondary") %>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-0.5 p-1 mt-0.5 max-h-64 overflow-y-auto scrollbar">
+                    <div class="pb-2 pl-4 text-secondary hidden text-xs" data-empty-message>
+                      No accounts found
+                    </div>
+
+                    <% Current.family.accounts.manual.active.alphabetically.each do |acc| %>
+                      <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover" data-filter-name="<%= acc.name %>">
+                        <button type="button"
+                                class="flex w-full items-center gap-2 cursor-pointer focus:outline-none"
+                                data-action="click->custom-select#selectOption"
+                                data-value="<%= acc.id %>">
+                          <div data-badge class="flex items-center gap-2 min-w-0">
+                            <%= render "accounts/logo", account: acc, size: "sm" %>
+                            <span class="text-sm font-medium text-primary truncate"><%= acc.name %></span>
+                          </div>
+                        </button>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <%= f.date_field :date,
+                             label: t(".date"),
+                             required: true,
+                             min: Entry.min_supported_date,
+                             max: Date.current,
+                             value: (entry.date || Date.current) %>
+          </div>
         <% end %>
-        <%= f.text_area :notes,
-                        label: t(".note_label"),
-                        placeholder: t(".note_placeholder"),
-                        rows: 5,
-                        "data-auto-submit-form-target": "auto" %>
 
-        <%# Receipt attachment - stored in R2 for zero-egress cost %>
-        <div class="space-y-1">
-          <label class="form-field__label"><%= t(".receipt_label", default: "Receipt / Document") %></label>
-          <%= f.file_field :receipt,
-                          accept: "image/jpeg,image/png,image/webp,application/pdf",
-                          class: "block w-full text-sm text-secondary file:rounded-md file:border-0 file:bg-container file:text-sm file:font-semibold file:text-primary hover:file:bg-surface-inset cursor-pointer" %>
-          <p class="text-xs text-tertiary"><%= t(".receipt_hint", default: "JPEG, PNG, WebP, or PDF (max 10MB)") %></p>
+        <%= f.fields_for :entryable do |ef| %>
+          <div class="md:col-span-2 transition-all duration-400 ease-in-out origin-top overflow-hidden opacity-100 max-h-[120px] collapsible-visible" data-new-transaction-split-target="parentCategory">
+            <div class="form-field" data-controller="custom-select">
+              <div class="form-field__body relative">
+                <label class="form-field__label" id="category_dropdown_label">
+                  <%= t(".category") %>
+                </label>
+
+                <input type="hidden" name="entry[entryable_attributes][category_id]" value="<%= entry.entryable.category_id %>" data-custom-select-target="hiddenInput">
+
+                <button type="button"
+                        aria-labelledby="category_dropdown_label"
+                        class="form-field__input w-full flex items-center justify-between text-left focus:outline-none cursor-pointer h-6 min-w-0"
+                        data-custom-select-target="trigger"
+                        data-action="click->custom-select#toggle">
+                  <span data-custom-select-target="triggerContent" class="flex items-center gap-1.5 min-w-0">
+                    <% current_category = entry.entryable.category %>
+                    <% if current_category %>
+                      <%= render partial: "categories/badge", locals: { category: current_category } %>
+                    <% else %>
+                      <span class="text-secondary text-sm font-medium"><%= t(".category_prompt") %></span>
+                    <% end %>
+                  </span>
+                  <%= icon("chevron-down", class: "w-4 h-4 text-secondary shrink-0") %>
+                </button>
+
+                <div data-custom-select-target="dropdown"
+                     class="hidden z-50 min-w-[200px] shadow-border-xs bg-container rounded-lg">
+                  <div class="p-1.5 flex flex-col gap-0.5">
+                    <div class="p-1">
+                      <div class="relative flex items-center bg-container border border-secondary rounded-lg">
+                        <input placeholder="<%= t(".search_placeholder", default: "Search") %>"
+                               autocomplete="nope"
+                               type="search"
+                               class="bg-container placeholder:text-sm placeholder:text-secondary font-normal h-9 relative pl-9 w-full border-none rounded-lg focus:outline-hidden focus:ring-0 text-sm"
+                               data-custom-select-target="filterInput"
+                               data-action="input->custom-select#filter">
+                        <%= icon("search", class: "absolute inset-0 ml-2 transform top-1/2 -translate-y-1/2 w-4 h-4 text-secondary") %>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col gap-0.5 p-1 mt-0.5 max-h-64 overflow-y-auto scrollbar">
+                      <div class="pb-2 pl-4 text-secondary hidden text-xs" data-empty-message>
+                        <%= t(".no_categories", default: "No categories found") %>
+                      </div>
+
+                      <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover" data-filter-name="uncategorized none clear select category">
+                        <button type="button"
+                                class="flex w-full items-center gap-1.5 cursor-pointer focus:outline-none"
+                                data-action="click->custom-select#selectOption"
+                                data-value="">
+                          <div data-badge>
+                            <span class="text-secondary text-sm font-medium"><%= t(".category_prompt") %></span>
+                          </div>
+                        </button>
+                      </div>
+
+                      <% Category::Group.for(categories).each do |group| %>
+                        <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover" data-filter-name="<%= group.category.name %>">
+                          <button type="button"
+                                  class="flex w-full items-center gap-1.5 cursor-pointer focus:outline-none"
+                                  data-action="click->custom-select#selectOption"
+                                  data-value="<%= group.category.id %>">
+                            <div data-badge>
+                              <%= render partial: "categories/badge", locals: { category: group.category } %>
+                            </div>
+                          </button>
+                        </div>
+
+                        <% group.subcategories.each do |sub| %>
+                          <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover pl-6" data-filter-name="<%= sub.name %>">
+                            <button type="button"
+                                    class="flex w-full items-center gap-1.5 cursor-pointer focus:outline-none"
+                                    data-action="click->custom-select#selectOption"
+                                    data-value="<%= sub.id %>">
+                              <%= icon("corner-down-right", size: "sm", class: "text-secondary shrink-0") %>
+                              <div data-badge class="flex items-center gap-1.5">
+                                <%= render partial: "categories/badge", locals: { category: sub } %>
+                              </div>
+                            </button>
+                          </div>
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="md:col-span-2">
+            <div class="form-field" data-controller="custom-select">
+              <div class="form-field__body relative">
+                <label class="form-field__label" id="merchant_dropdown_label">
+                  <%= t("transactions.show.merchant_label", default: "Merchant") %>
+                </label>
+
+                <input type="hidden" name="entry[entryable_attributes][merchant_id]" value="<%= entry.entryable.merchant_id %>" data-custom-select-target="hiddenInput">
+
+                <button type="button"
+                        aria-labelledby="merchant_dropdown_label"
+                        class="form-field__input w-full flex items-center justify-between text-left focus:outline-none cursor-pointer h-6 min-w-0"
+                        data-custom-select-target="trigger"
+                        data-action="click->custom-select#toggle">
+                  <span data-custom-select-target="triggerContent" class="flex items-center gap-2 min-w-0">
+                    <% current_merchant = entry.entryable.merchant %>
+                    <% if current_merchant %>
+                      <% if current_merchant.display_logo_url.present? %>
+                        <%= image_tag current_merchant.display_logo_url, class: "w-5 h-5 rounded-full shrink-0 object-cover" %>
+                      <% else %>
+                        <%= icon("store", size: "sm", class: "text-secondary shrink-0") %>
+                      <% end %>
+                      <span class="text-sm font-medium text-primary truncate"><%= current_merchant.name %></span>
+                    <% else %>
+                      <span class="text-secondary text-sm font-medium"><%= t(".none") %></span>
+                    <% end %>
+                  </span>
+                  <%= icon("chevron-down", class: "w-4 h-4 text-secondary shrink-0") %>
+                </button>
+
+                <div data-custom-select-target="dropdown"
+                     class="hidden z-50 min-w-[200px] shadow-border-xs bg-container rounded-lg">
+                  <div class="p-1.5 flex flex-col gap-0.5">
+                    <div class="p-1">
+                      <div class="relative flex items-center bg-container border border-secondary rounded-lg">
+                        <input placeholder="<%= t(".search_placeholder", default: "Search") %>"
+                               autocomplete="nope"
+                               type="search"
+                               class="bg-container placeholder:text-sm placeholder:text-secondary font-normal h-9 relative pl-9 w-full border-none rounded-lg focus:outline-hidden focus:ring-0 text-sm"
+                               data-custom-select-target="filterInput"
+                               data-action="input->custom-select#filter">
+                        <%= icon("search", class: "absolute inset-0 ml-2 transform top-1/2 -translate-y-1/2 w-4 h-4 text-secondary") %>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col gap-0.5 p-1 mt-0.5 max-h-64 overflow-y-auto scrollbar">
+                      <div class="pb-2 pl-4 text-secondary hidden text-xs" data-empty-message>
+                        No merchants found
+                      </div>
+
+                      <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover" data-filter-name="none clear merchant">
+                        <button type="button"
+                                class="flex w-full items-center gap-2 cursor-pointer focus:outline-none"
+                                data-action="click->custom-select#selectOption"
+                                data-value="">
+                          <div data-badge class="flex items-center gap-2 min-w-0">
+                            <span class="text-secondary text-sm font-medium"><%= t(".none") %></span>
+                          </div>
+                        </button>
+                      </div>
+
+                      <% [entry.entryable.merchant, *Current.family.merchants.alphabetically].compact.uniq.each do |merchant| %>
+                        <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover" data-filter-name="<%= merchant.name %>">
+                          <button type="button"
+                                  class="flex w-full items-center gap-2 cursor-pointer focus:outline-none"
+                                  data-action="click->custom-select#selectOption"
+                                  data-value="<%= merchant.id %>">
+                            <div data-badge class="flex items-center gap-2 min-w-0">
+                              <% if merchant.display_logo_url.present? %>
+                                <%= image_tag merchant.display_logo_url, class: "w-5 h-5 rounded-full shrink-0 object-cover" %>
+                              <% else %>
+                                <%= icon("store", size: "sm", class: "text-secondary shrink-0") %>
+                              <% end %>
+                              <span class="text-sm font-medium text-primary truncate"><%= merchant.name %></span>
+                            </div>
+                          </button>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="section-card space-y-4">
+      <div class="flex cursor-pointer items-center gap-4 justify-between">
+        <div class="text-sm space-y-1">
+          <h4 class="text-primary font-semibold">Split Transaction</h4>
+          <p class="text-secondary text-xs">Divide this transaction into multiple categories or parts.</p>
+        </div>
+
+        <%= check_box_tag :split_transaction, "1", false,
+              class: "checkbox checkbox--light",
+              data: {
+                new_transaction_split_target: "checkbox",
+                action: "change->new-transaction-split#toggle"
+              } %>
+      </div>
+
+      <%# Splits dynamic container %>
+      <div data-new-transaction-split-target="fields" class="hidden space-y-4 pt-2 transition-all duration-400 ease-in-out origin-top overflow-hidden opacity-0 max-h-0 collapsible-hidden">
+        <div data-new-transaction-split-target="rowsContainer" class="space-y-3">
+          <%# Template row %>
+          <div class="p-4 rounded-xl border border-secondary bg-container shadow-xs" data-new-transaction-split-target="row">
+            <div class="flex flex-wrap md:flex-nowrap items-end gap-3">
+              <div class="w-full md:flex-1 md:w-auto min-w-0">
+                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5">Name</label>
+                <input type="text"
+                       name="entry[splits][0][name]"
+                       placeholder="Split name"
+                       class="wise-split-row-input"
+                       autocomplete="off"
+                       data-new-transaction-split-target="nameInput">
+              </div>
+              <div class="flex-1 md:flex-none md:w-28">
+                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5">Amount</label>
+                <input type="number"
+                       name="entry[splits][0][amount]"
+                       placeholder="0.00"
+                       step="0.01"
+                       class="wise-split-row-input"
+                       autocomplete="off"
+                       data-new-transaction-split-target="amountInput"
+                       data-action="input->new-transaction-split#updateRemaining">
+              </div>
+              <div class="category-select-container flex-1 min-w-0" data-controller="custom-select">
+                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5">Category</label>
+                
+                <div class="relative">
+                  <input type="hidden" name="entry[splits][0][category_id]" value="" data-custom-select-target="hiddenInput">
+
+                  <button type="button"
+                          aria-label="Category"
+                          class="wise-split-row-input flex items-center justify-between text-left focus:outline-none cursor-pointer min-w-0"
+                          data-custom-select-target="trigger"
+                          data-action="click->custom-select#toggle">
+                    <span data-custom-select-target="triggerContent" class="flex items-center gap-1.5 min-w-0 truncate">
+                      <span class="text-secondary text-sm font-medium"><%= t(".category_prompt") %></span>
+                    </span>
+                    <%= icon("chevron-down", class: "w-4 h-4 text-secondary shrink-0") %>
+                  </button>
+
+                  <div data-custom-select-target="dropdown"
+                       class="hidden z-50 min-w-[200px] shadow-border-xs bg-container rounded-lg">
+                    <div class="p-1.5 flex flex-col gap-0.5">
+                      <div class="p-1">
+                        <div class="relative flex items-center bg-container border border-secondary rounded-lg">
+                          <input placeholder="<%= t(".search_placeholder", default: "Search") %>"
+                                 autocomplete="nope"
+                                 type="search"
+                                 class="bg-container placeholder:text-sm placeholder:text-secondary font-normal h-9 relative pl-9 w-full border-none rounded-lg focus:outline-hidden focus:ring-0 text-sm"
+                                 data-custom-select-target="filterInput"
+                                 data-action="input->custom-select#filter">
+                          <%= icon("search", class: "absolute inset-0 ml-2 transform top-1/2 -translate-y-1/2 w-4 h-4 text-secondary") %>
+                        </div>
+                      </div>
+
+                      <div class="flex flex-col gap-0.5 p-1 mt-0.5 max-h-64 overflow-y-auto scrollbar">
+                        <div class="pb-2 pl-4 text-secondary hidden text-xs" data-empty-message>
+                          <%= t(".no_categories", default: "No categories found") %>
+                        </div>
+
+                        <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover" data-filter-name="uncategorized none clear select category">
+                          <button type="button"
+                                  class="flex w-full items-center gap-1.5 cursor-pointer focus:outline-none"
+                                  data-action="click->custom-select#selectOption"
+                                  data-value="">
+                            <div data-badge>
+                              <span class="text-secondary text-sm font-medium"><%= t(".category_prompt") %></span>
+                            </div>
+                          </button>
+                        </div>
+
+                        <% Category::Group.for(categories).each do |group| %>
+                          <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover" data-filter-name="<%= group.category.name %>">
+                            <button type="button"
+                                    class="flex w-full items-center gap-1.5 cursor-pointer focus:outline-none"
+                                    data-action="click->custom-select#selectOption"
+                                    data-value="<%= group.category.id %>">
+                              <div data-badge>
+                                <%= render partial: "categories/badge", locals: { category: group.category } %>
+                              </div>
+                            </button>
+                          </div>
+
+                          <% group.subcategories.each do |sub| %>
+                            <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover pl-6" data-filter-name="<%= sub.name %>">
+                              <button type="button"
+                                      class="flex w-full items-center gap-1.5 cursor-pointer focus:outline-none"
+                                      data-action="click->custom-select#selectOption"
+                                      data-value="<%= sub.id %>">
+                                <%= icon("corner-down-right", size: "sm", class: "text-secondary shrink-0") %>
+                                <div data-badge class="flex items-center gap-1.5">
+                                  <%= render partial: "categories/badge", locals: { category: sub } %>
+                                </div>
+                              </button>
+                            </div>
+                          <% end %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="w-8 shrink-0 hidden md:block"></div>
+            </div>
+          </div>
+        </div>
+
+        <%# Add split button %>
+        <button type="button"
+                class="flex items-center justify-center gap-1.5 w-full py-2.5 text-sm font-semibold text-secondary hover:text-primary border border-dashed border-secondary hover:border-primary rounded-xl transition-all"
+                data-action="click->new-transaction-split#addRow">
+          <svg class="w-4 h-4 shrink-0 transition-all duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add Row
+        </button>
+
+        <%# Remaining balance indicator %>
+        <div data-new-transaction-split-target="remainingContainer" class="remaining-box remaining-box--unbalanced text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-secondary font-semibold">Remaining</span>
+            <span data-new-transaction-split-target="remaining" class="font-bold">
+              0.00
+            </span>
+          </div>
+          <p data-new-transaction-split-target="error" class="text-xs mt-1.5 font-medium">
+            Amounts must equal original transaction amount.
+          </p>
         </div>
       </div>
-    <% end %>
-  </section>
+    </section>
 
-  <section class="flex justify-end pt-2">
-    <%= f.submit t(".submit") %>
-  </section>
-<% end %>
+    <%# Preserve subscription context so the controller can link the payment back to the plan %>
+    <% if params[:subscription_plan_id].present? %>
+      <%= hidden_field_tag :subscription_plan_id, params[:subscription_plan_id] %>
+    <% end %>
+
+    <section class="section-card space-y-4">
+      <%= render DS::Disclosure.new(title: t(".details")) do %>
+        <div class="space-y-4 pt-4">
+          <%= f.fields_for :entryable do |ef| %>
+            <%= ef.select :tag_ids,
+                          Current.family.tags.alphabetically.pluck(:name, :id),
+                          {
+                            include_blank: t(".none"),
+                            multiple: true,
+                            label:    t(".tags_label")
+                          },
+                          { "data-controller": "multi-select" } %>
+          <% end %>
+          <%= f.text_area :notes,
+                          label: t(".note_label"),
+                          placeholder: t(".note_placeholder"),
+                          rows: 5,
+                          "data-auto-submit-form-target": "auto" %>
+
+          <%# Receipt attachment - stored in R2 for zero-egress cost %>
+          <div class="space-y-1">
+            <label class="form-field__label"><%= t(".receipt_label", default: "Receipt / Document") %></label>
+            <%= f.file_field :receipt,
+                            accept: "image/jpeg,image/png,image/webp,application/pdf",
+                            class: "block w-full text-sm text-secondary file:rounded-md file:border-0 file:bg-container file:text-sm file:font-semibold file:text-primary hover:file:bg-surface-inset cursor-pointer" %>
+            <p class="text-xs text-tertiary"><%= t(".receipt_hint", default: "JPEG, PNG, WebP, or PDF (max 10MB)") %></p>
+          </div>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="flex justify-end pt-2">
+      <%= f.submit t(".submit"), data: { new_transaction_split_target: "submitButton" } %>
+    </section>
+  <% end %>
+</div>

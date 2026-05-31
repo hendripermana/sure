@@ -10,6 +10,7 @@ import { Controller } from "@hotwired/stimulus";
  * - Dispatches custom event to close other open menus (prevents stacking)
  * - Stores direct element references since targets are lost when moved to body
  * - Rails 8.1: Properly handles Turbo morph refreshes by cleaning up orphaned content
+ * - Re-entry guard on toggle() prevents double-fire from Stimulus reconnect cycles
  */
 export default class extends Controller {
   static targets = ["button", "content"];
@@ -24,12 +25,16 @@ export default class extends Controller {
     // Generate unique ID for this menu instance to track its content
     this._menuId = `ds-menu-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
+    // Defensive cleanup: remove any stale listeners from a previous connect()
+    // that may not have been properly disconnected (e.g., Turbo morph reconnect)
+    this.removeEventListeners();
+    this.stopAutoUpdate();
+
     // Store direct references before moving to body (targets won't work after move)
     this._buttonEl = this.hasButtonTarget ? this.buttonTarget : null;
     this._contentEl = this.hasContentTarget ? this.contentTarget : null;
 
     if (!this._buttonEl || !this._contentEl) {
-      console.warn("DS--menu: Missing button or content target");
       return;
     }
 
@@ -102,6 +107,9 @@ export default class extends Controller {
   addEventListeners() {
     if (!this._buttonEl) return;
 
+    // Create bound handlers and store them so we can remove them later.
+    // IMPORTANT: Each call creates new bound functions, so we must remove
+    // any stale handlers BEFORE calling this method.
     this.toggleHandler = this.toggle.bind(this);
     this.keydownHandler = this.handleKeydown.bind(this);
     this.outsideClickHandler = this.handleOutsideClick.bind(this);
@@ -141,6 +149,15 @@ export default class extends Controller {
     if (this.closeOtherMenusHandler) {
       document.removeEventListener("ds:menu:close-others", this.closeOtherMenusHandler);
     }
+
+    // Null out handler references so removeEventListeners is idempotent
+    this.toggleHandler = null;
+    this.keydownHandler = null;
+    this.outsideClickHandler = null;
+    this.turboLoadHandler = null;
+    this.turboBeforeVisitHandler = null;
+    this.turboBeforeRenderHandler = null;
+    this.closeOtherMenusHandler = null;
   }
 
   handleTurboLoad() {
@@ -190,6 +207,16 @@ export default class extends Controller {
 
   toggle(event) {
     if (!this._contentEl) return;
+
+    // Re-entry guard: prevent double-fire within the same frame.
+    // This can happen when Stimulus reconnects the controller during
+    // Turbo morph cycles, causing addEventListener to bind twice before
+    // the old handler is cleaned up.
+    if (this._toggling) return;
+    this._toggling = true;
+    requestAnimationFrame(() => {
+      this._toggling = false;
+    });
 
     if (event) {
       event.preventDefault();
