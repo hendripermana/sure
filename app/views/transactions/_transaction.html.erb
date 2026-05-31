@@ -1,10 +1,10 @@
-<%# locals: (entry:, balance_trend: nil, view_ctx: "global", in_split_group: false) %>
+<%# locals: (entry:, balance_trend: nil, view_ctx: "global", in_split_group: false, split_share: nil) %>
 
 <% transaction = entry.entryable %>
 
 <%= turbo_frame_tag dom_id(entry) do %>
   <%= turbo_frame_tag dom_id(transaction) do %>
-    <div class="flex lg:grid lg:grid-cols-12 items-center text-primary text-sm font-medium p-3 lg:p-4 <%= "pl-8 lg:pl-12" if in_split_group %> <%= entry.excluded ? "opacity-50 text-gray-400" : "" %>">
+    <div class="flex lg:grid lg:grid-cols-12 items-center text-primary text-sm font-medium p-3 lg:p-4 <%= "split-child-row pl-4 lg:pl-5" if in_split_group %> <%= entry.excluded ? "opacity-50 text-gray-400" : "" %>">
 
       <div class="pr-4 lg:pr-10 flex items-center gap-3 lg:gap-4 col-span-8 min-w-0">
         <%= check_box_tag dom_id(entry, "selection"),
@@ -132,14 +132,16 @@
                     </span>
                   <% else %>
                     <% if transaction.merchant&.present? %>
-                      <span class="hidden lg:inline truncate"><%= transaction.merchant.name %> • </span>
+                      <span class="hidden lg:inline truncate"><%= transaction.merchant.name %><%= " • " unless in_split_group %></span>
                     <% end %>
-                    <span class="text-secondary hidden lg:inline">
-                      <%= link_to entry.account.name,
-                          account_path(entry.account, tab: "transactions"),
-                          data: { turbo_frame: "_top" },
-                          class: "hover:underline" %>
-                    </span>
+                    <% unless in_split_group %>
+                      <span class="text-secondary hidden lg:inline">
+                        <%= link_to entry.account.name,
+                            account_path(entry.account, tab: "transactions"),
+                            data: { turbo_frame: "_top" },
+                            class: "hover:underline" %>
+                      </span>
+                    <% end %>
                     <div class="flex items-center gap-1 truncate">
                       <%= render "categories/category_name_mobile", transaction: transaction %>
                       <% if transaction.merchant&.present? %>
@@ -178,6 +180,9 @@
         end %>
 
         <%= content_tag :p, amount_label, class: ["text-green-600": entry.amount.negative?] %>
+        <% if split_share %>
+          <p class="text-secondary text-xs font-normal mt-0.5" title="Share of split"><%= split_share %>%</p>
+        <% end %>
       </div>
     </div>
   <% end %>

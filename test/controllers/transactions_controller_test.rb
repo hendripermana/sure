@@ -30,9 +30,56 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
 
     created_entry = Entry.order(:created_at).last
 
-    assert_redirected_to account_url(created_entry.account)
+    assert_redirected_to transactions_url
     assert_equal "Transaction created", flash[:notice]
     assert_enqueued_with(job: SyncJob)
+  end
+
+  test "creates transaction and redirects to transactions_url when referer is not account page" do
+    assert_difference [ "Entry.count", "Transaction.count" ], 1 do
+      post transactions_url, headers: { "HTTP_REFERER" => root_url }, params: {
+        entry: {
+          account_id: @entry.account_id,
+          name: "New transaction",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "inflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: {
+            tag_ids: [ Tag.first.id ],
+            category_id: Category.first.id,
+            merchant_id: Merchant.first.id
+          }
+        }
+      }
+    end
+
+    assert_redirected_to transactions_url
+  end
+
+  test "creates transaction and redirects back to account page when referer is account page" do
+    account = @entry.account
+    assert_difference [ "Entry.count", "Transaction.count" ], 1 do
+      post transactions_url, headers: { "HTTP_REFERER" => account_url(account) }, params: {
+        entry: {
+          account_id: account.id,
+          name: "New transaction",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "inflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: {
+            tag_ids: [ Tag.first.id ],
+            category_id: Category.first.id,
+            merchant_id: Merchant.first.id
+          }
+        }
+      }
+    end
+
+    assert_redirected_to account_url(account)
   end
 
   test "updates with transaction details" do
@@ -317,5 +364,192 @@ end
 
     get transactions_url(q: { categories: [ "Food" ], types: [ "expense" ] })
     assert_response :success
+  end
+
+  test "creates a split transaction" do
+    assert_difference "Entry.count", 3 do # Parent + 2 children
+      post transactions_url, params: {
+        split_transaction: "1",
+        entry: {
+          account_id: @entry.account_id,
+          name: "Split Parent",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "outflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: {
+            category_id: "",
+            merchant_id: ""
+          },
+          splits: {
+            "0" => { name: "Groceries", amount: "70", category_id: Category.first.id },
+            "1" => { name: "Household", amount: "30", category_id: "" }
+          }
+        }
+      }
+    end
+
+    created_parent = Entry.where(name: "Split Parent").last
+    assert created_parent.excluded?
+    assert created_parent.split_parent?
+
+    children = created_parent.child_entries.order(:amount)
+    assert_equal 2, children.count
+    assert_equal 30, children.first.amount
+    assert_equal 70, children.last.amount
+    assert_nil created_parent.entryable.category_id
+  end
+
+  test "fails to create split transaction with unbalanced amounts" do
+    assert_no_difference "Entry.count" do
+      post transactions_url, params: {
+        split_transaction: "1",
+        entry: {
+          account_id: @entry.account_id,
+          name: "Unbalanced split",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "outflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: { category_id: "" },
+          splits: {
+            "0" => { name: "Part 1", amount: "60", category_id: categories(:food_and_drink).id },
+            "1" => { name: "Part 2", amount: "30", category_id: categories(:subcategory).id }
+          }
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "fails to create split with fewer than the minimum number of rows" do
+    assert_no_difference "Entry.count" do
+      post transactions_url, params: {
+        split_transaction: "1",
+        entry: {
+          account_id: @entry.account_id,
+          name: "Single split",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "outflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: { category_id: "" },
+          splits: {
+            "0" => { name: "Only one", amount: "100", category_id: categories(:food_and_drink).id }
+          }
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "creates income split with correct negative amount signs" do
+    assert_difference "Entry.count", 3 do # Parent + 2 children
+      post transactions_url, params: {
+        split_transaction: "1",
+        entry: {
+          account_id: @entry.account_id,
+          name: "Income split",
+          date: Date.current,
+          currency: "USD",
+          amount: 500, # Entered positive; inflow nature flips the sign
+          nature: "inflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: { category_id: "" },
+          splits: {
+            "0" => { name: "Salary part 1", amount: "300", category_id: categories(:salary).id },
+            "1" => { name: "Bonus", amount: "200", category_id: categories(:income).id }
+          }
+        }
+      }
+    end
+
+    parent = Entry.where(name: "Income split").last
+    assert_equal(-500, parent.amount) # Inflow stored as negative
+    assert parent.split_parent?
+
+    child_amounts = parent.child_entries.pluck(:amount).sort
+    assert_equal [ -300, -200 ].sort, child_amounts
+  end
+
+  test "split children remain independent after parent update" do
+    post transactions_url, params: {
+      split_transaction: "1",
+      entry: {
+        account_id: @entry.account_id,
+        name: "Original split",
+        date: Date.current,
+        currency: "USD",
+        amount: 100,
+        nature: "outflow",
+        entryable_type: @entry.entryable_type,
+        entryable_attributes: { category_id: "" },
+        splits: {
+          "0" => { name: "Part 1", amount: "60", category_id: categories(:food_and_drink).id },
+          "1" => { name: "Part 2", amount: "40", category_id: categories(:subcategory).id }
+        }
+      }
+    }
+
+    parent = Entry.where(name: "Original split").last
+    original_children_count = parent.child_entries.count
+    assert_equal 2, original_children_count
+
+    patch transaction_url(parent), params: {
+      entry: {
+        name: "Updated split name",
+        amount: 150
+      }
+    }
+
+    parent.reload
+    assert_equal "Updated split name", parent.name
+    assert_equal original_children_count, parent.child_entries.count
+  end
+
+  test "renders split transactions as a grouped collapsible card on the index" do
+    post transactions_url, params: {
+      split_transaction: "1",
+      entry: {
+        account_id: @entry.account_id,
+        name: "Grouped Split Parent",
+        date: Date.current,
+        currency: "USD",
+        amount: 100,
+        nature: "outflow",
+        entryable_type: @entry.entryable_type,
+        entryable_attributes: { category_id: "" },
+        splits: {
+          "0" => { name: "Groceries Split", amount: "60", category_id: categories(:food_and_drink).id },
+          "1" => { name: "Soap Split", amount: "40", category_id: categories(:subcategory).id }
+        }
+      }
+    }
+
+    parent = Entry.where(name: "Grouped Split Parent").last
+
+    get transactions_url
+    assert_response :success
+
+    # Cohesive split-group card with collapse controller + children container
+    assert_select "[data-testid='split-group-#{parent.id}'][data-controller='split-group']"
+    assert_select "[data-testid='split-group-#{parent.id}'] .split-group__children"
+    # Header shows the parent name and the split chip
+    assert_match "Grouped Split Parent", @response.body
+    # Children render inside the group
+    assert_match "Groceries Split", @response.body
+    assert_match "Soap Split", @response.body
+    # Per-child share percentage (60 / 40 of 100)
+    assert_match "60%", @response.body
+    assert_match "40%", @response.body
+    # Always-visible actions menu (kebab) is present
+    assert_select "[data-testid='split-group-menu-#{parent.id}']"
+    # Unsplit action is available
+    assert_select "form[action='#{transaction_split_path(parent)}']"
   end
 end
