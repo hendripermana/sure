@@ -1,6 +1,11 @@
 class TransactionsController < ApplicationController
   include EntryableResource
 
+  # Minimum number of rows required to create a split transaction.
+  # Kept in sync with the `MINIMUM_SPLITS` constant in
+  # `new_transaction_split_controller.js`.
+  MINIMUM_SPLITS = 2
+
   before_action :store_params!, only: :index
 
   def new
@@ -120,6 +125,15 @@ class TransactionsController < ApplicationController
       if @entry.entryable.is_a?(Transaction)
         @entry.entryable.category_id = nil
       end
+
+      # Enforce a minimum number of splits server-side (mirrors the client UI)
+      if normalized_splits.size < MINIMUM_SPLITS
+        @entry.errors.add(:base, t("transactions.form.minimum_splits_error"))
+        @income_categories = Current.family.categories.incomes.alphabetically
+        @expense_categories = Current.family.categories.expenses.alphabetically
+        flash.now[:alert] = t("transactions.form.transaction_error")
+        return render :new, status: :unprocessable_entity
+      end
     end
 
     success = false
@@ -237,6 +251,7 @@ class TransactionsController < ApplicationController
       # Re-render form with errors (stays in modal)
       @income_categories = Current.family.categories.incomes.alphabetically
       @expense_categories = Current.family.categories.expenses.alphabetically
+      flash.now[:alert] = t("transactions.form.transaction_error")
       render :new, status: :unprocessable_entity
     end
   end

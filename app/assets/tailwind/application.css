@@ -74,6 +74,17 @@
   }
 }
 
+/* Gentle pulse for the unbalanced split indicator icon */
+@keyframes pulse-gentle {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
 @keyframes messageComplete {
 
   0%,
@@ -202,6 +213,7 @@
     --color-canvas: #ffffff;
     --color-ink: #0e0f0c;
     --color-body: #454745;
+    --color-mute: #868685;
     --color-primary: #9fe870;
     --color-primary-hover: #cdffad;
     --color-border-field: rgba(14, 15, 12, 0.15);
@@ -413,54 +425,129 @@
       opacity: 1 !important;
     }
 
-    /* Split rows inputs */
+    /* Split rows inputs — DESIGN.md text-input: 1px border, rounded.md (12px) */
     .wise-split-row-input {
       border: 1.5px solid var(--color-border-soft-row) !important;
-      border-radius: 10px !important;
-      padding: 8px 12px !important;
+      border-radius: 12px !important;
+      padding: 10px 14px !important;
       font-size: 14px !important;
+      line-height: 20px !important;
       color: var(--color-ink) !important;
       background-color: var(--color-canvas) !important;
-      transition: border-color 0.2s, box-shadow 0.2s !important;
+      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s !important;
       width: 100% !important;
     }
-    
+
+    .wise-split-row-input::placeholder {
+      color: var(--color-mute) !important;
+    }
+
     .wise-split-row-input:hover {
       border-color: rgba(14, 15, 12, 0.4) !important;
     }
-    
+
     .wise-split-row-input:focus {
       outline: none !important;
       border-color: var(--color-ink) !important;
-      box-shadow: 0 0 0 3px rgba(159, 232, 112, 0.2) !important;
+      box-shadow: 0 0 0 3px rgba(159, 232, 112, 0.25) !important;
+    }
+
+    /* Invalid required field feedback (toggled from the Stimulus controller) */
+    .wise-split-row-input--error {
+      border-color: var(--color-negative) !important;
+      box-shadow: 0 0 0 3px rgba(208, 50, 56, 0.18) !important;
+    }
+
+    /* Remove-split icon button — destructive affordance, WCAG-sized target */
+    .split-remove-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 10px !important;
+      border-radius: 12px !important;
+      color: var(--color-mute) !important;
+      background-color: transparent !important;
+      border: 1.5px solid transparent !important;
+      cursor: pointer !important;
+      transition: color 0.2s, background-color 0.2s, border-color 0.2s !important;
+    }
+
+    .split-remove-btn:hover {
+      color: var(--color-negative) !important;
+      background-color: var(--color-negative-pale) !important;
+    }
+
+    .split-remove-btn:focus-visible {
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(208, 50, 56, 0.35) !important;
     }
 
     /* Dynamic remaining box indicator styling */
     .remaining-box {
       border-radius: 12px !important;
-      padding: 14px !important;
+      padding: 14px 16px !important;
       transition: all 0.3s ease !important;
     }
-    
+
+    .remaining-box__icon {
+      flex-shrink: 0 !important;
+      width: 20px !important;
+      height: 20px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .remaining-box__text {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+    }
+
+    .remaining-box__amount {
+      font-size: 18px !important;
+      font-weight: 700 !important;
+    }
+
     .remaining-box--balanced {
       background-color: var(--color-positive-pale) !important;
       border: 1.5px solid var(--color-positive) !important;
       color: var(--color-positive-deep) !important;
-      
+
+      .remaining-box__icon,
+      .remaining-box__text,
+      .remaining-box__amount,
       .text-destructive,
       .text-secondary {
         color: var(--color-positive-deep) !important;
       }
     }
-    
+
+    .remaining-box--balanced .remaining-box__error {
+      display: none !important;
+    }
+
     .remaining-box--unbalanced {
       background-color: var(--color-negative-pale) !important;
       border: 1.5px solid var(--color-negative) !important;
       color: var(--color-negative-darkest) !important;
-      
+
+      .remaining-box__icon,
+      .remaining-box__text,
+      .remaining-box__amount,
       .text-destructive,
       .text-secondary {
         color: var(--color-negative-darkest) !important;
+      }
+    }
+
+    /* Gentle pulse to draw attention to an unbalanced split */
+    .remaining-box--unbalanced .remaining-box__icon {
+      animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .remaining-box--unbalanced .remaining-box__icon {
+        animation: none !important;
       }
     }
 
@@ -514,6 +601,7 @@
     --color-canvas: #242424;
     --color-ink: #f5f5f5;
     --color-body: #a3a3a3;
+    --color-mute: #737373;
     --color-border-field: rgba(245, 245, 245, 0.15);
     --color-border-soft-row: rgba(245, 245, 245, 0.2);
 

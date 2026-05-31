@@ -7,6 +7,23 @@ en:
       amount: Amount
       category: Category
       category_prompt: Select a Category
+      add_split_row_button: Add row
+      minimum_splits_error: At least 2 splits are required.
+      remaining_balance_balanced: Balanced
+      remaining_balance_label: Remaining
+      remaining_balance_unbalanced: Unbalanced
+      remove_split_row_button: Remove split
+      split_amounts_error: Split amounts must equal the total transaction amount.
+      split_amounts_unbalanced_message: Adjust the amounts above so the remaining balance is zero.
+      split_row_amount_label: Amount
+      split_row_amount_placeholder: '0.00'
+      split_row_category_label: Category
+      split_row_category_prompt: Select category
+      split_row_name_label: Name
+      split_row_name_placeholder: Split name
+      split_transaction_description: Divide this transaction into multiple categories or parts.
+      split_transaction_label: Split Transaction
+      transaction_error: We couldn't save this transaction. Please review the errors and try again.
       date: Date
       description: Description
       description_placeholder: Describe transaction

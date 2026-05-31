@@ -400,4 +400,115 @@ end
     assert_equal 70, children.last.amount
     assert_nil created_parent.entryable.category_id
   end
+
+  test "fails to create split transaction with unbalanced amounts" do
+    assert_no_difference "Entry.count" do
+      post transactions_url, params: {
+        split_transaction: "1",
+        entry: {
+          account_id: @entry.account_id,
+          name: "Unbalanced split",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "outflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: { category_id: "" },
+          splits: {
+            "0" => { name: "Part 1", amount: "60", category_id: categories(:food_and_drink).id },
+            "1" => { name: "Part 2", amount: "30", category_id: categories(:subcategory).id }
+          }
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "fails to create split with fewer than the minimum number of rows" do
+    assert_no_difference "Entry.count" do
+      post transactions_url, params: {
+        split_transaction: "1",
+        entry: {
+          account_id: @entry.account_id,
+          name: "Single split",
+          date: Date.current,
+          currency: "USD",
+          amount: 100,
+          nature: "outflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: { category_id: "" },
+          splits: {
+            "0" => { name: "Only one", amount: "100", category_id: categories(:food_and_drink).id }
+          }
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "creates income split with correct negative amount signs" do
+    assert_difference "Entry.count", 3 do # Parent + 2 children
+      post transactions_url, params: {
+        split_transaction: "1",
+        entry: {
+          account_id: @entry.account_id,
+          name: "Income split",
+          date: Date.current,
+          currency: "USD",
+          amount: 500, # Entered positive; inflow nature flips the sign
+          nature: "inflow",
+          entryable_type: @entry.entryable_type,
+          entryable_attributes: { category_id: "" },
+          splits: {
+            "0" => { name: "Salary part 1", amount: "300", category_id: categories(:salary).id },
+            "1" => { name: "Bonus", amount: "200", category_id: categories(:income).id }
+          }
+        }
+      }
+    end
+
+    parent = Entry.where(name: "Income split").last
+    assert_equal(-500, parent.amount) # Inflow stored as negative
+    assert parent.split_parent?
+
+    child_amounts = parent.child_entries.pluck(:amount).sort
+    assert_equal [ -300, -200 ].sort, child_amounts
+  end
+
+  test "split children remain independent after parent update" do
+    post transactions_url, params: {
+      split_transaction: "1",
+      entry: {
+        account_id: @entry.account_id,
+        name: "Original split",
+        date: Date.current,
+        currency: "USD",
+        amount: 100,
+        nature: "outflow",
+        entryable_type: @entry.entryable_type,
+        entryable_attributes: { category_id: "" },
+        splits: {
+          "0" => { name: "Part 1", amount: "60", category_id: categories(:food_and_drink).id },
+          "1" => { name: "Part 2", amount: "40", category_id: categories(:subcategory).id }
+        }
+      }
+    }
+
+    parent = Entry.where(name: "Original split").last
+    original_children_count = parent.child_entries.count
+    assert_equal 2, original_children_count
+
+    patch transaction_url(parent), params: {
+      entry: {
+        name: "Updated split name",
+        amount: 150
+      }
+    }
+
+    parent.reload
+    assert_equal "Updated split name", parent.name
+    assert_equal original_children_count, parent.child_entries.count
+  end
 end

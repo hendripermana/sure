@@ -1,14 +1,24 @@
 <%# locals: (entry:, income_categories:, expense_categories:) %>
 
 <div class="wise-form">
-  <%= styled_form_with model: entry, url: transactions_path, class: "space-y-4", data: { controller: "new-transaction-split" } do |f| %>
+  <%= styled_form_with model: entry, url: transactions_path, class: "space-y-4", data: {
+        controller: "new-transaction-split",
+        "new_transaction_split_i18n_value": {
+          name_label: t(".split_row_name_label"),
+          name_placeholder: t(".split_row_name_placeholder"),
+          amount_label: t(".split_row_amount_label"),
+          amount_placeholder: t(".split_row_amount_placeholder"),
+          category_prompt: t(".split_row_category_prompt"),
+          remove_label: t(".remove_split_row_button")
+        }.to_json
+      } do |f| %>
     <%
       categories = params[:nature] == "inflow" ? income_categories : expense_categories
       category_options = Category::Group.for(categories).flat_map do |group|
         root = group.category
         root_style = "color: #{root.color}; font-weight: 600;"
         options = [[root.name, root.id, { style: root_style }]]
-        
+
         group.subcategories.each do |sub|
           sub_style = "color: #{sub.color}; padding-left: 12px;"
           options << ["  ↳ #{sub.name}", sub.id, { style: sub_style }]
@@ -19,7 +29,7 @@
       split_category_options = Category::Group.for(categories).flat_map do |group|
         root = group.category
         options = [[root.name, root.id]]
-        
+
         group.subcategories.each do |sub|
           options << ["  ↳ #{sub.name}", sub.id]
         end
@@ -312,57 +322,65 @@
     <section class="section-card space-y-4">
       <div class="flex cursor-pointer items-center gap-4 justify-between">
         <div class="text-sm space-y-1">
-          <h4 class="text-primary font-semibold">Split Transaction</h4>
-          <p class="text-secondary text-xs">Divide this transaction into multiple categories or parts.</p>
+          <h4 class="text-primary font-semibold"><%= t(".split_transaction_label") %></h4>
+          <p class="text-secondary text-xs"><%= t(".split_transaction_description") %></p>
         </div>
 
         <%= check_box_tag :split_transaction, "1", false,
               class: "checkbox checkbox--light",
+              id: "split_transaction_checkbox",
+              "aria-label": t(".split_transaction_label"),
               data: {
                 new_transaction_split_target: "checkbox",
                 action: "change->new-transaction-split#toggle"
               } %>
+        <label for="split_transaction_checkbox" class="sr-only"><%= t(".split_transaction_label") %></label>
       </div>
 
       <%# Splits dynamic container %>
       <div data-new-transaction-split-target="fields" class="hidden space-y-4 pt-2 transition-all duration-400 ease-in-out origin-top overflow-hidden opacity-0 max-h-0 collapsible-hidden">
         <div data-new-transaction-split-target="rowsContainer" class="space-y-3">
           <%# Template row %>
-          <div class="p-4 rounded-xl border border-secondary bg-container shadow-xs" data-new-transaction-split-target="row">
-            <div class="flex flex-wrap md:flex-nowrap items-end gap-3">
-              <div class="w-full md:flex-1 md:w-auto min-w-0">
-                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5">Name</label>
+          <div class="p-3 md:p-4 rounded-xl border border-secondary bg-container shadow-xs" data-new-transaction-split-target="row">
+            <div class="space-y-3 md:space-y-0 md:flex md:flex-nowrap md:items-end md:gap-3">
+              <div class="w-full md:flex-1 md:min-w-0">
+                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5"><%= t(".split_row_name_label") %></label>
                 <input type="text"
                        name="entry[splits][0][name]"
-                       placeholder="Split name"
+                       placeholder="<%= t(".split_row_name_placeholder") %>"
+                       aria-label="<%= t(".split_row_name_label") %>"
                        class="wise-split-row-input"
                        autocomplete="off"
-                       data-new-transaction-split-target="nameInput">
+                       data-field-type="name"
+                       data-new-transaction-split-target="nameInput"
+                       data-action="input->new-transaction-split#validateRow">
               </div>
-              <div class="flex-1 md:flex-none md:w-28">
-                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5">Amount</label>
+              <div class="w-full md:w-32 md:flex-shrink-0">
+                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5"><%= t(".split_row_amount_label") %></label>
                 <input type="number"
                        name="entry[splits][0][amount]"
-                       placeholder="0.00"
+                       placeholder="<%= t(".split_row_amount_placeholder") %>"
+                       aria-label="<%= t(".split_row_amount_label") %>"
                        step="0.01"
                        class="wise-split-row-input"
                        autocomplete="off"
+                       data-field-type="amount"
                        data-new-transaction-split-target="amountInput"
-                       data-action="input->new-transaction-split#updateRemaining">
+                       data-action="input->new-transaction-split#updateRemaining input->new-transaction-split#validateRow">
               </div>
-              <div class="category-select-container flex-1 min-w-0" data-controller="custom-select">
-                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5">Category</label>
-                
+              <div class="category-select-container w-full md:flex-1 md:min-w-0" data-controller="custom-select">
+                <label class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1.5"><%= t(".split_row_category_label") %></label>
+
                 <div class="relative">
-                  <input type="hidden" name="entry[splits][0][category_id]" value="" data-custom-select-target="hiddenInput">
+                  <input type="hidden" name="entry[splits][0][category_id]" value="" data-field-type="category_id" data-custom-select-target="hiddenInput">
 
                   <button type="button"
-                          aria-label="Category"
+                          aria-label="<%= t(".split_row_category_label") %>"
                           class="wise-split-row-input flex items-center justify-between text-left focus:outline-none cursor-pointer min-w-0"
                           data-custom-select-target="trigger"
                           data-action="click->custom-select#toggle">
                     <span data-custom-select-target="triggerContent" class="flex items-center gap-1.5 min-w-0 truncate">
-                      <span class="text-secondary text-sm font-medium"><%= t(".category_prompt") %></span>
+                      <span class="text-secondary text-sm font-medium"><%= t(".split_row_category_prompt") %></span>
                     </span>
                     <%= icon("chevron-down", class: "w-4 h-4 text-secondary shrink-0") %>
                   </button>
@@ -429,7 +447,15 @@
                   </div>
                 </div>
               </div>
-              <div class="w-8 shrink-0 hidden md:block"></div>
+              <div class="w-full md:w-auto md:flex-shrink-0 flex md:block">
+                <button type="button"
+                        class="split-remove-btn w-full md:w-auto"
+                        data-action="click->new-transaction-split#removeRow"
+                        title="<%= t(".remove_split_row_button") %>"
+                        aria-label="<%= t(".remove_split_row_button") %>">
+                  <%= icon("trash-2", class: "w-4 h-4") %>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -441,19 +467,26 @@
           <svg class="w-4 h-4 shrink-0 transition-all duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Add Row
+          <%= t(".add_split_row_button") %>
         </button>
 
         <%# Remaining balance indicator %>
-        <div data-new-transaction-split-target="remainingContainer" class="remaining-box remaining-box--unbalanced text-sm">
-          <div class="flex items-center justify-between">
-            <span class="text-secondary font-semibold">Remaining</span>
-            <span data-new-transaction-split-target="remaining" class="font-bold">
+        <div data-new-transaction-split-target="remainingContainer" class="remaining-box remaining-box--unbalanced">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span data-new-transaction-split-target="remainingIcon" class="remaining-box__icon">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </span>
+              <span class="remaining-box__text"><%= t(".remaining_balance_label") %></span>
+            </div>
+            <span data-new-transaction-split-target="remaining" class="remaining-box__amount">
               0.00
             </span>
           </div>
-          <p data-new-transaction-split-target="error" class="text-xs mt-1.5 font-medium">
-            Amounts must equal original transaction amount.
+          <p data-new-transaction-split-target="error" class="remaining-box__error text-xs mt-1.5 font-medium">
+            <%= t(".split_amounts_unbalanced_message") %>
           </p>
         </div>
       </div>
