@@ -141,7 +141,7 @@ jobs:
           echo "APP_VERSION=v$VERSION" >> $GITHUB_ENV
 
       - name: Publish 'linux/${{ matrix.platform }}' image by digest
-        uses: docker/build-push-action@v6.16.0
+        uses: docker/build-push-action@v7.2.0
         id: build
         with:
           context: .
