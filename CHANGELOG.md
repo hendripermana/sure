@@ -1,3 +1,14 @@
+## [0.22.0](https://github.com/hendripermana/sure/compare/v0.21.7...v0.22.0) (2026-06-07)
+
+### Features
+
+- feat: add account reconciliation and stale account warnings (ae496425)
+
+### Other Changes
+
+- Merge pull request #180 from hendripermana/feature/account-reconciliation (ef399751)
+- style: fix rubocop and erb lint offenses (bf3c2c3c)
+
 ## [0.21.7](https://github.com/hendripermana/sure/compare/v0.21.6...v0.21.7) (2026-06-07)
 
 ### Other Changes
