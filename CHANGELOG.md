@@ -1,3 +1,9 @@
+## [0.21.0](https://github.com/hendripermana/permoney/compare/v0.20.2...v0.21.0) (2026-06-07)
+
+### Features
+
+- feat: complete Sure rebrand and design system (2791044a)
+
 ## [0.20.2](https://github.com/hendripermana/sure/compare/v0.20.1...v0.20.2) (2026-06-07)
 
 ### Other Changes
