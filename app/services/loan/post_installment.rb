@@ -91,7 +91,7 @@ class Loan::PostInstallment
       end
 
       installment.update!(status: "posted", posted_on: @date, transfer_id: transfer&.id)
-      ActiveSupport::Notifications.instrument("permoney.loan.installment.posted", loan_id: @account.accountable_id, installment_no: installment.installment_no, idempotent: false) rescue nil
+      ActiveSupport::Notifications.instrument("sure.loan.installment.posted", loan_id: @account.accountable_id, installment_no: installment.installment_no, idempotent: false) rescue nil
 
       @account.sync_later
       @source.sync_later
@@ -118,7 +118,7 @@ class Loan::PostInstallment
     if e.is_a?(ActiveRecord::RecordNotUnique)
       inst = LoanInstallment.for_account(@account.id).find_by(installment_no: @installment_no)
       if inst&.status == "posted" && inst.transfer_id.present?
-        ActiveSupport::Notifications.instrument("permoney.loan.installment.posted", loan_id: @account.accountable_id, installment_no: inst.installment_no, idempotent: true) rescue nil
+        ActiveSupport::Notifications.instrument("sure.loan.installment.posted", loan_id: @account.accountable_id, installment_no: inst.installment_no, idempotent: true) rescue nil
         return already_posted_result(inst)
       end
     end

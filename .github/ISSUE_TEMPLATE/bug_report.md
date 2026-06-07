@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve Permoney
+about: Create a report to help us improve Sure
 title: ''
 labels: 'bug'
 assignees: ''
@@ -33,6 +33,6 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.
 
 **Before submitting**
-- [ ] I have searched [existing issues](https://github.com/hendripermana/permoney/issues?q=is:issue) and [discussions](https://github.com/hendripermana/permoney/discussions) to ensure this is not a duplicate issue
+- [ ] I have searched [existing issues](https://github.com/hendripermana/sure/issues?q=is:issue) and [discussions](https://github.com/hendripermana/sure/discussions) to ensure this is not a duplicate issue
 - [ ] I have provided all the requested information above
 - [ ] I have included relevant screenshots or logs if applicable

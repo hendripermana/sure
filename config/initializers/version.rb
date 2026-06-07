@@ -1,4 +1,4 @@
-module Permoney
+module Sure
   class << self
     def version
       Semver.new(semver)

@@ -1,15 +1,15 @@
-/* 
-  This file contains all of the Figma design tokens, components, etc. that 
-  are used globally across the app. 
+/*
+  This file contains all of the Figma design tokens, components, etc. that
+  are used globally across the app.
 
   One-off styling (3rd party overrides, etc.) should be done in the application.css file.
 */
 
-@import './permoney-design-system/background-utils.css';
-@import './permoney-design-system/foreground-utils.css';
-@import './permoney-design-system/text-utils.css';
-@import './permoney-design-system/border-utils.css';
-@import './permoney-design-system/component-utils.css';
+@import './Sure-design-system/background-utils.css';
+@import './Sure-design-system/foreground-utils.css';
+@import './Sure-design-system/text-utils.css';
+@import './Sure-design-system/border-utils.css';
+@import './Sure-design-system/component-utils.css';
 
 @custom-variant theme-dark (&:where([data-theme=dark], [data-theme=dark] *));
 
@@ -21,6 +21,10 @@
   /* Base colors */
   --color-white: #ffffff;
   --color-black: #0B0B0B;
+  --color-primary: #9fe870;
+  --color-primary-hover: #cdffad;
+  --color-on-primary: #0e0f0c;
+  --color-canvas-soft: #e8ebe6;
   --color-success: var(--color-green-600);
   --color-warning: var(--color-yellow-600);
   --color-destructive: var(--color-red-600);
@@ -298,6 +302,7 @@
 }
 
 @layer components {
+
   /* Forms */
   .form-field {
     @apply flex flex-col gap-1 relative px-3 py-2 rounded-md border bg-container border-secondary shadow-xs w-full;
@@ -354,7 +359,7 @@
     filter: invert(1);
     cursor: pointer;
   }
-  
+
   select.form-field__input {
     @apply pr-10 appearance-none;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -444,12 +449,14 @@
     --color-shadow: var(--color-alpha-white-100);
   }
 }
+
 /* Animations for streaming chat */
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

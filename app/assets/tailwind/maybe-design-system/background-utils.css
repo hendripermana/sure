@@ -1,10 +1,10 @@
-/* 
+/*
   COMPATIBILITY SHIM - DEPRECATED
-  
+
   This file provides backward compatibility for the old maybe-design-system/background-utils.css path.
-  Please update your imports to use permoney-design-system/background-utils.css instead.
-  
+  Please update your imports to use Sure-design-system/background-utils.css instead.
+
   This shim will be removed in a future version.
 */
 
-@import "../permoney-design-system/background-utils.css";
+@import "../Sure-design-system/background-utils.css";
