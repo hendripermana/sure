@@ -1,4 +1,4 @@
-# Post-Completion Checklist for Permoney Tasks
+# Post-Completion Checklist for Sure Tasks
 
 ## Before Committing Code
 
@@ -28,7 +28,7 @@
 - [ ] All event listeners cleaned up in `disconnect()`
 
 #### CSS/Styling
-- [ ] Use design system tokens from `permoney-design-system.css`
+- [ ] Use design system tokens from `Sure-design-system.css`
 - [ ] No custom styles added to design system files
 - [ ] No hardcoded colors (use functional tokens)
 - [ ] Responsive design works on mobile and desktop

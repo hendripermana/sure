@@ -1,4 +1,4 @@
-# Suggested Commands for Permoney
+# Suggested Commands for Sure
 
 ## Setup & Environment
 ```bash
@@ -14,9 +14,6 @@ cp .env.local.example .env.local
 # Start development server (Rails, Sidekiq, Tailwind CSS watcher)
 bin/dev
 
-# Start Rails server only
-bin/rails server
-
 # Open Rails console
 bin/rails console
 ```
@@ -25,9 +22,6 @@ bin/rails console
 ```bash
 # Run all tests
 bin/rails test
-
-# Run tests with database reset
-bin/rails test:db
 
 # Run specific test file
 bin/rails test test/models/account_test.rb
@@ -56,14 +50,8 @@ bundle exec erb_lint ./app/**/*.erb -a
 # JavaScript/TypeScript/CSS linting with Biome
 npm run lint
 
-# Fix JavaScript/TypeScript/CSS issues
-npm run lint:fix
-
 # Format code with Biome
 npm run format
-
-# Check formatting with Biome
-npm run format:check
 
 # Security analysis
 bin/brakeman --no-pager
@@ -73,15 +61,6 @@ bin/brakeman --no-pager
 ```bash
 # Create and migrate database
 bin/rails db:prepare
-
-# Run pending migrations
-bin/rails db:migrate
-
-# Rollback last migration
-bin/rails db:rollback
-
-# Load seed data
-bin/rails db:seed
 
 # Clear cache
 bin/rails tmp:cache:clear
@@ -135,7 +114,7 @@ bundle exec derailed bundle:mem
 ## Docker (for self-hosted deployments)
 ```bash
 # Build Docker image
-docker build -t permoney .
+docker build -t Sure .
 
 # Run with Docker Compose
 docker-compose -f compose.yml up
@@ -153,7 +132,7 @@ grep -r "pattern" app/
 ls -la
 
 # Navigate to project root
-cd /home/ubuntu/permoney
+cd /home/ubuntu/sure
 
 # View git status
 git status
