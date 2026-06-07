@@ -1,3 +1,10 @@
+## [0.21.6](https://github.com/hendripermana/sure/compare/v0.21.5...v0.21.6) (2026-06-07)
+
+### Other Changes
+
+- Merge pull request #178 from hendripermana/codex/recurring-intelligence-reconciliation (25c284a1)
+- Unify recurring intelligence and reconciliation (768a37f2)
+
 ## [0.21.5](https://github.com/hendripermana/sure/compare/v0.21.4...v0.21.5) (2026-06-07)
 
 ### Other Changes
