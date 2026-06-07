@@ -24,11 +24,9 @@ class LoanHelperTest < ActionView::TestCase
   end
 
   test "smart_interest_rate_default returns appropriate rate for institutional loans" do
-    # Mock Current.family.currency
-    Current.stub :family, OpenStruct.new(currency: "IDR") do
-      rate = smart_interest_rate_default(false, false)
-      assert_equal 12.0, rate
-    end
+    Current.stubs(:family).returns(OpenStruct.new(currency: "IDR"))
+
+    assert_equal 12.0, smart_interest_rate_default(false, false)
   end
 
   test "smart_term_months_default returns shorter term for personal loans" do
