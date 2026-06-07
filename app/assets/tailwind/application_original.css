@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-@import "./permoney-design-system.css";
+@import "./Sure-design-system.css";
 
 @import "./geist-font.css";
 @import "./geist-mono-font.css";
@@ -17,18 +17,20 @@
 
 /* Performance optimizations */
 @layer utilities {
+
   /* Modern Progress Indicator Animations */
   @keyframes scaleIn {
     from {
       transform: scale(0);
       opacity: 0;
     }
+
     to {
       transform: scale(1);
       opacity: 1;
     }
   }
-  
+
   .animate-scale-in {
     animation: scaleIn 0.3s ease-out forwards;
   }
@@ -49,16 +51,16 @@
   /* Optimized scrollbar styling */
   .scrollbar-thin {
     scrollbar-width: thin;
-    
+
     &::-webkit-scrollbar {
       width: 6px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background-color: rgba(156, 163, 175, 0.5);
       border-radius: 3px;
     }
-    
+
     &::-webkit-scrollbar-thumb:hover {
       background-color: rgba(156, 163, 175, 0.7);
     }
@@ -71,6 +73,7 @@
 
   /* Reduced motion support - improves accessibility and performance */
   @media (prefers-reduced-motion: reduce) {
+
     .animate-scale-in,
     .gpu-accelerated {
       animation: none;
@@ -85,76 +88,89 @@
 }
 
 @layer components {
-  .pcr-app{
+  .pcr-app {
     position: static !important;
     background: none !important;
     box-shadow: none !important;
     padding: 0 !important;
     width: 100% !important;
   }
-  .pcr-color-palette{
-      height: 12em !important;
+
+  .pcr-color-palette {
+    height: 12em !important;
   }
-  .pcr-palette{
-      border-radius: 10px !important;
+
+  .pcr-palette {
+    border-radius: 10px !important;
   }
-  .pcr-palette:before{
-      border-radius: 10px !important;
+
+  .pcr-palette:before {
+    border-radius: 10px !important;
   }
-  .pcr-color-chooser{
-      height: 1.5em !important;
+
+  .pcr-color-chooser {
+    height: 1.5em !important;
   }
-  .pcr-picker{
-      height: 20px !important;
-      width: 20px !important;
+
+  .pcr-picker {
+    height: 20px !important;
+    width: 20px !important;
   }
 }
 
 @layer utilities {
+
   /* Modern Progress Indicator Animations */
   @keyframes scaleIn {
     from {
       transform: scale(0);
       opacity: 0;
     }
+
     to {
       transform: scale(1);
       opacity: 1;
     }
   }
-  
+
   .animate-scale-in {
     animation: scaleIn 0.3s ease-out forwards;
   }
 }
 
 @layer components {
-  .pcr-app{
+  .pcr-app {
     position: static !important;
     background: none !important;
     box-shadow: none !important;
     padding: 0 !important;
     width: 100% !important;
   }
-  .pcr-color-palette{
-      height: 12em !important;
+
+  .pcr-color-palette {
+    height: 12em !important;
   }
-  .pcr-palette{
-      border-radius: 10px !important;
+
+  .pcr-palette {
+    border-radius: 10px !important;
   }
-  .pcr-palette:before{
-      border-radius: 10px !important;
+
+  .pcr-palette:before {
+    border-radius: 10px !important;
   }
-  .pcr-color-chooser{
-      height: 1.5em !important;
+
+  .pcr-color-chooser {
+    height: 1.5em !important;
   }
-  .pcr-picker{
-      height: 20px !important;
-      width: 20px !important;
+
+  .pcr-picker {
+    height: 20px !important;
+    width: 20px !important;
   }
 }
 
 .combobox {
+
   .hw-combobox__main__wrapper,
   .hw-combobox__input {
     @apply bg-container text-primary w-full;
@@ -171,7 +187,7 @@
   .hw-combobox__label {
     @apply block text-xs text-gray-500 peer-disabled:text-gray-400;
   }
-  
+
   .hw-combobox__option {
     @apply bg-container hover:bg-container-hover;
   }
@@ -192,7 +208,7 @@
 
 /* Typography */
 .prose {
-  @apply max-w-none text-primary; 
+  @apply max-w-none text-primary;
 
   a {
     @apply text-link;
@@ -240,7 +256,8 @@
 .prose--ai-chat {
   @apply break-words;
 
-  p, li {
+  p,
+  li {
     @apply text-sm text-primary;
   }
 
@@ -257,7 +274,7 @@
 
   ::-webkit-scrollbar-thumb {
     background-color: rgba(156, 163, 175, 0.5);
-    border-radius: 3px; 
+    border-radius: 3px;
   }
 }
 
@@ -274,7 +291,7 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: #a6a6a6;
-  }  
+  }
 }
 
 .scrollbar {
@@ -297,6 +314,7 @@
   transition: opacity 0.2s;
   opacity: 1;
 }
+
 .invite_code .hidden {
   display: none !important;
   opacity: 0;

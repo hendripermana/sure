@@ -1,17 +1,17 @@
-# Contributing to Permoney
+# Contributing to Sure
 
-It means so much that you're interested in contributing to Permoney! Seriously. Thank you. The entire community benefits from these contributions!
+It means so much that you're interested in contributing to Sure! Seriously. Thank you. The entire community benefits from these contributions!
 
 ## Getting Started
 
-Before contributing, please read our [Project Conventions Rule](https://github.com/hendripermana/permoney/blob/main/.cursor/rules/project-conventions.mdc), which is intended for LLMs, but is also an excellent primer on how we write code for Permoney.
+Before contributing, please read our [Project Conventions Rule](https://github.com/hendripermana/Sure/blob/main/.cursor/rules/project-conventions.mdc), which is intended for LLMs, but is also an excellent primer on how we write code for Sure.
 
-- Before contributing, please check if it already exists in [issues](https://github.com/hendripermana/permoney/issues) or [PRs](https://github.com/hendripermana/permoney/pulls)
-- If you're not sure where to start, check out our [good first issues](https://github.com/hendripermana/permoney/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- Before contributing, please check if it already exists in [issues](https://github.com/hendripermana/Sure/issues) or [PRs](https://github.com/hendripermana/Sure/pulls)
+- If you're not sure where to start, check out our [good first issues](https://github.com/hendripermana/Sure/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 
-As we are still in the early days of this project, we recommend [heading over to the Wiki](https://github.com/hendripermana/permoney/wiki) to get a better idea of _what_ to contribute.
+As we are still in the early days of this project, we recommend [heading over to the Wiki](https://github.com/hendripermana/Sure/wiki) to get a better idea of _what_ to contribute.
 
-In general, _full features_ that get us closer to [our 🔜 Vision](https://github.com/hendripermana/permoney/wiki/Vision) are the most valuable contributions at this stage.
+In general, _full features_ that get us closer to [our 🔜 Vision](https://github.com/hendripermana/Sure/wiki/Vision) are the most valuable contributions at this stage.
 
 ## Development Setup
 
@@ -24,10 +24,10 @@ In general, _full features_ that get us closer to [our 🔜 Vision](https://gith
 ### Quick Start
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/permoney.git`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/Sure.git`
 3. Set up the development environment:
    ```bash
-   cd permoney
+   cd Sure
    cp .env.local.example .env.local
    bin/setup
    bin/dev
@@ -36,9 +36,9 @@ In general, _full features_ that get us closer to [our 🔜 Vision](https://gith
 
 ### Setup Guides
 
-- [Mac Setup Guide](https://github.com/hendripermana/permoney/wiki/Mac-Dev-Setup-Guide)
-- [Linux Setup Guide](https://github.com/hendripermana/permoney/wiki/Linux-Dev-Setup-Guide)
-- [Windows Setup Guide](https://github.com/hendripermana/permoney/wiki/Windows-Dev-Setup-Guide)
+- [Mac Setup Guide](https://github.com/hendripermana/Sure/wiki/Mac-Dev-Setup-Guide)
+- [Linux Setup Guide](https://github.com/hendripermana/Sure/wiki/Linux-Dev-Setup-Guide)
+- [Windows Setup Guide](https://github.com/hendripermana/Sure/wiki/Windows-Dev-Setup-Guide)
 
 ## Making Changes
 
@@ -60,8 +60,8 @@ In general, _full features_ that get us closer to [our 🔜 Vision](https://gith
 ## Questions?
 
 If you have questions, feel free to:
-- Open a [Discussion](https://github.com/hendripermana/permoney/discussions)
+- Open a [Discussion](https://github.com/hendripermana/Sure/discussions)
 - Join our [Discord](https://discord.gg/36ZGBsxYEK)
-- Open an [Issue](https://github.com/hendripermana/permoney/issues)
+- Open an [Issue](https://github.com/hendripermana/Sure/issues)
 
-Thank you for contributing to Permoney! 🎉
+Thank you for contributing to Sure! 🎉

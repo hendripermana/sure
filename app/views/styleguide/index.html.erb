@@ -1,6 +1,6 @@
 <% content_for :page_header do %>
   <div class="space-y-1 mb-6">
-    <h1 class="text-3xl font-medium text-primary">Permoney Style Guide</h1>
+    <h1 class="text-3xl font-medium text-primary">Sure Style Guide</h1>
     <p class="text-secondary">Design tokens, components, and usage guidelines.</p>
   </div>
 <% end %>
@@ -45,7 +45,7 @@
   <section class="section-card">
     <h2 class="text-xl font-medium text-primary mb-4">Sections & Cards</h2>
     <p class="mb-4 text-primary">Use <code>.section-card</code> for main content blocks. It includes padding, background, and hover effects.</p>
-    
+
     <div class="section-grid">
       <div class="section-card">
         <h3 class="font-medium text-primary mb-2">Card 1</h3>
@@ -87,14 +87,14 @@
       <%= skeleton_loader("h-32 w-full rounded-xl") %>
     </div>
   </section>
-  
+
   <!-- Before / After Transformation Demo -->
   <section class="space-y-6">
     <div class="space-y-1">
       <h2 class="text-xl font-medium text-primary">UI Transformation Demo</h2>
       <p class="text-secondary">Direct comparison between legacy design patterns and the new design system.</p>
     </div>
-    
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Legacy Version -->
       <div class="space-y-4">
@@ -102,12 +102,12 @@
         <div class="bg-white border border-gray-200 rounded p-4 space-y-4 shadow-sm" style="background-color: #fff; border-radius: 0.375rem; border: 1px solid #e5e7eb;">
           <h2 class="text-lg font-bold text-gray-900">Account Settings</h2>
           <p class="text-gray-600 text-sm">Manage your account details and preferences.</p>
-          
+
           <div class="space-y-2">
             <label class="block text-sm font-medium text-gray-700">Username</label>
             <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="jdoe">
           </div>
-          
+
           <div class="flex justify-end pt-2">
             <button class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-indigo-700">
               Save Changes
@@ -124,12 +124,12 @@
             <h2 class="text-lg font-medium text-primary">Account Settings</h2>
             <p class="text-secondary text-sm mt-1">Manage your account details and preferences.</p>
           </div>
-          
+
           <div class="form-field">
             <label class="form-field__label">Username</label>
             <input type="text" class="form-field__input" placeholder="jdoe">
           </div>
-          
+
           <div class="flex justify-end pt-2">
             <%= render DS::Button.new(
               text: "Save Changes",
@@ -151,7 +151,7 @@
         <label class="form-field__label">Email Address</label>
         <input type="email" class="form-field__input" placeholder="you@example.com">
       </div>
-      
+
       <div class="form-field">
         <label class="form-field__label">Category</label>
         <select class="form-field__input">

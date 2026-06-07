@@ -2,6 +2,10 @@
   @apply text-gray-900 theme-dark:text-white;
 }
 
+@utility text-on-primary {
+  color: var(--color-on-primary);
+}
+
 @utility text-inverse {
   @apply text-white theme-dark:text-gray-900;
 }

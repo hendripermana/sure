@@ -1,10 +1,10 @@
-/* 
+/*
   COMPATIBILITY SHIM - DEPRECATED
-  
+
   This file provides backward compatibility for the old maybe-design-system/component-utils.css path.
-  Please update your imports to use permoney-design-system/component-utils.css instead.
-  
+  Please update your imports to use Sure-design-system/component-utils.css instead.
+
   This shim will be removed in a future version.
 */
 
-@import "../permoney-design-system/component-utils.css";
+@import "../Sure-design-system/component-utils.css";

@@ -5,9 +5,9 @@
 #
 # Notes:
 # - Preferred signal: already-imported Entry records for the linked Account
-#   (they are in Permoney convention: expenses/charges > 0, payments < 0).
+#   (they are in Sure convention: expenses/charges > 0, payments < 0).
 # - Fallback signal: provider raw transactions payload with amounts converted
-#   to Permoney convention by negating SimpleFIN's banking convention.
+#   to Sure convention by negating SimpleFIN's banking convention.
 # - Returns :unknown when evidence is insufficient; callers should fallback
 #   to existing sign-only normalization.
 class SimplefinAccount::Liabilities::OverpaymentAnalyzer
@@ -197,7 +197,7 @@ class SimplefinAccount::Liabilities::OverpaymentAnalyzer
       when Numeric then BigDecimal(val.to_s)
       else BigDecimal("0")
       end
-      # Negate to convert banking convention (expenses negative) -> Permoney convention
+      # Negate to convert banking convention (expenses negative) -> Sure convention
       -amt
     end
 
