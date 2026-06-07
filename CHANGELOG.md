@@ -1,3 +1,10 @@
+## [0.21.5](https://github.com/hendripermana/sure/compare/v0.21.4...v0.21.5) (2026-06-07)
+
+### Other Changes
+
+- Merge pull request #177 from hendripermana/codex/subscription-billing-lifecycle (bbdaff81)
+- Add subscription billing lifecycle (9416d885)
+
 ## [0.21.4](https://github.com/hendripermana/sure/compare/v0.21.3...v0.21.4) (2026-06-07)
 
 ### Other Changes
