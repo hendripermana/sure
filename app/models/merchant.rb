@@ -3,6 +3,7 @@ class Merchant < ApplicationRecord
 
   has_many :transactions, dependent: :nullify
   has_many :recurring_transactions, dependent: :destroy
+  has_many :recurring_transaction_suppressions, dependent: :nullify
   has_many :subscription_plans, dependent: :nullify
 
   validates :name, presence: true

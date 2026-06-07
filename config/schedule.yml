@@ -19,6 +19,12 @@ subscription_renewals:
   queue: "scheduled"
   description: "Processes subscription lifecycle changes and sends renewal reminders"
 
+recurring_intelligence:
+  cron: "30 7 * * *"
+  class: "RecurringIntelligenceJob"
+  queue: "scheduled"
+  description: "Identifies and reconciles recurring cash-flow patterns"
+
 clean_syncs:
   cron: "0 * * * *" # every hour
   class: "SyncCleanerJob"

@@ -1,7 +1,7 @@
 class TransfersController < ApplicationController
   include StreamExtensions
 
-  before_action :set_transfer, only: %i[show destroy update]
+  before_action :set_transfer, only: %i[show destroy update mark_as_recurring]
 
   def new
     @transfer = Transfer.new
@@ -9,6 +9,12 @@ class TransfersController < ApplicationController
 
   def show
     @categories = Current.family.categories.expenses
+    @recurring_transfer_exists = Current.family.recurring_transactions.exists?(
+      account_id: @transfer.from_account&.id,
+      destination_account_id: @transfer.to_account&.id,
+      amount: @transfer.outflow_transaction&.entry&.amount,
+      currency: @transfer.outflow_transaction&.entry&.currency
+    )
   end
 
   def create
@@ -68,6 +74,16 @@ class TransfersController < ApplicationController
   def destroy
     @transfer.destroy!
     redirect_back_or_to transactions_url, notice: t(".success")
+  end
+
+  def mark_as_recurring
+    recurring = RecurringTransaction.create_from_transfer(@transfer)
+    redirect_to recurring_transactions_path, notice: "Transfer marked as recurring."
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique => e
+    Rails.logger.warn("Recurring transfer creation rejected for transfer #{@transfer&.id}: #{e.message}")
+    redirect_back_or_to transactions_path, alert: "This recurring transfer already exists or is invalid."
+  rescue ArgumentError => e
+    redirect_back_or_to transactions_path, alert: e.message
   end
 
   private

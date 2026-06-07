@@ -1,0 +1,24 @@
+<%# locals: (current:) %>
+<% items = [
+  { key: "overview", label: "Overview", icon: "layout-dashboard", path: recurring_path },
+  { key: "subscriptions", label: "Subscriptions", icon: "wallet-cards", path: subscription_plans_path },
+  { key: "detected", label: "Detected", icon: "search", path: recurring_transactions_path },
+  { key: "transfers", label: "Transfers", icon: "arrow-left-right", path: recurring_transactions_path(kind: "transfers") },
+  { key: "ignored", label: "Ignored", icon: "eye-off", path: recurring_transactions_path(kind: "ignored") }
+] %>
+
+<nav class="mb-6 overflow-x-auto" aria-label="Recurring workspace">
+  <div class="inline-flex min-w-full gap-1 rounded-[24px] bg-container-inset p-1 shadow-border-xs sm:min-w-0">
+    <% items.each do |item| %>
+      <%= link_to item[:path],
+          class: class_names(
+            "inline-flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-[20px] px-4 py-2 text-sm font-semibold transition-colors sm:flex-none",
+            item[:key] == current ? "bg-container text-primary shadow-border-xs" : "text-secondary hover:bg-surface-hover hover:text-primary"
+          ),
+          aria: { current: ("page" if item[:key] == current) } do %>
+        <%= icon item[:icon], class: "h-4 w-4" %>
+        <%= item[:label] %>
+      <% end %>
+    <% end %>
+  </div>
+</nav>

@@ -36,6 +36,7 @@ class Family < ApplicationRecord
 
   has_many :llm_usages, dependent: :destroy
   has_many :recurring_transactions, dependent: :destroy
+  has_many :recurring_transaction_suppressions, dependent: :destroy
   has_many :subscription_plans, dependent: :destroy
 
   def primary_user
