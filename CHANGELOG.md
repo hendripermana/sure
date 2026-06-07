@@ -1,3 +1,9 @@
+## [0.21.1](https://github.com/hendripermana/sure/compare/v0.21.0...v0.21.1) (2026-06-07)
+
+### Other Changes
+
+- Harden runtime and deployment configuration (#173) (0e760ec0)
+
 ## [0.21.0](https://github.com/hendripermana/sure/compare/v0.20.2...v0.21.0) (2026-06-07)
 
 ### Features
