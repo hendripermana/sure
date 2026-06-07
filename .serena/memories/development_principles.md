@@ -3,7 +3,7 @@
 ## 🚫 ABSOLUTE RULES (NON-NEGOTIABLE)
 
 ### NO QUICK FIXES - PERIOD
-This is NOT a suggestion. This is MANDATORY for every AI Agent working on Permoney.
+This is NOT a suggestion. This is MANDATORY for every AI Agent working on Sure.
 
 **NEVER do this:**
 - ❌ Temporary workarounds that create technical debt
@@ -159,7 +159,7 @@ Every code change MUST have:
 ```ruby
 test "syncs account transactions" do
   SyncJob.any_instance.expects(:call).returns([]).once
-  
+
   assert_difference "@account.transactions.count", 2 do
     Account::Syncer.new(@account).sync
   end
@@ -256,4 +256,3 @@ Code is "done" ONLY when:
 ---
 
 **Remember:** Speed is secondary to QUALITY. A perfect solution takes longer, saves time long-term.
-
