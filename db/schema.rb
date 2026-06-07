@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_082431) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_06_000500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -738,6 +738,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_082431) do
     t.string "type", null: false
     t.datetime "updated_at", null: false
     t.string "website_url"
+    t.index ["family_id", "name"], name: "idx_service_merchants_family_name_unique", unique: true, where: "(((type)::text = 'ServiceMerchant'::text) AND (family_id IS NOT NULL))"
     t.index ["family_id", "name"], name: "index_merchants_on_family_id_and_name", unique: true, where: "((type)::text = 'FamilyMerchant'::text)"
     t.index ["family_id"], name: "index_merchants_on_family_id"
     t.index ["popular"], name: "index_merchants_on_popular"
@@ -1225,16 +1226,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_082431) do
     t.index ["status"], name: "index_simplefin_items_on_status"
   end
 
+  create_table "stripe_event_receipts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "event_created_at", null: false
+    t.string "event_id", null: false
+    t.string "event_type", null: false
+    t.string "status", default: "processed", null: false
+    t.uuid "subscription_plan_id"
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_stripe_event_receipts_on_event_id", unique: true
+    t.index ["subscription_plan_id", "event_created_at"], name: "idx_stripe_receipts_plan_created"
+    t.index ["subscription_plan_id"], name: "index_stripe_event_receipts_on_subscription_plan_id"
+  end
+
   create_table "subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.decimal "amount", precision: 19, scale: 4, null: false
     t.boolean "archived", default: false, null: false
     t.boolean "auto_renew", default: true, null: false
     t.string "billing_cycle", default: "monthly", null: false
+    t.integer "billing_day_end"
+    t.integer "billing_day_start"
+    t.boolean "cancel_at_period_end", default: false, null: false
     t.date "cancelled_at"
     t.datetime "created_at", null: false
     t.string "currency", default: "USD", null: false
+    t.decimal "default_admin_fee", precision: 19, scale: 4, default: "0.0"
     t.text "description"
+    t.datetime "discarded_at"
     t.date "expires_at"
     t.boolean "failed_payment_alert_sent", default: false, null: false
     t.uuid "family_id", null: false
@@ -1250,13 +1269,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_082431) do
     t.boolean "shared_within_family", default: false, null: false
     t.date "started_at", null: false
     t.string "status", default: "active", null: false
+    t.datetime "stripe_cancel_at"
+    t.datetime "stripe_current_period_end"
     t.string "stripe_customer_id"
+    t.datetime "stripe_last_event_created_at"
+    t.string "stripe_last_event_id"
+    t.string "stripe_status"
     t.string "stripe_subscription_id"
     t.date "trial_ends_at"
     t.datetime "updated_at", null: false
     t.integer "usage_count", default: 0
     t.index ["account_id"], name: "index_subscription_plans_on_account_id"
     t.index ["archived"], name: "index_subscription_plans_on_archived"
+    t.index ["billing_day_start", "billing_day_end"], name: "idx_sub_plans_billing_window"
+    t.index ["cancel_at_period_end"], name: "index_subscription_plans_on_cancel_at_period_end"
+    t.index ["discarded_at"], name: "idx_sub_plans_discarded_at"
     t.index ["family_id", "next_billing_at"], name: "index_subscription_plans_on_family_id_and_next_billing_at"
     t.index ["family_id", "service_id"], name: "index_subscription_plans_on_family_id_and_service_id", unique: true
     t.index ["family_id", "status"], name: "index_subscription_plans_on_family_id_and_status"
@@ -1264,7 +1291,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_082431) do
     t.index ["merchant_id"], name: "index_subscription_plans_on_merchant_id"
     t.index ["service_id"], name: "index_subscription_plans_on_service_id"
     t.index ["status", "next_billing_at"], name: "index_subscription_plans_on_status_and_next_billing_at"
+    t.index ["stripe_status"], name: "index_subscription_plans_on_stripe_status"
     t.index ["stripe_subscription_id"], name: "index_subscription_plans_on_stripe_subscription_id", unique: true, where: "(stripe_subscription_id IS NOT NULL)"
+  end
+
+  create_table "subscription_renewals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.decimal "actual_amount", precision: 19, scale: 4, null: false
+    t.decimal "admin_fee", precision: 19, scale: 4, default: "0.0"
+    t.date "billing_period_end", null: false
+    t.date "billing_period_start", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", limit: 3, null: false
+    t.integer "cycle_number", default: 1, null: false
+    t.uuid "entry_id"
+    t.jsonb "metadata", default: {}
+    t.text "notes"
+    t.date "paid_at"
+    t.string "payment_method"
+    t.string "status", default: "pending", null: false
+    t.uuid "subscription_plan_id", null: false
+    t.decimal "template_amount", precision: 19, scale: 4, null: false
+    t.virtual "total_paid", type: :decimal, precision: 19, scale: 4, as: "(actual_amount + COALESCE(admin_fee, (0)::numeric))", stored: true
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "idx_sub_renewals_account_id"
+    t.index ["entry_id"], name: "idx_sub_renewals_entry_id"
+    t.index ["paid_at"], name: "index_subscription_renewals_on_paid_at"
+    t.index ["subscription_plan_id", "cycle_number"], name: "idx_sub_renewals_plan_cycle_unique", unique: true
+    t.index ["subscription_plan_id", "status"], name: "idx_sub_renewals_plan_status"
+    t.index ["subscription_plan_id"], name: "idx_sub_renewals_plan_id"
   end
 
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1498,10 +1553,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_082431) do
   add_foreign_key "sessions", "users"
   add_foreign_key "simplefin_accounts", "simplefin_items"
   add_foreign_key "simplefin_items", "families"
+  add_foreign_key "stripe_event_receipts", "subscription_plans", on_delete: :cascade
   add_foreign_key "subscription_plans", "accounts"
   add_foreign_key "subscription_plans", "families"
   add_foreign_key "subscription_plans", "merchants", on_delete: :nullify
   add_foreign_key "subscription_plans", "services"
+  add_foreign_key "subscription_renewals", "accounts"
+  add_foreign_key "subscription_renewals", "entries", on_delete: :nullify
+  add_foreign_key "subscription_renewals", "subscription_plans", on_delete: :cascade
   add_foreign_key "subscriptions", "families"
   add_foreign_key "syncs", "syncs", column: "parent_id"
   add_foreign_key "taggings", "tags"

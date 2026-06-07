@@ -1,0 +1,144 @@
+<tr id="<%= dom_id(subscription, :row) %>" class="<%= subscription_row_class(subscription) %>"
+    data-controller="clickable-row"
+    data-clickable-row-url-value="<%= subscription_plan_path(subscription) %>">
+  <% service = subscription.service_merchant %>
+  <%# Service Column - Avatar + Name + Category (Clickable) %>
+  <td class="px-6 py-4" data-clickable-row-target="cell">
+    <div class="flex items-center gap-3">
+      <% if service&.respond_to?(:display_logo_url) && service.display_logo_url.present? %>
+        <%= image_tag service.display_logo_url, class: "h-11 w-11 rounded-2xl object-cover shadow-border-xs", loading: "lazy" %>
+      <% else %>
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-container-inset text-xl shadow-border-xs">
+          <%= service_icon(service) %>
+        </div>
+      <% end %>
+      <div class="min-w-0">
+        <div class="font-medium text-primary group-hover:text-blue-600 theme-dark:group-hover:text-blue-400 transition-colors"><%= subscription.name %></div>
+        <div class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-secondary">
+          <%= subscription_service_category(subscription)&.humanize || "Subscription" %>
+          <% if subscription.shared_within_family %>
+            <span class="rounded-full bg-blue-tint-10 px-2 py-0.5 text-blue-700 theme-dark:text-blue-200">Shared</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </td>
+
+  <%# Amount Column (Clickable) %>
+  <td class="px-6 py-4" data-clickable-row-target="cell">
+    <div class="text-base font-semibold text-primary"><%= number_to_currency(subscription.amount, unit: subscription.currency + " ") %></div>
+    <div class="mt-0.5 text-xs text-secondary"><%= subscription.formatted_billing_cycle %></div>
+  </td>
+
+  <%# Status Column with Dynamic Badge (Clickable) %>
+  <td class="px-6 py-4" data-clickable-row-target="cell">
+    <div class="flex flex-col items-start gap-1.5">
+      <span
+        class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold <%= subscription_lifecycle_badge_class(subscription) %>"
+        data-subscription-status="<%= subscription.status %>">
+        <%= icon subscription_lifecycle_icon(subscription), class: "h-3.5 w-3.5" %>
+        <%= subscription_lifecycle_label(subscription) %>
+      </span>
+      <span class="inline-flex items-center gap-1.5 text-xs text-secondary" data-subscription-billing-state>
+        <span class="h-1.5 w-1.5 rounded-full <%= subscription_billing_state_dot_class(subscription) %>"></span>
+        <%= subscription_billing_state_label(subscription) %>
+      </span>
+    </div>
+    <% if subscription.trial_days_remaining.positive? %>
+      <div class="text-xs text-blue-600 theme-dark:text-blue-400 mt-1"><%= subscription.trial_days_remaining %>d trial</div>
+    <% end %>
+  </td>
+
+  <%# Next Billing Column (Clickable) %>
+  <td class="px-6 py-4" data-clickable-row-target="cell">
+    <% if subscription.next_billing_at %>
+      <% if subscription.cancelled? || subscription.expired? %>
+        <div class="text-sm font-medium text-secondary">No future billing</div>
+        <span class="text-xs text-secondary">Ended subscription</span>
+      <% else %>
+        <div class="text-sm font-medium text-primary"><%= subscription.next_billing_at.strftime("%b %d, %Y") %></div>
+        <% if subscription.days_until_renewal == 0 %>
+          <span class="text-xs font-medium text-orange-600 theme-dark:text-orange-400">Today</span>
+        <% elsif subscription.days_until_renewal <= 3 %>
+          <span class="text-xs font-medium text-red-600 theme-dark:text-red-400"><%= subscription.days_until_renewal %> days</span>
+        <% else %>
+          <span class="text-xs text-secondary"><%= subscription.days_until_renewal %> days</span>
+        <% end %>
+      <% end %>
+    <% else %>
+      <span class="text-sm text-secondary">—</span>
+    <% end %>
+  </td>
+
+  <%# Actions Column - Dropdown Menu + Modal Trigger %>
+  <td class="px-6 py-4 text-right flex items-center justify-end gap-2" data-clickable-row-target="exclude">
+    <% if subscription.active_or_trial? %>
+      <%= link_to new_subscription_plan_subscription_renewal_path(subscription), data: { turbo_frame: "modal" }, class: "flex h-9 w-9 items-center justify-center rounded-full bg-container-inset text-primary shadow-border-xs transition-colors hover:bg-surface-hover", title: "Record Payment" do %>
+        <%= icon "credit-card", class: "h-5 w-5" %>
+      <% end %>
+    <% end %>
+
+    <%= render DS::Menu.new(placement: "bottom-end") do |menu| %>
+      <% menu.with_item(variant: "link", text: "View details", href: subscription_plan_path(subscription), icon: "eye") %>
+      <% menu.with_item(variant: "link", text: "Edit", href: edit_subscription_plan_path(subscription), icon: "pencil") %>
+
+      <% menu.with_item(variant: "divider") %>
+
+      <% if subscription.active? %>
+        <% menu.with_item(variant: "button", text: "Pause", href: pause_subscription_plan_path(subscription), icon: "pause", method: :patch) %>
+      <% elsif subscription.paused? %>
+        <% menu.with_item(variant: "button", text: "Resume", href: resume_subscription_plan_path(subscription), icon: "play", method: :patch) %>
+      <% end %>
+
+      <% menu.with_item(variant: "divider") %>
+
+      <% if subscription.pending_cancellation? %>
+        <% menu.with_item(
+          variant: "button",
+          text: "Keep subscription",
+          href: undo_cancellation_subscription_plan_path(subscription),
+          icon: "rotate-ccw",
+          method: :patch,
+          confirm: "Remove the scheduled cancellation and keep this subscription active?"
+        ) %>
+        <% menu.with_item(
+          variant: "button",
+          text: "Cancel now",
+          href: cancel_subscription_plan_path(subscription, timing: "immediate"),
+          icon: "x-circle",
+          method: :patch,
+          destructive: true,
+          confirm: "Cancel immediately? Access and future billing may stop now."
+        ) %>
+      <% elsif subscription.cancelled? || subscription.expired? %>
+        <% menu.with_item(
+          variant: "button",
+          text: "Delete",
+          href: subscription_plan_path(subscription),
+          icon: "trash-2",
+          method: :delete,
+          destructive: true,
+          confirm: "Are you sure you want to delete this subscription?"
+        ) %>
+      <% else %>
+        <% menu.with_item(
+          variant: "button",
+          text: "Cancel at renewal",
+          href: cancel_subscription_plan_path(subscription, timing: "period_end"),
+          icon: "calendar-x",
+          method: :patch,
+          confirm: "Keep access until the next renewal, then cancel this subscription?"
+        ) %>
+        <% menu.with_item(
+          variant: "button",
+          text: "Cancel now",
+          href: cancel_subscription_plan_path(subscription, timing: "immediate"),
+          icon: "x-circle",
+          method: :patch,
+          destructive: true,
+          confirm: "Cancel immediately? Access and future billing may stop now."
+        ) %>
+      <% end %>
+    <% end %>
+  </td>
+</tr>

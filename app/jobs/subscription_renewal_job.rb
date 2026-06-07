@@ -13,19 +13,22 @@ class SubscriptionRenewalJob < ApplicationJob
   def perform(date = Date.current)
     Rails.logger.info("Starting subscription renewals for #{date}")
 
+    reminder_policy = SubscriptionPlan::ReminderPolicy.new(date: date)
+
     # Process renewals for the specified date
     process_renewals_for_date(date)
 
-    # Send renewal reminders
-    send_renewal_reminders(date)
+    # Send renewal and trial reminders through the idempotent audit ledger.
+    reminder_counts = reminder_policy.deliver_upcoming!
 
     # Process trial expirations
-    process_trial_expirations(date)
+    process_trial_expirations(date, reminder_policy: reminder_policy)
 
     # Process subscription expirations
     process_subscription_expirations(date)
 
     Rails.logger.info("Completed subscription renewals for #{date}")
+    { reminders: reminder_counts }
   end
 
   private
@@ -52,9 +55,19 @@ class SubscriptionRenewalJob < ApplicationJob
             # Process Stripe payment
             process_stripe_renewal(subscription)
           else
-            # Manual renewal - just mark as renewed
-            subscription.mark_as_renewed!
-            create_manual_transaction(subscription)
+            # Manual renewal using RenewalForm
+            form = SubscriptionPlan::RenewalForm.new(
+              subscription_plan: subscription,
+              account_id: subscription.account_id,
+              actual_amount: subscription.amount,
+              admin_fee: subscription.default_admin_fee || 0,
+              paid_at: date,
+              payment_method: subscription.payment_method,
+              currency: subscription.currency
+            )
+            unless form.create
+              raise "Failed to create manual renewal: #{form.errors.full_messages.join(', ')}"
+            end
           end
         else
           # Auto-renew disabled - mark as expired if past due
@@ -82,11 +95,20 @@ class SubscriptionRenewalJob < ApplicationJob
         stripe_subscription = Stripe::Subscription.retrieve(subscription.stripe_subscription_id)
 
         if stripe_subscription.status == "active"
-          # Subscription is still active, just update next billing date
-          subscription.mark_as_renewed!
+          billing_period_start = subscription.next_billing_at || Date.current
+          billing_period_end = subscription.calculate_next_billing_date || billing_period_start
 
-          # Create transaction for accounting
-          create_stripe_transaction(subscription, stripe_subscription)
+          ActiveRecord::Base.transaction do
+            create_stripe_transaction(
+              subscription,
+              stripe_subscription,
+              billing_period_start: billing_period_start,
+              billing_period_end: billing_period_end
+            )
+
+            # Advance only after the accounting entry and renewal record are durable.
+            subscription.mark_as_renewed!
+          end
 
           # Send confirmation email
           SubscriptionMailer.renewal_confirmation(subscription).deliver_later
@@ -119,41 +141,50 @@ class SubscriptionRenewalJob < ApplicationJob
       end
     end
 
-    def create_stripe_transaction(subscription, stripe_subscription)
-      # Create transaction record for the renewal
-      transaction = subscription.account.transactions.create!(
-        amount: -subscription.amount, # Negative for expense
-        currency: subscription.currency,
+    def create_stripe_transaction(subscription, stripe_subscription, billing_period_start: subscription.next_billing_at || Date.current, billing_period_end: subscription.calculate_next_billing_date || Date.current)
+      invoice_id = stripe_invoice_id(stripe_subscription)
+
+      entry = subscription.account.entries.create!(
+        name: "Subscription: #{subscription.name}",
         date: Date.current,
-        description: "Subscription renewal: #{subscription.name}",
-        category: find_subscription_category(subscription.family),
-        metadata: {
-          subscription_id: subscription.id,
-          stripe_subscription_id: subscription.stripe_subscription_id,
-          stripe_invoice_id: stripe_subscription.latest_invoice&.id
-        }
+        amount: subscription.amount,
+        currency: subscription.currency,
+        notes: "Stripe subscription renewal",
+        entryable: Transaction.new(
+          kind: "standard",
+          category: find_subscription_category(subscription.family),
+          merchant: subscription.merchant,
+          extra: {
+            subscription_plan_id: subscription.id,
+            stripe_subscription_id: subscription.stripe_subscription_id,
+            stripe_invoice_id: invoice_id
+          }.compact
+        )
       )
 
-      # Update subscription with transaction reference
-      subscription.update!(last_transaction_id: transaction.id)
+      subscription.subscription_renewals.create!(
+        cycle_number: subscription.next_cycle_number,
+        account: subscription.account,
+        entry: entry,
+        billing_period_start: billing_period_start,
+        billing_period_end: billing_period_end,
+        paid_at: Date.current,
+        template_amount: subscription.amount,
+        actual_amount: subscription.amount,
+        admin_fee: subscription.default_admin_fee || 0,
+        currency: subscription.currency,
+        status: "paid",
+        payment_method: subscription.payment_method,
+        metadata: {
+          stripe_subscription_id: subscription.stripe_subscription_id,
+          stripe_invoice_id: invoice_id
+        }.compact
+      )
     end
 
-    def create_manual_transaction(subscription)
-      # Create manual transaction for non-Stripe payments
-      transaction = subscription.account.transactions.create!(
-        amount: -subscription.amount, # Negative for expense
-        currency: subscription.currency,
-        date: Date.current,
-        description: "Manual subscription payment: #{subscription.name}",
-        category: find_subscription_category(subscription.family),
-        metadata: {
-          subscription_id: subscription.id,
-          payment_method: subscription.payment_method
-        }
-      )
-
-      # Update subscription with transaction reference
-      subscription.update!(last_transaction_id: transaction.id)
+    def stripe_invoice_id(stripe_subscription)
+      invoice = stripe_subscription.latest_invoice
+      invoice.respond_to?(:id) ? invoice.id : invoice
     end
 
     # Safely find or create subscription category scoped to family
@@ -204,42 +235,15 @@ class SubscriptionRenewalJob < ApplicationJob
       )
     end
 
-    def send_renewal_reminders(date)
-      Rails.logger.info("Sending renewal reminders for #{date}")
-
-      # Send reminders for upcoming renewals (3 days, 1 day)
-      [ 3, 1 ].each do |days_ahead|
-        reminder_date = date + days_ahead.days
-        subscriptions_reminded = 0
-
-        SubscriptionPlan.active.where(next_billing_at: reminder_date).find_each do |subscription|
-          # Only send reminder if not already sent for this cycle
-          unless subscription.metadata&.dig("reminder_sent_for_cycle", reminder_date.to_s)
-            SubscriptionMailer.renewal_reminder(subscription, days_ahead).deliver_later
-
-            # Track that reminder was sent
-            subscription.update_column(
-              :metadata,
-              (subscription.metadata || {}).deep_merge(
-                "reminder_sent_for_cycle" => { reminder_date.to_s => true }
-              )
-            )
-
-            subscriptions_reminded += 1
-          end
-        end
-
-        Rails.logger.info("Sent #{subscriptions_reminded} renewal reminders for #{days_ahead} days ahead")
-      end
-    end
-
-    def process_trial_expirations(date)
+    def process_trial_expirations(date, reminder_policy: SubscriptionPlan::ReminderPolicy.new(date: date))
       Rails.logger.info("Processing trial expirations for #{date}")
 
       # Find trials ending today
-      trials_ending = SubscriptionPlan.trial.where(trial_ends_at: date)
+      trials_ending = SubscriptionPlan.where(status: %w[trial active], trial_ends_at: date)
 
       trials_ending.find_each do |subscription|
+        reminder_policy.deliver_trial_expired!(subscription)
+
         if subscription.auto_renewal_enabled?
           # Convert trial to active subscription
           subscription.resume!

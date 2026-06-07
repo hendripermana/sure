@@ -1,222 +1,101 @@
-<div class="container mx-auto px-4 py-6">
-  <!-- Page Header -->
-  <div class="mb-8">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-3xl font-bold text-primary">Subscription Manager</h1>
-        <p class="text-secondary mt-1">Manage your subscriptions and recurring payments</p>
-      </div>
-      <div>
-        <%= link_to new_subscription_plan_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors" do %>
-          <%= icon "plus", class: "h-5 w-5" %>
-          Add Subscription
-        <% end %>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dashboard Summary Cards - Theme Aware -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-    <!-- Monthly Recurring Revenue -->
-    <div class="bg-container rounded-xl border border-primary p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-lg bg-green-100 theme-dark:bg-green-900/30">
-            <%= icon "trending-up", class: "h-5 w-5 text-green-600 theme-dark:text-green-400" %>
-          </div>
-          <div>
-            <p class="text-secondary text-xs font-medium uppercase tracking-wide">Monthly Revenue</p>
-            <p class="text-2xl font-bold text-primary">
-              <%= Money.new(@analytics.mrr, Current.family.currency).format %>
-            </p>
-          </div>
+<div class="mx-auto max-w-[1240px] px-4 py-6 lg:px-8">
+  <section class="mb-8 rounded-[24px] bg-surface p-6 theme-dark:bg-container lg:p-8">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div class="max-w-3xl">
+        <div class="mb-3 inline-flex items-center gap-2 rounded-full bg-container px-3 py-1 text-xs font-semibold text-secondary shadow-border-xs">
+          <span class="h-2 w-2 rounded-full bg-primary"></span>
+          Recurring money control
         </div>
+        <h1 class="text-4xl font-black leading-none text-primary lg:text-5xl">Subscription Manager</h1>
+        <p class="mt-3 max-w-2xl text-base text-secondary lg:text-lg">Track active, paused, and cancelled commitments without mixing lifecycle status with payment state.</p>
       </div>
-      <p class="text-xs text-secondary mt-3"><%= @active_subscriptions.count %> active subscriptions</p>
+
+      <%= render DS::Link.new(
+        text: "Add Subscription",
+        icon: "plus",
+        variant: :primary,
+        size: :lg,
+        href: new_subscription_plan_path,
+        class: "min-h-12 px-6"
+      ) %>
     </div>
 
-    <!-- Active Subscriptions -->
-    <div class="bg-container rounded-xl border border-primary p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-lg bg-blue-100 theme-dark:bg-blue-900/30">
-            <%= icon "layers", class: "h-5 w-5 text-blue-600 theme-dark:text-blue-400" %>
-          </div>
-          <div>
-            <p class="text-secondary text-xs font-medium uppercase tracking-wide">Active</p>
-            <p class="text-2xl font-bold text-primary"><%= @active_subscriptions.count %></p>
-          </div>
+    <div class="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div class="rounded-[24px] bg-container p-5 shadow-border-xs">
+        <div class="mb-4 flex items-center justify-between">
+          <span class="rounded-full bg-primary/20 px-3 py-1 text-xs font-semibold text-primary">Monthly</span>
+          <%= icon "wallet-cards", class: "h-5 w-5 text-secondary" %>
         </div>
+        <p class="text-sm font-medium text-secondary">Recurring spend</p>
+        <p class="mt-1 text-3xl font-black text-primary"><%= Money.new(@analytics.mrr, Current.family.currency).format %></p>
+        <p class="mt-3 text-xs text-secondary"><%= @active_subscriptions.count %> active billing streams</p>
       </div>
-      <p class="text-xs text-secondary mt-3">Total subscriptions</p>
-    </div>
 
-    <!-- Upcoming Renewals -->
-    <div class="bg-container rounded-xl border border-primary p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-lg bg-orange-100 theme-dark:bg-orange-900/30">
-            <%= icon "calendar", class: "h-5 w-5 text-orange-600 theme-dark:text-orange-400" %>
-          </div>
-          <div>
-            <p class="text-secondary text-xs font-medium uppercase tracking-wide">Renewals</p>
-            <p class="text-2xl font-bold text-primary"><%= @upcoming_renewals.count %></p>
-          </div>
+      <div class="rounded-[24px] bg-container p-5 shadow-border-xs">
+        <div class="mb-4 flex items-center justify-between">
+          <span class="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 theme-dark:bg-green-tint-10 theme-dark:text-green-200">Active</span>
+          <%= icon "check-circle-2", class: "h-5 w-5 text-success" %>
         </div>
+        <p class="text-sm font-medium text-secondary">Currently renewing</p>
+        <p class="mt-1 text-3xl font-black text-primary"><%= @active_subscriptions.count %></p>
+        <p class="mt-3 text-xs text-secondary">Included in monthly forecasts</p>
       </div>
-      <p class="text-xs text-secondary mt-3">In next 7 days</p>
-    </div>
 
-    <!-- Overdue Payments -->
-    <div class="bg-container rounded-xl border border-primary p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-lg bg-red-100 theme-dark:bg-red-900/30">
-            <%= icon "alert-triangle", class: "h-5 w-5 text-red-600 theme-dark:text-red-400" %>
-          </div>
-          <div>
-            <p class="text-secondary text-xs font-medium uppercase tracking-wide">Overdue</p>
-            <p class="text-2xl font-bold text-primary"><%= @overdue_subscriptions.count %></p>
-          </div>
+      <div class="rounded-[24px] bg-container p-5 shadow-border-xs">
+        <div class="mb-4 flex items-center justify-between">
+          <span class="rounded-full bg-yellow-50 px-3 py-1 text-xs font-semibold text-yellow-800 theme-dark:bg-yellow-tint-10 theme-dark:text-yellow-200">Paused</span>
+          <%= icon "pause-circle", class: "h-5 w-5 text-warning" %>
         </div>
+        <p class="text-sm font-medium text-secondary">Temporarily stopped</p>
+        <p class="mt-1 text-3xl font-black text-primary"><%= @paused_subscriptions.count %></p>
+        <p class="mt-3 text-xs text-secondary">Ready to resume later</p>
       </div>
-      <p class="text-xs text-secondary mt-3">Require attention</p>
+
+      <div class="rounded-[24px] bg-container p-5 shadow-border-xs">
+        <div class="mb-4 flex items-center justify-between">
+          <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 theme-dark:bg-red-tint-10 theme-dark:text-red-200">Attention</span>
+          <%= icon "alert-triangle", class: "h-5 w-5 text-destructive" %>
+        </div>
+        <p class="text-sm font-medium text-secondary">Overdue or cancelled</p>
+        <p class="mt-1 text-3xl font-black text-primary"><%= @overdue_subscriptions.count + @cancelled_subscriptions.count %></p>
+        <p class="mt-3 text-xs text-secondary"><%= @overdue_subscriptions.count %> overdue, <%= @cancelled_subscriptions.count %> cancelled</p>
+      </div>
     </div>
-  </div>
+  </section>
 
   <!-- Analytics Charts -->
   <%= render "subscription_plans/analytics_charts" %>
 
   <!-- Subscription List -->
-  <div class="bg-container rounded-xl border border-primary overflow-hidden">
-    <div class="px-6 py-4 border-b border-primary flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-primary">All Subscriptions</h2>
-      <span class="text-sm text-secondary">Showing <%= @subscription_plans.count %> entries</span>
+  <div class="overflow-hidden rounded-[24px] bg-container shadow-border-xs">
+    <div class="flex flex-col gap-4 border-b border-primary px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h2 class="text-xl font-semibold text-primary">All Subscriptions</h2>
+        <p class="mt-1 text-sm text-secondary">Lifecycle status and payment state are shown separately.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 text-xs font-medium text-secondary">
+        <span class="rounded-full bg-container-inset px-3 py-1 shadow-border-xs">Showing <%= @subscription_plans.count %> entries</span>
+        <span class="rounded-full bg-green-50 px-3 py-1 text-green-700 theme-dark:bg-green-tint-10 theme-dark:text-green-200"><%= @active_subscriptions.count %> active</span>
+        <span class="rounded-full bg-yellow-50 px-3 py-1 text-yellow-800 theme-dark:bg-yellow-tint-10 theme-dark:text-yellow-200"><%= @paused_subscriptions.count %> paused</span>
+        <span class="rounded-full bg-gray-100 px-3 py-1 text-gray-700 theme-dark:bg-gray-800 theme-dark:text-gray-300"><%= @cancelled_subscriptions.count %> cancelled</span>
+      </div>
     </div>
 
     <% if @subscription_plans.any? %>
       <div class="overflow-x-auto">
         <table class="min-w-full">
           <thead>
-            <tr class="border-b border-primary bg-surface">
-              <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Service</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Amount</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Next Billing</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-secondary uppercase tracking-wider">Actions</th>
+            <tr class="border-b border-primary bg-container-inset">
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-secondary">Service</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-secondary">Amount</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-secondary">Lifecycle</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-secondary">Next Billing</th>
+              <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-secondary">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-primary/10">
+          <tbody class="divide-y divide-tertiary">
             <% @subscription_plans.each do |subscription| %>
-              <% service = subscription.service_merchant %>
-              <tr class="group hover:bg-surface-hover transition-colors cursor-pointer <%= subscription_row_class(subscription) %>"
-                  data-controller="clickable-row"
-                  data-clickable-row-url-value="<%= subscription_plan_path(subscription) %>">
-                <%# Service Column - Avatar + Name + Category (Clickable) %>
-                <td class="px-6 py-4" data-clickable-row-target="cell">
-                  <div class="flex items-center gap-3">
-                    <% if service&.respond_to?(:display_logo_url) && service.display_logo_url.present? %>
-                      <%= image_tag service.display_logo_url, class: "w-10 h-10 rounded-lg object-cover", loading: "lazy" %>
-                    <% else %>
-                      <div class="w-10 h-10 rounded-lg bg-gray-100 theme-dark:bg-gray-800 flex items-center justify-center text-xl">
-                        <%= service_icon(service) %>
-                      </div>
-                    <% end %>
-                    <div>
-                      <div class="font-medium text-primary group-hover:text-blue-600 theme-dark:group-hover:text-blue-400 transition-colors"><%= subscription.name %></div>
-                      <div class="text-xs text-secondary">
-                        <%= subscription_service_category(subscription)&.humanize || "Subscription" %>
-                        <% if subscription.shared_within_family %>
-                          <span class="ml-1 text-blue-600 theme-dark:text-blue-400">• Shared</span>
-                        <% end %>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-
-                <%# Amount Column (Clickable) %>
-                <td class="px-6 py-4" data-clickable-row-target="cell">
-                  <div class="font-semibold text-primary"><%= number_to_currency(subscription.amount, unit: subscription.currency + " ") %></div>
-                  <div class="text-xs text-secondary"><%= subscription.billing_cycle.humanize %></div>
-                </td>
-
-                <%# Status Column (Clickable) %>
-                <td class="px-6 py-4" data-clickable-row-target="cell">
-                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium <%= subscription.status_badge_class %>">
-                    <%= subscription.status.humanize %>
-                  </span>
-                  <% if subscription.trial_days_remaining.positive? %>
-                    <div class="text-xs text-blue-600 theme-dark:text-blue-400 mt-1"><%= subscription.trial_days_remaining %>d trial</div>
-                  <% end %>
-                </td>
-
-                <%# Next Billing Column (Clickable) %>
-                <td class="px-6 py-4" data-clickable-row-target="cell">
-                  <% if subscription.next_billing_at %>
-                    <div class="text-sm text-primary"><%= subscription.next_billing_at.strftime("%b %d, %Y") %></div>
-                    <% if subscription.days_until_renewal == 0 %>
-                      <span class="text-xs font-medium text-orange-600 theme-dark:text-orange-400">Today</span>
-                    <% elsif subscription.days_until_renewal <= 3 %>
-                      <span class="text-xs font-medium text-red-600 theme-dark:text-red-400"><%= subscription.days_until_renewal %> days</span>
-                    <% else %>
-                      <span class="text-xs text-secondary"><%= subscription.days_until_renewal %> days</span>
-                    <% end %>
-                  <% else %>
-                    <span class="text-sm text-secondary">—</span>
-                  <% end %>
-                </td>
-
-                <%# Actions Column - Dropdown Menu (Not Clickable for row navigation) %>
-                <td class="px-6 py-4 text-right" data-clickable-row-target="exclude">
-                  <%= render DS::Menu.new(placement: "bottom-end") do |menu| %>
-                    <% menu.with_item(variant: "link", text: "View details", href: subscription_plan_path(subscription), icon: "eye") %>
-                    <% menu.with_item(variant: "link", text: "Edit", href: edit_subscription_plan_path(subscription), icon: "pencil", frame: "modal") %>
-
-                    <% if subscription.active_or_trial? %>
-                      <% menu.with_item(
-                        variant: "link",
-                        text: "Record payment",
-                        href: new_transaction_path(account_id: subscription.account_id, nature: "outflow", subscription_plan_id: subscription.id),
-                        icon: "credit-card",
-                        frame: "modal"
-                      ) %>
-                    <% end %>
-
-                    <% menu.with_item(variant: "divider") %>
-
-                    <% if subscription.active? %>
-                      <% menu.with_item(variant: "button", text: "Pause", href: pause_subscription_plan_path(subscription), icon: "pause", method: :patch) %>
-                    <% elsif subscription.paused? %>
-                      <% menu.with_item(variant: "button", text: "Resume", href: resume_subscription_plan_path(subscription), icon: "play", method: :patch) %>
-                    <% end %>
-
-                    <% menu.with_item(variant: "button", text: "Renew now", href: renew_subscription_plan_path(subscription), icon: "refresh-cw", method: :patch) %>
-
-                    <% menu.with_item(variant: "divider") %>
-
-                    <% if subscription.cancelled? || subscription.expired? %>
-                      <% menu.with_item(
-                        variant: "button",
-                        text: "Delete",
-                        href: subscription_plan_path(subscription),
-                        icon: "trash-2",
-                        method: :delete,
-                        destructive: true,
-                        confirm: "Are you sure you want to delete this subscription?"
-                      ) %>
-                    <% else %>
-                      <% menu.with_item(
-                        variant: "button",
-                        text: "Cancel subscription",
-                        href: cancel_subscription_plan_path(subscription),
-                        icon: "x-circle",
-                        method: :patch,
-                        destructive: true
-                      ) %>
-                    <% end %>
-                  <% end %>
-                </td>
-              </tr>
+              <%= render partial: "subscription_plans/row", locals: { subscription: subscription } %>
             <% end %>
           </tbody>
         </table>
@@ -228,10 +107,12 @@
         </div>
         <h3 class="text-lg font-medium text-primary mb-2">No Subscriptions Yet</h3>
         <p class="text-secondary mb-6 max-w-sm mx-auto">Start tracking your subscriptions and recurring payments to get insights.</p>
-        <%= link_to new_subscription_plan_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors" do %>
-          <%= icon "plus", class: "h-5 w-5" %>
-          Add Your First Subscription
-        <% end %>
+        <%= render DS::Link.new(
+          text: "Add Your First Subscription",
+          icon: "plus",
+          variant: :primary,
+          href: new_subscription_plan_path
+        ) %>
       </div>
     <% end %>
   </div>

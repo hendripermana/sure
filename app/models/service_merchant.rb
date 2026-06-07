@@ -1,4 +1,6 @@
 class ServiceMerchant < Merchant
+  belongs_to :family, optional: true
+
   # Service categories for subscription services
   CATEGORIES = %w[
     streaming software utilities subscriptions memberships insurance
@@ -13,14 +15,20 @@ class ServiceMerchant < Merchant
     security parking
   ].freeze
 
-  BILLING_FREQUENCIES = %w[monthly annual quarterly biennial one_time].freeze
+  BILLING_FREQUENCIES = %w[daily weekly monthly quarterly annual biennial one_time].freeze
+
+  attr_writer :default_interval_count, :default_interval_unit
 
   validates :subscription_category, inclusion: { in: CATEGORIES }, allow_nil: true
-  validates :billing_frequency, inclusion: { in: BILLING_FREQUENCIES }, allow_nil: true
-  validates :name, uniqueness: { scope: :type }
+  validate :billing_frequency_is_supported
+  validate :apply_default_schedule
+  validates :name, uniqueness: { scope: :family_id }
   validates :avg_monthly_cost, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   scope :popular, -> { where(popular: true) }
+  scope :catalog, -> { where(family_id: nil, popular: true) }
+  scope :owned_by, ->(family) { where(family_id: family.id) }
+  scope :available_to, ->(family) { catalog.or(owned_by(family)).alphabetically }
   scope :by_category, ->(category) { where(subscription_category: category) }
   scope :search, ->(query) {
     return all if query.blank?
@@ -39,10 +47,32 @@ class ServiceMerchant < Merchant
     )
   end
 
+  def billing_schedule
+    Recurring::Schedule.from_service_merchant(self)
+  end
+
+  def default_interval_count
+    @default_interval_count || (billing_frequency.present? ? billing_schedule.count : 1)
+  end
+
+  def default_interval_unit
+    @default_interval_unit || (billing_frequency.present? ? billing_schedule.unit : nil)
+  end
+
+  def formatted_billing_frequency
+    return "No default" if billing_frequency.blank?
+
+    billing_schedule.label
+  end
+
   # Seed popular subscription services
   def self.seed_popular_services
     popular_services.each do |service_data|
-      service = find_or_initialize_by(name: service_data[:name], type: "ServiceMerchant")
+      service = find_or_initialize_by(
+        name: service_data[:name],
+        type: "ServiceMerchant",
+        family_id: nil
+      )
       service.assign_attributes(service_data.except(:name))
       service.website_url ||= derive_website_url(service_data[:name])
 
@@ -187,6 +217,30 @@ class ServiceMerchant < Merchant
   end
 
   private
+
+    def apply_default_schedule
+      return if @default_interval_count.blank? && @default_interval_unit.blank?
+
+      if @default_interval_unit.blank?
+        self.billing_frequency = nil
+        return
+      end
+
+      self.billing_frequency = Recurring::Schedule.new(
+        count: @default_interval_count.presence || 1,
+        unit: @default_interval_unit
+      ).service_frequency
+    rescue ArgumentError => error
+      errors.add(:billing_frequency, error.message)
+    end
+
+    def billing_frequency_is_supported
+      return if billing_frequency.blank?
+
+      Recurring::Schedule.from_service_merchant(self)
+    rescue ArgumentError
+      errors.add(:billing_frequency, "is not supported")
+    end
 
     def self.popular_services
       [
