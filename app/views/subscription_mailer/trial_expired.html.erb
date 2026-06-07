@@ -1,0 +1,8 @@
+<h1>Your <%= @subscription.name %> trial has ended</h1>
+
+<p>
+  The trial ended on <%= @subscription.trial_ends_at.strftime("%B %d, %Y") %>.
+  Its current lifecycle status is available in Subscription Manager.
+</p>
+
+<%= link_to "Review subscription", subscription_plan_url(@subscription) %>

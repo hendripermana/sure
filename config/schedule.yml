@@ -13,6 +13,12 @@ gold_price_fetch:
   queue: "scheduled"
   description: "Fetches daily Indonesian gold prices from harga-emas.org"
 
+subscription_renewals:
+  cron: "0 7 * * *"
+  class: "SubscriptionRenewalJob"
+  queue: "scheduled"
+  description: "Processes subscription lifecycle changes and sends renewal reminders"
+
 clean_syncs:
   cron: "0 * * * *" # every hour
   class: "SyncCleanerJob"

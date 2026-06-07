@@ -51,8 +51,9 @@ Rails.application.routes.draw do
       patch :pause
       patch :resume
       patch :cancel
-      patch :renew
+      patch :undo_cancellation
     end
+    resources :subscription_renewals, only: %i[index new create show]
   end
 
   # Services management
