@@ -1,3 +1,9 @@
+## [0.21.4](https://github.com/hendripermana/sure/compare/v0.21.3...v0.21.4) (2026-06-07)
+
+### Other Changes
+
+- Harden family sync queries (#176) (7dbe9104)
+
 ## [0.21.3](https://github.com/hendripermana/sure/compare/v0.21.2...v0.21.3) (2026-06-07)
 
 ### Other Changes
