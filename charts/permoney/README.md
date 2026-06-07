@@ -1,6 +1,6 @@
-# Permoney Helm Chart
+# Sure Helm Chart
 
-Official Helm chart for deploying the Permoney Rails application on Kubernetes. It supports web (Rails) and worker (Sidekiq) workloads, optional in-cluster PostgreSQL (CloudNativePG) and Redis subcharts for turnkey self-hosting, and production-grade features like pre-upgrade migrations, pod security contexts, HPAs, and optional ServiceMonitor.
+Official Helm chart for deploying the Sure Rails application on Kubernetes. It supports web (Rails) and worker (Sidekiq) workloads, optional in-cluster PostgreSQL (CloudNativePG) and Redis subcharts for turnkey self-hosting, and production-grade features like pre-upgrade migrations, pod security contexts, HPAs, and optional ServiceMonitor.
 
 ## Features
 
@@ -87,7 +87,7 @@ Below are example value stubs you can start from, depending on whether you want 
 
 ```yaml
 image:
-  repository: ghcr.io/hendripermana/permoney
+  repository: ghcr.io/hendripermana/sure
   tag: "v1.0.0"          # pin a specific version in production
   pullPolicy: IfNotPresent
 
@@ -538,17 +538,17 @@ When using locally built images on single-node k3s/k3d/kind clusters:
   - k3s (containerd):
     ```bash
     # Export your image to a tar (e.g., from Docker or podman)
-    docker save ghcr.io/hendripermana/permoney:dev -o permoney-dev.tar
+    docker save ghcr.io/hendripermana/sure:dev -o sure-dev.tar
     # Import into each node's containerd
-    sudo ctr -n k8s.io images import permoney-dev.tar
+    sudo ctr -n k8s.io images import sure-dev.tar
     ```
   - k3d:
     ```bash
-    k3d image import ghcr.io/hendripermana/permoney:dev -c <your-cluster-name>
+    k3d image import ghcr.io/hendripermana/sure:dev -c <your-cluster-name>
     ```
   - kind:
     ```bash
-    kind load docker-image ghcr.io/hendripermana/permoney:dev --name <your-cluster-name>
+    kind load docker-image ghcr.io/hendripermana/sure:dev --name <your-cluster-name>
     ```
 - Multi-node clusters require loading the image into every node or pushing to a registry that all nodes can reach.
 

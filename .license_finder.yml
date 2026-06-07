@@ -1,4 +1,4 @@
-# License Finder configuration for Permoney
+# License Finder configuration for Sure
 # This file defines approved licenses and dependency decisions
 
 # Approved licenses for the project
@@ -9,7 +9,7 @@ approved_licenses:
   - BSD-3-Clause
   - ISC
   - GPL-3.0
-  - AGPL-3.0  # Our project license
+  - AGPL-3.0 # Our project license
   - Ruby
   - Artistic-2.0
   - CC0-1.0
@@ -48,7 +48,7 @@ decisions:
   #   - :who
   #   - maintainer
   #   - :why
-  #   - "Approved for use in Permoney project"
+  #   - "Approved for use in Sure project"
   #   - :versions
   #   - []
   #   - :when

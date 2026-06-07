@@ -6,25 +6,23 @@
 # --------
 #
 # This file is an example Docker Compose configuration for self hosting
-# Permoney with Ollama on your local machine or on a cloud VPS.
+# Sure with Ollama on your local machine or on a cloud VPS.
 #
 # The configuration below is a "standard" setup that works out of the box,
 # but if you're running this outside of a local network, it is recommended
 # to set the environment variables for extra security.
 
-version: "3.9"
-
 # Setup:
 # ------
 #
 # To run this, read the setup guide:
-# https://github.com/hendripermana/permoney/blob/main/docs/hosting/docker.md
+# https://github.com/hendripermana/sure/blob/main/docs/hosting/docker.md
 #
 # Troubleshooting:
 # ----------------
 #
 # If you run into problems, please open an issue on GitHub:
-# https://github.com/hendripermana/permoney/issues
+# https://github.com/hendripermana/sure/issues
 
 x-db-env: &db_env
   POSTGRES_USER: ${POSTGRES_USER:-permoney_user}
@@ -57,7 +55,7 @@ x-rails-env: &rails_env
   OPENAI_URI_BASE: ${OPENAI_URI_BASE:-http://ollama:11434/v1}
 
 x-app-base: &app_base
-  image: ${PERMONEY_IMAGE:-ghcr.io/hendripermana/permoney:latest}
+  image: ${SURE_IMAGE:-ghcr.io/hendripermana/sure:latest}
   restart: unless-stopped
   volumes:
     - app-storage:/rails/storage

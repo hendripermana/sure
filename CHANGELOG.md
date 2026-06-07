@@ -1,4 +1,4 @@
-## [0.21.0](https://github.com/hendripermana/permoney/compare/v0.20.2...v0.21.0) (2026-06-07)
+## [0.21.0](https://github.com/hendripermana/sure/compare/v0.20.2...v0.21.0) (2026-06-07)
 
 ### Features
 
