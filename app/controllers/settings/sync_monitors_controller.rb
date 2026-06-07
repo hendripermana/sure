@@ -131,7 +131,7 @@ class Settings::SyncMonitorsController < ApplicationController
 
     # 3. Find duplicate entries on the exact same date and amount
     all_txs = @account.entries.excluding_split_parents.where(entryable_type: "Transaction").to_a
-    @duplicates = all_txs.group_by { |e| [e.date, e.amount.to_f.abs] }
+    @duplicates = all_txs.group_by { |e| [ e.date, e.amount.to_f.abs ] }
                          .select { |key, list| list.size > 1 }
 
     # 4. Find close duplicates (within 2 days with same amount)

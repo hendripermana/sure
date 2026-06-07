@@ -43,8 +43,8 @@
                 required
                 class="w-full pl-12 pr-4 py-3 text-lg font-semibold rounded-xl border border-primary bg-container text-primary focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0.00"
-                autofocus
-              />
+                autocomplete="off"
+                autofocus>
             </div>
           </div>
 
@@ -58,8 +58,8 @@
               id="reconciliation_date"
               value="<%= Date.current.to_s %>"
               max="<%= Date.current.to_s %>"
-              class="w-full px-3 py-2.5 rounded-xl border border-primary bg-container text-primary text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+              autocomplete="off"
+              class="w-full px-3 py-2.5 rounded-xl border border-primary bg-container text-primary text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           </div>
         </div>
 

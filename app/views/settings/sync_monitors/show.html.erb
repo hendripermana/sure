@@ -5,7 +5,7 @@
     <h1 class="text-primary text-xl font-medium">Sync Monitor</h1>
     <p class="text-sm text-secondary mt-1">Manage and trigger sync operations for all accounts.</p>
   </div>
-  
+
   <div class="flex items-center gap-2">
     <%= form_with url: sync_target_settings_sync_monitor_path, method: :post, class: "flex items-center gap-2" do |f| %>
       <%= f.select :syncable_key,
@@ -29,7 +29,7 @@
 
 <%= turbo_frame_tag "sync_monitor_frame" do %>
   <div class="section-card space-y-6" data-controller="sync-monitor" data-sync-monitor-active-value="<%= @summary[:pending] > 0 || @summary[:syncing] > 0 %>">
-    
+
     <!-- Action Bar -->
     <div class="flex flex-wrap items-center justify-end gap-2">
       <% if @summary[:failed] > 0 %>

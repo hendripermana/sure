@@ -32,7 +32,7 @@
   <!-- Duplicate Warnings (Crucial!) -->
   <div class="space-y-3">
     <h3 class="text-sm font-semibold text-primary">Duplicate Transaction Checks</h3>
-    
+
     <% if @duplicates.empty? && @close_duplicates.empty? %>
       <div class="flex items-center gap-2.5 p-3.5 rounded-2xl bg-surface-inset border border-primary text-xs text-secondary">
         <%= icon "check", class: "w-4 h-4 text-green-500" %>
@@ -118,7 +118,7 @@
   <div class="space-y-3">
     <h3 class="text-sm font-semibold text-primary">Manual Valuation History</h3>
     <p class="text-xs text-secondary mt-1">Valuations represent explicit balance checkpoints. All transactions before a valuation date are overridden by the valuation amount in balance calculations.</p>
-    
+
     <% if @valuations.any? %>
       <div class="bg-container border border-primary rounded-2xl overflow-hidden">
         <table class="w-full text-left">
@@ -153,7 +153,7 @@
   <div class="space-y-3">
     <h3 class="text-sm font-semibold text-primary">Monthly Net Cash Flow Summary</h3>
     <p class="text-xs text-secondary mt-1">Compare these monthly cash flows (excluding valuations) with your bank statements to quickly pinpoint which month is missing transactions.</p>
-    
+
     <div class="bg-container border border-primary rounded-2xl overflow-hidden">
       <table class="w-full text-left">
         <thead>
@@ -166,7 +166,7 @@
           <% @monthly_sums.each do |month, net_flow| %>
             <tr class="border-b border-primary last:border-b-0 hover:bg-surface-hover transition-colors">
               <td class="px-4 py-2.5 text-sm font-mono text-primary font-medium"><%= month %></td>
-              <td class="px-4 py-2.5 text-sm font-bold text-right <%= net_flow < 0 ? 'text-green-500' : 'text-red-500' %>">
+              <td class="px-4 py-2.5 text-sm font-bold text-right <%= net_flow < 0 ? "text-green-500" : "text-red-500" %>">
                 <%= net_flow.zero? ? "Rp 0" : (net_flow < 0 ? "+" : "-") + number_to_currency(net_flow.abs, unit: @account.currency + " ", precision: 0) %>
               </td>
             </tr>

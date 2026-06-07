@@ -17,7 +17,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
       last_entry_date: 10.days.ago.to_date,
       days_since_last_entry: 10
     )
-    PagesController.any_instance.stubs(:detect_stale_manual_accounts).returns([stale_mock])
+    PagesController.any_instance.stubs(:detect_stale_manual_accounts).returns([ stale_mock ])
 
     get root_path
     assert_response :ok

@@ -13,7 +13,7 @@
       <% end %>
 
       <%# Balance Comparison Card %>
-      <div class="p-5 rounded-2xl border-2 <%= @is_synced ? 'border-green-300 bg-green-50/30 theme-dark:bg-green-950/20 theme-dark:border-green-800' : 'border-amber-300 bg-amber-50/30 theme-dark:bg-amber-950/20 theme-dark:border-amber-800' %>">
+      <div class="p-5 rounded-2xl border-2 <%= @is_synced ? "border-green-300 bg-green-50/30 theme-dark:bg-green-950/20 theme-dark:border-green-800" : "border-amber-300 bg-amber-50/30 theme-dark:bg-amber-950/20 theme-dark:border-amber-800" %>">
         <div class="flex items-center gap-2 mb-4">
           <% if @is_synced %>
             <%= icon "check-circle", class: "w-6 h-6 text-green-500" %>
@@ -43,7 +43,7 @@
           <div class="mt-4 p-4 rounded-xl bg-container border border-primary">
             <div class="flex items-center justify-between">
               <p class="text-sm font-semibold text-primary">Difference</p>
-              <p class="text-2xl font-bold <%= @difference > 0 ? 'text-red-500' : 'text-blue-500' %>">
+              <p class="text-2xl font-bold <%= @difference > 0 ? "text-red-500" : "text-blue-500" %>">
                 <%= @difference > 0 ? "+" : "" %><%= format_money(Money.new(@difference, @account.currency)) %>
               </p>
             </div>
@@ -90,7 +90,7 @@
                     <td class="px-4 py-2.5 text-sm text-right text-red-500 font-medium">
                       -<%= number_to_currency(data[:outflows], unit: "", precision: 0, delimiter: ".") %>
                     </td>
-                    <td class="px-4 py-2.5 text-sm text-right font-bold <%= net >= 0 ? 'text-green-600' : 'text-red-500' %>">
+                    <td class="px-4 py-2.5 text-sm text-right font-bold <%= net >= 0 ? "text-green-600" : "text-red-500" %>">
                       <%= net >= 0 ? "+" : "-" %><%= number_to_currency(net.abs, unit: "", precision: 0, delimiter: ".") %>
                     </td>
                   </tr>
@@ -110,11 +110,11 @@
           <div class="grid gap-3">
             <%# Option 1: Force set the correct balance %>
             <%= styled_form_with url: account_reconciliation_path(@account), method: :post do |f| %>
-              <input type="hidden" name="reconciliation[real_balance]" value="<%= @real_balance %>" />
-              <input type="hidden" name="reconciliation[date]" value="<%= @reconciliation_date %>" />
-              <input type="hidden" name="reconciliation[apply]" value="true" />
+              <input type="hidden" name="reconciliation[real_balance]" value="<%= @real_balance %>">
+              <input type="hidden" name="reconciliation[date]" value="<%= @reconciliation_date %>">
+              <input type="hidden" name="reconciliation[apply]" value="true">
 
-              <button type="submit" class="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-blue-200 bg-blue-50/50 hover:bg-blue-100/50 transition-colors theme-dark:bg-blue-950/20 theme-dark:border-blue-800 theme-dark:hover:bg-blue-900/30 text-left group" data-confirm="This will create a reconciliation entry that sets your balance to <%= format_money(Money.new(@real_balance, @account.currency)) %> as of <%= @reconciliation_date.strftime('%B %d, %Y') %>. Continue?">
+              <button type="submit" class="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-blue-200 bg-blue-50/50 hover:bg-blue-100/50 transition-colors theme-dark:bg-blue-950/20 theme-dark:border-blue-800 theme-dark:hover:bg-blue-900/30 text-left group" data-confirm="This will create a reconciliation entry that sets your balance to <%= format_money(Money.new(@real_balance, @account.currency)) %> as of <%= @reconciliation_date.strftime("%B %d, %Y") %>. Continue?">
                 <div class="p-2.5 rounded-xl bg-blue-100 theme-dark:bg-blue-900/40 group-hover:bg-blue-200 transition-colors">
                   <%= icon "zap", class: "w-5 h-5 text-blue-600 theme-dark:text-blue-400" %>
                 </div>

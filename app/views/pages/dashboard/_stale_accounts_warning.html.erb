@@ -16,7 +16,7 @@
 
     <div class="border-t border-amber-200/40 theme-dark:border-amber-900/20">
       <% stale_accounts.each_with_index do |stale, idx| %>
-        <div class="px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-amber-100/30 theme-dark:hover:bg-amber-900/10 transition-colors <%= 'border-t border-amber-200/20 theme-dark:border-amber-900/15' if idx > 0 %>">
+        <div class="px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-amber-100/30 theme-dark:hover:bg-amber-900/10 transition-colors <%= "border-t border-amber-200/20 theme-dark:border-amber-900/15" if idx > 0 %>">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-8 h-8 rounded-lg bg-amber-100 theme-dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
               <%= icon "wallet", class: "w-4 h-4 text-amber-600 theme-dark:text-amber-400" %>

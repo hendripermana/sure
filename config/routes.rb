@@ -272,7 +272,7 @@ Rails.application.routes.draw do
       post :sync_all
     end
 
-    resource :reconciliation, only: [:new, :create], controller: "account_reconciliations"
+    resource :reconciliation, only: [ :new, :create ], controller: "account_reconciliations"
   end
 
   # Convenience routes for polymorphic paths
