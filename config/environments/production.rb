@@ -142,21 +142,30 @@ Rails.application.configure do
   # Default :async adapter is non-persistent and jobs are lost on restart!
   config.active_job.queue_adapter = :sidekiq
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  smtp_configured = ENV["SMTP_ADDRESS"].present?
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.perform_deliveries = smtp_configured
+  config.action_mailer.raise_delivery_errors = smtp_configured
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
-
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  app_domain = ENV.fetch("APP_DOMAIN", "https://example.com")
+  app_uri = URI.parse(app_domain.match?(%r{\Ahttps?://}) ? app_domain : "https://#{app_domain}")
+  mailer_url_options = {
+    host: app_uri.host,
+    protocol: app_uri.scheme
+  }
+  mailer_url_options[:port] = app_uri.port unless [ 80, 443 ].include?(app_uri.port)
+  config.action_mailer.default_url_options = mailer_url_options
+  if smtp_configured
+    config.action_mailer.smtp_settings = {
+      address: ENV.fetch("SMTP_ADDRESS"),
+      port: ENV.fetch("SMTP_PORT", 587).to_i,
+      user_name: ENV["SMTP_USERNAME"],
+      password: ENV["SMTP_PASSWORD"],
+      authentication: ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
+      enable_starttls_auto: ActiveModel::Type::Boolean.new.cast(ENV.fetch("SMTP_TLS_ENABLED", true))
+    }.compact
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

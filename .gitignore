@@ -113,6 +113,9 @@ scripts/*
 # AI Agents & IDE Skills Cache
 .agents/
 .claude/
+!.claude/
+.claude/*
+!.claude/settings.json
 .factory/
 .junie/
 .kilocode/
