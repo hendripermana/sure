@@ -123,6 +123,7 @@ Rails.application.routes.draw do
       post :dismiss_sync, on: :member
       post :dismiss_all_stale, on: :collection
       post :sync_all, on: :collection
+      post :diagnose_account, on: :collection
     end
   end
 
@@ -270,6 +271,8 @@ Rails.application.routes.draw do
     collection do
       post :sync_all
     end
+
+    resource :reconciliation, only: [ :new, :create ], controller: "account_reconciliations"
   end
 
   # Convenience routes for polymorphic paths

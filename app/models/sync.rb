@@ -58,8 +58,12 @@ class Sync < ApplicationRecord
 
   class << self
     def clean
+      stale_count = 0
+
       # Clean syncs yang sudah terlalu lama (24 jam)
-      incomplete.where("syncs.created_at < ?", STALE_AFTER.ago).find_each(&:mark_stale!)
+      stale_24h = incomplete.where("syncs.created_at < ?", STALE_AFTER.ago)
+      stale_count += stale_24h.count
+      stale_24h.find_each(&:mark_stale!)
 
       # Clean syncs yang stuck di syncing state lebih dari 10 menit (lebih agresif)
       # Ini untuk menangani kasus dimana sync job crash atau timeout tapi state tidak ter-update
@@ -71,9 +75,14 @@ class Sync < ApplicationRecord
       if stuck_count > 0
         Rails.logger.warn("Found #{stuck_count} stuck syncing syncs. Marking as stale.")
         stuck_syncing.find_each do |sync|
-          sync.mark_stale! if sync.may_mark_stale?
+          if sync.may_mark_stale?
+            sync.mark_stale!
+            stale_count += 1
+          end
         end
       end
+
+      stale_count
     end
 
     def latest_stats_map_for(syncable_type:, syncable_ids:)

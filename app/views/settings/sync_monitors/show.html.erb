@@ -5,7 +5,7 @@
     <h1 class="text-primary text-xl font-medium">Sync Monitor</h1>
     <p class="text-sm text-secondary mt-1">Manage and trigger sync operations for all accounts.</p>
   </div>
-  
+
   <div class="flex items-center gap-2">
     <%= form_with url: sync_target_settings_sync_monitor_path, method: :post, class: "flex items-center gap-2" do |f| %>
       <%= f.select :syncable_key,
@@ -29,7 +29,7 @@
 
 <%= turbo_frame_tag "sync_monitor_frame" do %>
   <div class="section-card space-y-6" data-controller="sync-monitor" data-sync-monitor-active-value="<%= @summary[:pending] > 0 || @summary[:syncing] > 0 %>">
-    
+
     <!-- Action Bar -->
     <div class="flex flex-wrap items-center justify-end gap-2">
       <% if @summary[:failed] > 0 %>
@@ -141,3 +141,28 @@
     </div>
   </div>
 <% end %>
+
+<div class="section-card mt-6 space-y-6">
+  <div>
+    <h2 class="text-primary text-lg font-medium">Balance Diagnostics & Recalculator</h2>
+    <p class="text-sm text-secondary mt-1">Force rebuild daily balance snapshots and scan for duplicate manual entries or omission errors.</p>
+  </div>
+
+  <%= turbo_frame_tag "balance_diagnostics_frame" do %>
+    <%= form_with url: diagnose_account_settings_sync_monitor_path, method: :post, class: "space-y-4" do |f| %>
+      <div class="flex flex-col sm:flex-row items-end gap-3">
+        <div class="flex-1 min-w-[200px]">
+          <%= f.label :account_id, "Select Account to Diagnose", class: "block text-xs font-semibold text-secondary uppercase tracking-wider mb-2" %>
+          <%= f.select :account_id,
+                options_for_select(Current.family.accounts.order(:name).map { |a| [a.name, a.id] }),
+                { prompt: "Choose an account..." },
+                class: "w-full text-sm rounded-xl border border-primary bg-container text-primary px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+        <%= f.button type: :submit, class: "w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl border border-primary bg-container text-primary hover:bg-surface-hover transition-colors" do %>
+          <%= icon "activity", class: "w-4 h-4 text-secondary" %>
+          <span>Run Diagnostics & Rebuild</span>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
