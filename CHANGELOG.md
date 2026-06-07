@@ -1,3 +1,10 @@
+## [0.21.7](https://github.com/hendripermana/sure/compare/v0.21.6...v0.21.7) (2026-06-07)
+
+### Other Changes
+
+- Merge pull request #179 from hendripermana/codex/cleanup-obsolete-project-docs (67f1bef5)
+- Remove obsolete project reports (ab50de98)
+
 ## [0.21.6](https://github.com/hendripermana/sure/compare/v0.21.5...v0.21.6) (2026-06-07)
 
 ### Other Changes
