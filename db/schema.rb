@@ -1020,15 +1020,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_06_000500) do
     t.index ["user_id"], name: "index_provider_directories_on_user_id"
   end
 
-  create_table "recurring_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "recurring_transaction_suppressions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id"
     t.decimal "amount", precision: 19, scale: 4, null: false
     t.datetime "created_at", null: false
     t.string "currency", null: false
+    t.uuid "destination_account_id"
+    t.integer "expected_day_of_month"
+    t.uuid "family_id", null: false
+    t.uuid "merchant_id"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name"
+    t.string "reason", default: "user_ignored", null: false
+    t.string "signature", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_recurring_transaction_suppressions_on_account_id"
+    t.index ["destination_account_id"], name: "idx_on_destination_account_id_748a37a110"
+    t.index ["family_id", "signature"], name: "idx_recurring_txn_suppressions_unique", unique: true
+    t.index ["family_id"], name: "index_recurring_transaction_suppressions_on_family_id"
+    t.index ["merchant_id"], name: "index_recurring_transaction_suppressions_on_merchant_id"
+  end
+
+  create_table "recurring_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id"
+    t.decimal "amount", precision: 19, scale: 4, null: false
+    t.datetime "created_at", null: false
+    t.string "currency", null: false
+    t.uuid "destination_account_id"
     t.decimal "expected_amount_avg", precision: 19, scale: 4
     t.decimal "expected_amount_max", precision: 19, scale: 4
     t.decimal "expected_amount_min", precision: 19, scale: 4
     t.integer "expected_day_of_month", null: false
     t.uuid "family_id", null: false
+    t.string "identity_signature", null: false
     t.date "last_occurrence_date", null: false
     t.boolean "manual", default: false
     t.uuid "merchant_id"
@@ -1037,11 +1061,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_06_000500) do
     t.integer "occurrence_count", default: 0, null: false
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
-    t.index ["family_id", "merchant_id", "amount", "currency"], name: "idx_recurring_txns_on_family_merchant_amount_currency", unique: true
+    t.index ["account_id"], name: "index_recurring_transactions_on_account_id"
+    t.index ["destination_account_id"], name: "index_recurring_transactions_on_destination_account_id"
+    t.index ["family_id", "identity_signature"], name: "idx_recurring_txns_identity", unique: true
     t.index ["family_id", "status"], name: "index_recurring_transactions_on_family_id_and_status"
     t.index ["family_id"], name: "index_recurring_transactions_on_family_id"
     t.index ["merchant_id"], name: "index_recurring_transactions_on_merchant_id"
     t.index ["next_expected_date"], name: "index_recurring_transactions_on_next_expected_date"
+    t.check_constraint "destination_account_id IS NULL OR account_id IS NOT NULL", name: "chk_recurring_txns_transfer_requires_source"
+    t.check_constraint "destination_account_id IS NULL OR destination_account_id <> account_id", name: "chk_recurring_txns_transfer_distinct_accounts"
   end
 
   create_table "rejected_transfers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1539,6 +1567,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_06_000500) do
   add_foreign_key "plaid_items", "families"
   add_foreign_key "precious_metals", "accounts", column: "preferred_funding_account_id", on_delete: :nullify
   add_foreign_key "provider_directories", "users"
+  add_foreign_key "recurring_transaction_suppressions", "accounts", column: "destination_account_id", on_delete: :cascade
+  add_foreign_key "recurring_transaction_suppressions", "accounts", on_delete: :cascade
+  add_foreign_key "recurring_transaction_suppressions", "families", on_delete: :cascade
+  add_foreign_key "recurring_transaction_suppressions", "merchants", on_delete: :nullify
+  add_foreign_key "recurring_transactions", "accounts", column: "destination_account_id", on_delete: :cascade
+  add_foreign_key "recurring_transactions", "accounts", on_delete: :cascade
   add_foreign_key "recurring_transactions", "families"
   add_foreign_key "recurring_transactions", "merchants"
   add_foreign_key "rejected_transfers", "transactions", column: "inflow_transaction_id"

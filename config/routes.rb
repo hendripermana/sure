@@ -43,6 +43,8 @@ Rails.application.routes.draw do
   resource :registration, only: %i[new create]
 
   # Subscription Manager routes
+  get "/recurring", to: "recurring#index", as: :recurring
+
   resources :subscription_plans do
     collection do
       get :check_duplicate
@@ -160,7 +162,9 @@ Rails.application.routes.draw do
 
   resources :family_merchants, only: %i[index new create edit update destroy]
 
-  resources :transfers, only: %i[new create destroy show update]
+  resources :transfers, only: %i[new create destroy show update] do
+    post :mark_as_recurring, on: :member
+  end
 
   resources :imports, only: %i[index new show create destroy] do
     member do
@@ -216,6 +220,10 @@ Rails.application.routes.draw do
 
     member do
       post :toggle_status
+      post :create_subscription
+      post :restore
+      post :confirm
+      post :mark_transfer
     end
   end
 

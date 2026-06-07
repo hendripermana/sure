@@ -181,6 +181,18 @@ class Budget < ApplicationRecord
     (budgeted_spending || 0) - actual_spending
   end
 
+  def projected_recurring_spending
+    Recurring::Forecast.new(
+      family,
+      start_date: [ start_date, Date.current ].max,
+      end_date: end_date
+    ).projected_outflow
+  end
+
+  def projected_available_to_spend
+    available_to_spend - projected_recurring_spending
+  end
+
   def percent_of_budget_spent
     return 0 unless budgeted_spending > 0
 

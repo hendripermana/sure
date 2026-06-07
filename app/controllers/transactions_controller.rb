@@ -388,6 +388,7 @@ class TransactionsController < ApplicationController
 
     # Check if a recurring transaction already exists for this pattern
     existing = Current.family.recurring_transactions.find_by(
+      account_id: transaction.entry.account_id,
       merchant_id: transaction.merchant_id,
       name: transaction.merchant_id.present? ? nil : transaction.entry.name,
       currency: transaction.entry.currency,
