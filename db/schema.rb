@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_24_122331) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_082431) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -418,6 +418,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_122331) do
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.index ["family_id"], name: "index_family_exports_on_family_id"
+  end
+
+  create_table "gold_prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.decimal "buyback_price", precision: 19, scale: 4
+    t.datetime "created_at", null: false
+    t.string "currency", limit: 3, default: "IDR", null: false
+    t.date "date", null: false
+    t.jsonb "metadata", default: {}
+    t.string "metal_type", limit: 20, default: "gold", null: false
+    t.decimal "price_per_gram", precision: 19, scale: 4, null: false
+    t.boolean "provisional", default: false, null: false
+    t.string "source", limit: 50, null: false
+    t.string "unit", limit: 5, default: "g", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date", "source", "metal_type", "currency"], name: "idx_gold_prices_date_source_type_currency", unique: true
+    t.index ["metal_type", "date"], name: "idx_gold_prices_metal_type_date_desc", order: { date: :desc }
+    t.index ["source"], name: "index_gold_prices_on_source"
   end
 
   create_table "holdings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -962,16 +979,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_122331) do
     t.string "account_number"
     t.string "account_status", default: "active"
     t.string "akad"
+    t.boolean "auto_revalue", default: true, null: false
     t.datetime "created_at", null: false
     t.jsonb "locked_attributes", default: {}
     t.decimal "manual_price", precision: 19, scale: 8
     t.string "manual_price_currency", limit: 3
+    t.string "metal_type", limit: 20, default: "gold"
     t.uuid "preferred_funding_account_id"
+    t.string "price_source", limit: 50, default: "antam"
     t.decimal "quantity", precision: 19, scale: 4, default: "0.0", null: false
     t.string "scheme_type"
     t.string "subtype"
     t.string "unit", default: "g", null: false
     t.datetime "updated_at", null: false
+    t.index ["auto_revalue"], name: "idx_precious_metals_auto_revalue", where: "(auto_revalue = true)"
   end
 
   create_table "properties", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
