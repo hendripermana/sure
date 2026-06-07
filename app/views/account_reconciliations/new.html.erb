@@ -1,0 +1,79 @@
+<%= render DS::Dialog.new do |dialog| %>
+  <% dialog.with_header(title: "Reconcile Balance") %>
+  <% dialog.with_body do %>
+    <div class="space-y-6">
+      <%# Current app balance display %>
+      <div class="p-4 bg-surface-inset rounded-2xl border border-primary space-y-2">
+        <div class="flex items-center gap-2">
+          <%= icon "wallet", class: "w-5 h-5 text-secondary" %>
+          <p class="text-xs text-secondary font-semibold uppercase tracking-wider">App Balance for <%= @account.name %></p>
+        </div>
+        <p class="text-2xl font-bold text-primary">
+          <%= format_money(Money.new(@current_balance, @account.currency)) %>
+        </p>
+        <% if @days_since_last_entry %>
+          <p class="text-xs text-secondary">
+            Last entry: <%= @last_entry_date.strftime("%B %d, %Y") %>
+            <% if @days_since_last_entry > 7 %>
+              <span class="text-amber-500 font-medium">(<%= @days_since_last_entry %> days ago ⚠️)</span>
+            <% else %>
+              (<%= @days_since_last_entry %> days ago)
+            <% end %>
+          </p>
+        <% end %>
+      </div>
+
+      <%# Reconciliation form %>
+      <%= styled_form_with url: account_reconciliation_path(@account), method: :post, class: "space-y-4" do |form| %>
+        <div class="space-y-4">
+          <div>
+            <label for="reconciliation_real_balance" class="block text-sm font-medium text-primary mb-1.5">
+              Real Bank Balance
+            </label>
+            <p class="text-xs text-secondary mb-2">
+              Open your banking app (BCA Mobile, etc.) and enter the exact balance shown there.
+            </p>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-sm font-medium"><%= @account.currency %></span>
+              <input
+                type="number"
+                name="reconciliation[real_balance]"
+                id="reconciliation_real_balance"
+                step="0.01"
+                required
+                class="w-full pl-12 pr-4 py-3 text-lg font-semibold rounded-xl border border-primary bg-container text-primary focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="0.00"
+                autofocus
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="reconciliation_date" class="block text-sm font-medium text-primary mb-1.5">
+              As of Date
+            </label>
+            <input
+              type="date"
+              name="reconciliation[date]"
+              id="reconciliation_date"
+              value="<%= Date.current.to_s %>"
+              max="<%= Date.current.to_s %>"
+              class="w-full px-3 py-2.5 rounded-xl border border-primary bg-container text-primary text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm">
+          <%= icon "git-compare", class: "w-4 h-4 text-white" %>
+          Compare & Diagnose
+        </button>
+      <% end %>
+
+      <div class="p-3 bg-surface-inset rounded-xl border border-primary">
+        <p class="text-xs text-secondary leading-relaxed">
+          <strong class="text-primary">How it works:</strong> Enter your real bank balance and we'll compare it with the app's calculated balance. If there's a difference, we'll show you a monthly breakdown to pinpoint which month has missing entries, and let you fix it with one click.
+        </p>
+      </div>
+    </div>
+  <% end %>
+<% end %>

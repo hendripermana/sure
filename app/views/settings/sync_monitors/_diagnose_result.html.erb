@@ -1,0 +1,178 @@
+<div class="space-y-6">
+  <!-- Success Notification -->
+  <div class="flex items-center gap-3 p-4 rounded-2xl bg-green-50/50 border border-green-200/40 text-green-700 theme-dark:bg-green-950/20 theme-dark:border-green-900/30 theme-dark:text-green-400">
+    <%= icon "check-circle", class: "w-5 h-5 flex-shrink-0" %>
+    <div>
+      <p class="font-medium text-sm">Balances Rebuilt Successfully!</p>
+      <p class="text-xs opacity-90 mt-0.5">Calculated daily balances have been forced-sync'ed and updated from the transaction history.</p>
+    </div>
+  </div>
+
+  <!-- Account Details Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="p-4 bg-surface-inset rounded-2xl border border-primary">
+      <p class="text-xs text-secondary font-semibold uppercase tracking-wider">Current Balance</p>
+      <p class="text-xl font-bold text-primary mt-1">
+        <%= number_to_currency(@account.balance, unit: @account.currency + " ", precision: 0) %>
+      </p>
+    </div>
+    <div class="p-4 bg-surface-inset rounded-2xl border border-primary">
+      <p class="text-xs text-secondary font-semibold uppercase tracking-wider">Opening Anchor</p>
+      <p class="text-xl font-bold text-primary mt-1">
+        <%= number_to_currency(@account.opening_anchor_balance, unit: @account.currency + " ", precision: 0) %>
+      </p>
+      <p class="text-xs text-secondary mt-0.5">on <%= @account.opening_anchor_date %></p>
+    </div>
+    <div class="p-4 bg-surface-inset rounded-2xl border border-primary">
+      <p class="text-xs text-secondary font-semibold uppercase tracking-wider">Classification</p>
+      <p class="text-xl font-bold text-primary mt-1 capitalize"><%= @account.classification %> (<%= @account.balance_type %>)</p>
+    </div>
+  </div>
+
+  <!-- Duplicate Warnings (Crucial!) -->
+  <div class="space-y-3">
+    <h3 class="text-sm font-semibold text-primary">Duplicate Transaction Checks</h3>
+    
+    <% if @duplicates.empty? && @close_duplicates.empty? %>
+      <div class="flex items-center gap-2.5 p-3.5 rounded-2xl bg-surface-inset border border-primary text-xs text-secondary">
+        <%= icon "check", class: "w-4 h-4 text-green-500" %>
+        <span>No obvious duplicate entries (same date/amount) detected.</span>
+      </div>
+    <% else %>
+      <% if @duplicates.any? %>
+        <div class="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/40 text-amber-900 theme-dark:bg-amber-950/20 theme-dark:border-amber-900/30 theme-dark:text-amber-400 space-y-2">
+          <div class="flex items-center gap-2">
+            <%= icon "alert-triangle", class: "w-5 h-5 text-amber-500" %>
+            <p class="font-semibold text-sm">Potential Same-Day Duplicates Found</p>
+          </div>
+          <p class="text-xs opacity-90">The following entries have the exact same date and amount. Verify if they were entered twice by accident:</p>
+          <div class="mt-2 overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-amber-200/30 font-semibold opacity-85">
+                  <th class="py-1.5 pr-4">Date</th>
+                  <th class="py-1.5 pr-4">Amount</th>
+                  <th class="py-1.5">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @duplicates.each do |(date, amount), list| %>
+                  <% list.each do |e| %>
+                    <tr class="border-b border-amber-200/10 opacity-90 hover:opacity-100">
+                      <td class="py-1.5 pr-4 font-mono"><%= date %></td>
+                      <td class="py-1.5 pr-4 font-semibold"><%= number_to_currency(amount, unit: @account.currency + " ", precision: 0) %></td>
+                      <td class="py-1.5">
+                        <%= link_to e.name, transaction_path(e.entryable_id), class: "underline hover:text-amber-600", target: "_top" %>
+                        <% if e.excluded? %>
+                          <span class="ml-1.5 text-[10px] bg-amber-200/60 text-amber-800 px-1.5 py-0.5 rounded-full font-mono">Excluded</span>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @close_duplicates.any? %>
+        <div class="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/40 text-amber-900 theme-dark:bg-amber-950/20 theme-dark:border-amber-900/30 theme-dark:text-amber-400 space-y-2">
+          <div class="flex items-center gap-2">
+            <%= icon "info", class: "w-5 h-5 text-amber-500" %>
+            <p class="font-semibold text-sm">Potential Close-Date (±2 Days) Duplicates</p>
+          </div>
+          <p class="text-xs opacity-90">The following transactions have identical amounts but are dated within 2 days of each other:</p>
+          <div class="mt-2 overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-amber-200/30 font-semibold opacity-85">
+                  <th class="py-1.5 pr-4">Date 1</th>
+                  <th class="py-1.5 pr-4">Date 2</th>
+                  <th class="py-1.5 pr-4">Amount</th>
+                  <th class="py-1.5">Names</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @close_duplicates.each do |dup| %>
+                  <tr class="border-b border-amber-200/10 opacity-90">
+                    <td class="py-1.5 pr-4 font-mono"><%= dup[:entry1].date %></td>
+                    <td class="py-1.5 pr-4 font-mono"><%= dup[:entry2].date %></td>
+                    <td class="py-1.5 pr-4 font-semibold"><%= number_to_currency(dup[:amount], unit: @account.currency + " ", precision: 0) %></td>
+                    <td class="py-1.5">
+                      <%= link_to dup[:entry1].name, transaction_path(dup[:entry1].entryable_id), class: "underline hover:text-amber-600", target: "_top" %>
+                      and
+                      <%= link_to dup[:entry2].name, transaction_path(dup[:entry2].entryable_id), class: "underline hover:text-amber-600", target: "_top" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Valuation Overrides -->
+  <div class="space-y-3">
+    <h3 class="text-sm font-semibold text-primary">Manual Valuation History</h3>
+    <p class="text-xs text-secondary mt-1">Valuations represent explicit balance checkpoints. All transactions before a valuation date are overridden by the valuation amount in balance calculations.</p>
+    
+    <% if @valuations.any? %>
+      <div class="bg-container border border-primary rounded-2xl overflow-hidden">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-surface-default border-b border-primary text-xs text-secondary font-medium uppercase">
+              <th class="px-4 py-2.5">Date</th>
+              <th class="px-4 py-2.5">Valuation Amount</th>
+              <th class="px-4 py-2.5">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @valuations.each do |v| %>
+              <tr class="border-b border-primary last:border-b-0 hover:bg-surface-hover transition-colors">
+                <td class="px-4 py-2.5 text-sm font-mono text-primary"><%= v.date %></td>
+                <td class="px-4 py-2.5 text-sm font-bold text-primary">
+                  <%= number_to_currency(v.amount, unit: @account.currency + " ", precision: 0) %>
+                </td>
+                <td class="px-4 py-2.5 text-xs text-secondary"><%= v.name %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="p-4 text-center border border-dashed border-primary rounded-2xl bg-surface-inset">
+        <p class="text-xs text-secondary">No manual valuation overrides are recorded for this account. Balances are calculated pure-forward from the opening anchor.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Monthly Net Changes -->
+  <div class="space-y-3">
+    <h3 class="text-sm font-semibold text-primary">Monthly Net Cash Flow Summary</h3>
+    <p class="text-xs text-secondary mt-1">Compare these monthly cash flows (excluding valuations) with your bank statements to quickly pinpoint which month is missing transactions.</p>
+    
+    <div class="bg-container border border-primary rounded-2xl overflow-hidden">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-surface-default border-b border-primary text-xs text-secondary font-medium uppercase">
+            <th class="px-4 py-2.5">Month</th>
+            <th class="px-4 py-2.5 text-right">Net Change (Inflows - Outflows)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @monthly_sums.each do |month, net_flow| %>
+            <tr class="border-b border-primary last:border-b-0 hover:bg-surface-hover transition-colors">
+              <td class="px-4 py-2.5 text-sm font-mono text-primary font-medium"><%= month %></td>
+              <td class="px-4 py-2.5 text-sm font-bold text-right <%= net_flow < 0 ? 'text-green-500' : 'text-red-500' %>">
+                <%= net_flow.zero? ? "Rp 0" : (net_flow < 0 ? "+" : "-") + number_to_currency(net_flow.abs, unit: @account.currency + " ", precision: 0) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

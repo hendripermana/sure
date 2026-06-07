@@ -29,6 +29,8 @@
 
 <div class="w-full space-y-6 pb-24">
   <% if Current.family.accounts.any? %>
+    <%= render "pages/dashboard/stale_accounts_warning", stale_accounts: @stale_accounts %>
+
     <%# KPI Cards Section - Overview Metrics %>
     <%= render "pages/dashboard/kpi_cards", 
       kpi_net_worth: @kpi_net_worth,

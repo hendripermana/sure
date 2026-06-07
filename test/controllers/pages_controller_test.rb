@@ -10,6 +10,21 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
   end
 
+  test "dashboard shows stale accounts warning when there are stale manual accounts" do
+    account = accounts(:depository)
+    stale_mock = OpenStruct.new(
+      account: account,
+      last_entry_date: 10.days.ago.to_date,
+      days_since_last_entry: 10
+    )
+    PagesController.any_instance.stubs(:detect_stale_manual_accounts).returns([stale_mock])
+
+    get root_path
+    assert_response :ok
+    assert_select "h3", text: /1 Manual Account.*Need.*Attention/
+    assert_select "p", text: account.name
+  end
+
   test "changelog" do
     VCR.use_cassette("git_repository_provider/fetch_latest_release_notes") do
       get changelog_path
