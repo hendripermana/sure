@@ -1,3 +1,9 @@
+## [0.21.3](https://github.com/hendripermana/sure/compare/v0.21.2...v0.21.3) (2026-06-07)
+
+### Other Changes
+
+- Add automated gold valuation (#175) (5b3381b6)
+
 ## [0.21.2](https://github.com/hendripermana/sure/compare/v0.21.1...v0.21.2) (2026-06-07)
 
 ### Other Changes
