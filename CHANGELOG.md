@@ -1,3 +1,9 @@
+## [0.20.2](https://github.com/hendripermana/permoney/compare/v0.20.1...v0.20.2) (2026-06-07)
+
+### Other Changes
+
+- chore: unify agent governance (619a19a9)
+
 ## [0.20.1](https://github.com/hendripermana/permoney/compare/v0.20.0...v0.20.1) (2026-05-31)
 
 ### Other Changes
