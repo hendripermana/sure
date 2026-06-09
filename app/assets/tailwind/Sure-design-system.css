@@ -25,10 +25,30 @@
   --color-primary-hover: #cdffad;
   --color-on-primary: #0e0f0c;
   --color-canvas-soft: #e8ebe6;
-  --color-success: var(--color-green-600);
-  --color-warning: var(--color-yellow-600);
-  --color-destructive: var(--color-red-600);
+  --color-success: #2ead4b;
+  --color-warning: #ffd11a;
+  --color-destructive: #d03238;
   --color-shadow: rgba(11, 11, 11, 0.08);
+
+  /* DESIGN.md text colors */
+  --color-ink: #0e0f0c;
+  --color-ink-deep: #163300;
+  --color-body: #454745;
+  --color-mute: #868685;
+  --color-primary-neutral: #c5edab;
+  --color-primary-pale: #e2f6d5;
+
+  /* DESIGN.md semantic palette */
+  --color-positive: #2ead4b;
+  --color-positive-deep: #054d28;
+  --color-warning-deep: #b86700;
+  --color-warning-content: #4a3b1c;
+  --color-negative: #d03238;
+  --color-negative-deep: #a72027;
+  --color-negative-darkest: #a7000d;
+  --color-negative-bg: #320707;
+  --color-accent-orange: #ffc091;
+  --color-accent-cyan: #38c8ff;
 
   /* Colors used in Stimulus controllers with SVGs (easier to define light/dark mode here than toggle within the controllers) */
   /* See @layer base block below for dark mode overrides */
@@ -224,9 +244,38 @@
   --color-orange-tint-5: color-mix(in srgb, var(--color-orange-500) 5%, transparent);
   --color-orange-tint-10: color-mix(in srgb, var(--color-orange-500) 10%, transparent);
 
-  /* Border radius overrides */
-  --border-radius-md: 8px;
-  --border-radius-lg: 10px;
+  /* Border radius scale — DESIGN.md */
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  --border-radius-pill: 9999px;
+
+  /* Typography scale — DESIGN.md */
+  --text-display-mega: 126px;
+  --text-display-mega--line-height: 107.1px;
+  --text-display-xxl: 96px;
+  --text-display-xxl--line-height: 81.6px;
+  --text-display-xl: 64px;
+  --text-display-xl--line-height: 54.4px;
+  --text-display-md: 40px;
+  --text-display-md--line-height: 34px;
+  --text-display-sm: 32px;
+  --text-display-sm--line-height: 38.4px;
+  --text-display-sm--letter-spacing: -0.96px;
+  --text-display-xs: 24px;
+  --text-display-xs--line-height: 31.2px;
+  --text-display-xs--letter-spacing: -0.48px;
+  --text-body-lg: 20px;
+  --text-body-lg--line-height: 30px;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --font-weight-hero: 900;
+  --font-weight-subdisplay: 600;
 
   --shadow-xs: 0px 1px 2px 0px var(--color-shadow);
   --shadow-sm: 0px 1px 6px 0px var(--color-shadow);
@@ -259,9 +308,9 @@
 
 @layer base {
   [data-theme="dark"] {
-    --color-success: var(--color-green-500);
-    --color-warning: var(--color-yellow-400);
-    --color-destructive: var(--color-red-400);
+    --color-success: #2ead4b;
+    --color-warning: #ffd11a;
+    --color-destructive: #ef4444;
     --color-shadow: rgba(255, 255, 255, 0.08);
 
     /* Dark mode overrides for colors used in Stimulus controllers with SVGs */
