@@ -1,3 +1,11 @@
+## [0.23.1](https://github.com/hendripermana/sure/compare/v0.23.0...v0.23.1) (2026-06-13)
+
+### Other Changes
+
+- Merge pull request #181 from hendripermana/feature/ds-component-port-and-design-audit (17f2a3a1)
+- chore: upgrade brakeman to 8.0.5 to fix CI scan (43648644)
+- style: fix Biome lint violations in ported JS controllers (fa92fdaa)
+
 ## [0.23.0](https://github.com/hendripermana/sure/compare/v0.22.0...v0.23.0) (2026-06-09)
 
 ### Features
