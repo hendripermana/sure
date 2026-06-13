@@ -42,7 +42,7 @@ class Loan::ScheduleGenerator
     ms = ((t1 - t0) * 1000).round(1)
     begin
       ActiveSupport::Notifications.instrument(
-        "permoney.loan.schedule.generate",
+        "sure.loan.schedule.generate",
         loan_id: loan_id,
         principal: principal.to_s,
         tenor_months: tenor_months,

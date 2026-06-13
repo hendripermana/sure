@@ -10,6 +10,16 @@ class BudgetTest < ActiveSupport::TestCase
     assert Budget.budget_date_valid?(two_years_ago, family: @family)
   end
 
+  test "projected available spending includes future recurring commitments" do
+    budget = budgets(:one)
+
+    assert_operator budget.projected_recurring_spending, :>=, 0
+    assert_equal(
+      budget.available_to_spend - budget.projected_recurring_spending,
+      budget.projected_available_to_spend
+    )
+  end
+
   test "budget_date_valid? allows going back to earliest entry date if more than 2 years ago" do
     # Create an entry 3 years ago
     old_account = Account.create!(

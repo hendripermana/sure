@@ -1,4 +1,86 @@
-## [0.20.1](https://github.com/hendripermana/permoney/compare/v0.20.0...v0.20.1) (2026-05-31)
+## [0.23.1](https://github.com/hendripermana/sure/compare/v0.23.0...v0.23.1) (2026-06-13)
+
+### Other Changes
+
+- Merge pull request #181 from hendripermana/feature/ds-component-port-and-design-audit (17f2a3a1)
+- chore: upgrade brakeman to 8.0.5 to fix CI scan (43648644)
+- style: fix Biome lint violations in ported JS controllers (fa92fdaa)
+
+## [0.23.0](https://github.com/hendripermana/sure/compare/v0.22.0...v0.23.0) (2026-06-09)
+
+### Features
+
+- feat: DS component library port + design system audit & fix (9373a1a1)
+
+## [0.22.0](https://github.com/hendripermana/sure/compare/v0.21.7...v0.22.0) (2026-06-07)
+
+### Features
+
+- feat: add account reconciliation and stale account warnings (ae496425)
+
+### Other Changes
+
+- Merge pull request #180 from hendripermana/feature/account-reconciliation (ef399751)
+- style: fix rubocop and erb lint offenses (bf3c2c3c)
+
+## [0.21.7](https://github.com/hendripermana/sure/compare/v0.21.6...v0.21.7) (2026-06-07)
+
+### Other Changes
+
+- Merge pull request #179 from hendripermana/codex/cleanup-obsolete-project-docs (67f1bef5)
+- Remove obsolete project reports (ab50de98)
+
+## [0.21.6](https://github.com/hendripermana/sure/compare/v0.21.5...v0.21.6) (2026-06-07)
+
+### Other Changes
+
+- Merge pull request #178 from hendripermana/codex/recurring-intelligence-reconciliation (25c284a1)
+- Unify recurring intelligence and reconciliation (768a37f2)
+
+## [0.21.5](https://github.com/hendripermana/sure/compare/v0.21.4...v0.21.5) (2026-06-07)
+
+### Other Changes
+
+- Merge pull request #177 from hendripermana/codex/subscription-billing-lifecycle (bbdaff81)
+- Add subscription billing lifecycle (9416d885)
+
+## [0.21.4](https://github.com/hendripermana/sure/compare/v0.21.3...v0.21.4) (2026-06-07)
+
+### Other Changes
+
+- Harden family sync queries (#176) (7dbe9104)
+
+## [0.21.3](https://github.com/hendripermana/sure/compare/v0.21.2...v0.21.3) (2026-06-07)
+
+### Other Changes
+
+- Add automated gold valuation (#175) (5b3381b6)
+
+## [0.21.2](https://github.com/hendripermana/sure/compare/v0.21.1...v0.21.2) (2026-06-07)
+
+### Other Changes
+
+- Restore test suite compatibility (#174) (808a7eb0)
+
+## [0.21.1](https://github.com/hendripermana/sure/compare/v0.21.0...v0.21.1) (2026-06-07)
+
+### Other Changes
+
+- Harden runtime and deployment configuration (#173) (0e760ec0)
+
+## [0.21.0](https://github.com/hendripermana/sure/compare/v0.20.2...v0.21.0) (2026-06-07)
+
+### Features
+
+- feat: complete Sure rebrand and design system (2791044a)
+
+## [0.20.2](https://github.com/hendripermana/sure/compare/v0.20.1...v0.20.2) (2026-06-07)
+
+### Other Changes
+
+- chore: unify agent governance (619a19a9)
+
+## [0.20.1](https://github.com/hendripermana/sure/compare/v0.20.0...v0.20.1) (2026-05-31)
 
 ### Other Changes
 
@@ -19,13 +101,13 @@
 - deps(deps): bump jbuilder from 2.14.1 to 2.15.0 (#141) (f88a9e60)
 - deps(deps): bump importmap-rails from 2.2.2 to 2.2.3 (#140) (d11a6106)
 
-## [0.20.0](https://github.com/hendripermana/permoney/compare/v0.19.0...v0.20.0) (2026-05-27)
+## [0.20.0](https://github.com/hendripermana/sure/compare/v0.19.0...v0.20.0) (2026-05-27)
 
 ### Features
 
 - feat: Redesign Sync Monitor and Enforce Provider Configs (#155) (a341c34b)
 
-## [0.19.0](https://github.com/hendripermana/permoney/compare/v0.18.13...v0.19.0) (2026-05-24)
+## [0.19.0](https://github.com/hendripermana/sure/compare/v0.18.13...v0.19.0) (2026-05-24)
 
 ### Features
 
@@ -39,7 +121,7 @@
 
 - refactor: optimize docker conditions and clean up tag config logic (35143bca)
 
-## [0.18.13](https://github.com/hendripermana/permoney/compare/v0.18.12...v0.18.13) (2026-05-24)
+## [0.18.13](https://github.com/hendripermana/sure/compare/v0.18.12...v0.18.13) (2026-05-24)
 
 ### Other Changes
 
@@ -67,7 +149,7 @@
 - deps(deps): bump rqrcode from 3.1.0 to 3.2.0 (#129) (db27fb72)
 - deps(deps): bump sidekiq-cron from 2.3.1 to 2.4.0 (#130) (15a655b6)
 
-## [0.18.12](https://github.com/hendripermana/permoney/compare/v0.18.11...v0.18.12) (2026-05-24)
+## [0.18.12](https://github.com/hendripermana/sure/compare/v0.18.11...v0.18.12) (2026-05-24)
 
 ### Other Changes
 
@@ -75,25 +157,25 @@
 - ci: remove version key from pnpm setup to let it auto-detect from package.json (080c6816)
 - ci: sync pnpm setup action runner to version 11 (2a8fae51)
 
-## [0.18.11](https://github.com/hendripermana/permoney/compare/v0.18.10...v0.18.11) (2026-05-24)
+## [0.18.11](https://github.com/hendripermana/sure/compare/v0.18.10...v0.18.11) (2026-05-24)
 
 ### Other Changes
 
 - ci: resolve all biome errors and lock secure pnpm v11 (2a3023bc)
 
-## [0.18.10](https://github.com/hendripermana/permoney/compare/v0.18.9...v0.18.10) (2026-05-24)
+## [0.18.10](https://github.com/hendripermana/sure/compare/v0.18.9...v0.18.10) (2026-05-24)
 
 ### Other Changes
 
 - ci: fix biome schema, upgrade brakeman, and patch dompurify/lodash security flaws (3fa38c65)
 
-## [0.18.9](https://github.com/hendripermana/permoney/compare/v0.18.8...v0.18.9) (2026-05-24)
+## [0.18.9](https://github.com/hendripermana/sure/compare/v0.18.8...v0.18.9) (2026-05-24)
 
 ### Other Changes
 
 - ci: enhance pipeline to pnpm node24 and fix dependabot validations (4db3bda6)
 
-## [0.18.8](https://github.com/hendripermana/permoney/compare/v0.18.7...v0.18.8) (2026-02-08)
+## [0.18.8](https://github.com/hendripermana/sure/compare/v0.18.7...v0.18.8) (2026-02-08)
 
 ### Other Changes
 
@@ -101,7 +183,7 @@
 - Harden asset load paths (d87b43c3)
 - Fix Tailwind asset precompile (111b58c4)
 
-## [0.18.7](https://github.com/hendripermana/permoney/compare/v0.18.6...v0.18.7) (2026-02-08)
+## [0.18.7](https://github.com/hendripermana/sure/compare/v0.18.6...v0.18.7) (2026-02-08)
 
 ### Other Changes
 
@@ -111,7 +193,7 @@
 - chore: fix linting and formatting issues (1fc70264)
 - feat(ui): complete UI/UX overhaul with modern design system (0ff95609)
 
-## [0.18.6](https://github.com/hendripermana/permoney/compare/v0.18.5...v0.18.6) (2026-01-30)
+## [0.18.6](https://github.com/hendripermana/sure/compare/v0.18.5...v0.18.6) (2026-01-30)
 
 ### Other Changes
 
@@ -120,14 +202,14 @@
 - Fix lint whitespace and update Brakeman (e8808b25)
 - Implement community updates (AI cache, mobile chat, UX) (84569be7)
 
-## [0.18.5](https://github.com/hendripermana/permoney/compare/v0.18.4...v0.18.5) (2026-01-25)
+## [0.18.5](https://github.com/hendripermana/sure/compare/v0.18.4...v0.18.5) (2026-01-25)
 
 ### Other Changes
 
 - Merge pull request #110 from hendripermana/feat/perf-optimizations-jan2026 (1c751387)
 - Performance optimizations: N+1 fixes, cache improvements, composite index, safe testing (34a91be4)
 
-## [0.18.4](https://github.com/hendripermana/permoney/compare/v0.18.3...v0.18.4) (2026-01-25)
+## [0.18.4](https://github.com/hendripermana/sure/compare/v0.18.3...v0.18.4) (2026-01-25)
 
 ### Other Changes
 
@@ -135,7 +217,7 @@
 - Fix precious metal ledger entries (ef307d5d)
 - Fix precious metals create and 4-decimal precision (2332cef9)
 
-## [0.18.3](https://github.com/hendripermana/permoney/compare/v0.18.2...v0.18.3) (2026-01-25)
+## [0.18.3](https://github.com/hendripermana/sure/compare/v0.18.2...v0.18.3) (2026-01-25)
 
 ### Bug Fixes
 
@@ -155,7 +237,7 @@
 - fix(security): upgrade lodash from 4.17.21 to 4.17.23 to resolve prototype pollution vulnerability (b903e4fb)
 - Fix provider form and gold initial purchase flow (e881a756)
 
-## [0.18.2](https://github.com/hendripermana/permoney/compare/v0.18.1...v0.18.2) (2026-01-24)
+## [0.18.2](https://github.com/hendripermana/sure/compare/v0.18.1...v0.18.2) (2026-01-24)
 
 ### Other Changes
 
@@ -165,7 +247,7 @@
 - Harden gold valuation edge cases and tests\n\n- Add comprehensive tests for FX conversions with multiple currencies\n- Test nil-safe behavior when FX rates are missing\n- Test validation for invalid currency codes\n- Verify no FX call when currencies match (optimization)\n- Handle ConversionError and UnknownCurrencyError gracefully\n- Edge case: blank manual_price returns nil estimated value\n- Edge case: missing target currency defaults to family currency\n- All edge cases tested and verified (6b67eefc)
 - Add FX-backed gold valuation using shared Money exchange (396b1cd1)
 
-## [0.18.1](https://github.com/hendripermana/permoney/compare/v0.18.0...v0.18.1) (2026-01-13)
+## [0.18.1](https://github.com/hendripermana/sure/compare/v0.18.0...v0.18.1) (2026-01-13)
 
 ### Other Changes
 
@@ -173,7 +255,7 @@
 - Harden ActionCable config and docs (11c397f5)
 - Fix floating chat layout and interactions (f8a420b2)
 
-## [0.18.0](https://github.com/hendripermana/permoney/compare/v0.17.5...v0.18.0) (2026-01-12)
+## [0.18.0](https://github.com/hendripermana/sure/compare/v0.17.5...v0.18.0) (2026-01-12)
 
 ### Features
 
@@ -220,21 +302,21 @@
 - feat(rules): implement run all rules with execution history tracking (3d04421a)
 - feat(simplefin): integrate Sure community Phase 1 - critical stability fixes (09829b47)
 
-## [0.17.5](https://github.com/hendripermana/permoney/compare/v0.17.4...v0.17.5) (2025-12-20)
+## [0.17.5](https://github.com/hendripermana/sure/compare/v0.17.4...v0.17.5) (2025-12-20)
 
 ### Other Changes
 
-- Merge PR #104: Apply community updates and refresh Permoney icons (0d63490f)
+- Merge PR #104: Apply community updates and refresh Sure icons (0d63490f)
 - Apply community updates and refresh icons (dbbe1d43)
 
-## [0.17.4](https://github.com/hendripermana/permoney/compare/v0.17.3...v0.17.4) (2025-12-16)
+## [0.17.4](https://github.com/hendripermana/sure/compare/v0.17.3...v0.17.4) (2025-12-16)
 
 ### Other Changes
 
 - Merge pull request #103 from hendripermana/fix/security-compliance-v2 (317037ed)
 - fix(security): upgrade dompurify to 3.2.4 to resolve CVEs [skip ci] (435be9d4)
 
-## [0.17.3](https://github.com/hendripermana/permoney/compare/v0.17.2...v0.17.3) (2025-12-16)
+## [0.17.3](https://github.com/hendripermana/sure/compare/v0.17.2...v0.17.3) (2025-12-16)
 
 ### Bug Fixes
 
@@ -247,20 +329,20 @@
 - fix(security): switch to dompurify for sanitization and robustify timeout [skip ci] (c91551b8)
 - fix(security): enabling sanitize:true, fixing timeout logic and simplifying ui toggle [skip ci] (de6fc9ed)
 
-## [0.17.2](https://github.com/hendripermana/permoney/compare/v0.17.1...v0.17.2) (2025-12-15)
+## [0.17.2](https://github.com/hendripermana/sure/compare/v0.17.1...v0.17.2) (2025-12-15)
 
 ### Bug Fixes
 
 - fix: Authenticate WebSocket connection with session cookie (#99) (672445e3)
 
-## [0.17.1](https://github.com/hendripermana/permoney/compare/v0.17.0...v0.17.1) (2025-12-15)
+## [0.17.1](https://github.com/hendripermana/sure/compare/v0.17.0...v0.17.1) (2025-12-15)
 
 ### Other Changes
 
 - Merge pull request #98 from hendripermana/fix/chat-deployment-lint (8fa2d194)
 - style: Fix Biome formatting in chat_streaming_controller (4c841cdd)
 
-## [0.17.0](https://github.com/hendripermana/permoney/compare/v0.16.26...v0.17.0) (2025-12-15)
+## [0.17.0](https://github.com/hendripermana/sure/compare/v0.16.26...v0.17.0) (2025-12-15)
 
 ### Features
 
@@ -274,7 +356,7 @@
 
 - Merge pull request #97 from hendripermana/feature/chat-ai-modernization (ccd19d82)
 
-## [0.16.26](https://github.com/hendripermana/permoney/compare/v0.16.25...v0.16.26) (2025-12-14)
+## [0.16.26](https://github.com/hendripermana/sure/compare/v0.16.25...v0.16.26) (2025-12-14)
 
 ### Other Changes
 
@@ -283,7 +365,7 @@
 - Implement AI Review suggestions: MutationObserver, Security fixes, and Polish (d4589078)
 - Fix AI chat response flow: resolve DOM conflicts between JS streaming and Turbo Morphing (e5f833ae)
 
-## [0.16.25](https://github.com/hendripermana/permoney/compare/v0.16.24...v0.16.25) (2025-12-07)
+## [0.16.25](https://github.com/hendripermana/sure/compare/v0.16.24...v0.16.25) (2025-12-07)
 
 ### Bug Fixes
 
@@ -297,7 +379,7 @@
 
 - Merge pull request #95 from hendripermana/fix/profile-image-file-not-found (6368dc4f)
 
-## [0.16.24](https://github.com/hendripermana/permoney/compare/v0.16.23...v0.16.24) (2025-12-07)
+## [0.16.24](https://github.com/hendripermana/sure/compare/v0.16.23...v0.16.24) (2025-12-07)
 
 ### Other Changes
 
@@ -305,7 +387,7 @@
 - refactor(ui): Address AI code review suggestions for menu controller (83c5109c)
 - fix(ui): Resolve menu button regression after transaction creation in Rails 8.1 (2430ee71)
 
-## [0.16.23](https://github.com/hendripermana/permoney/compare/v0.16.22...v0.16.23) (2025-12-07)
+## [0.16.23](https://github.com/hendripermana/sure/compare/v0.16.22...v0.16.23) (2025-12-07)
 
 ### Documentation
 
@@ -317,50 +399,50 @@
 - fix(security): Address AI code review suggestions (3636bab2)
 - feat(storage): Enable Cloudflare R2 for Active Storage with receipt attachments (ab0d5ff4)
 
-## [0.16.22](https://github.com/hendripermana/permoney/compare/v0.16.21...v0.16.22) (2025-12-07)
+## [0.16.22](https://github.com/hendripermana/sure/compare/v0.16.21...v0.16.22) (2025-12-07)
 
 ### Other Changes
 
 - Add Redis memory monitoring and guard streaming assistant with test (6954ffdc)
 
-## [0.16.21](https://github.com/hendripermana/permoney/compare/v0.16.20...v0.16.21) (2025-12-07)
+## [0.16.21](https://github.com/hendripermana/sure/compare/v0.16.20...v0.16.21) (2025-12-07)
 
 ### Other Changes
 
 - Guard streaming assistant messages against blank content (6292679f)
 - Document connection_pool compatibility shim (749a0c6a)
 
-## [0.16.20](https://github.com/hendripermana/permoney/compare/v0.16.19...v0.16.20) (2025-12-06)
+## [0.16.20](https://github.com/hendripermana/sure/compare/v0.16.19...v0.16.20) (2025-12-06)
 
 ### Other Changes
 
 - Harden connection_pool shim for Sidekiq/Redis compatibility (01b6a666)
 
-## [0.16.19](https://github.com/hendripermana/permoney/compare/v0.16.18...v0.16.19) (2025-12-06)
+## [0.16.19](https://github.com/hendripermana/sure/compare/v0.16.18...v0.16.19) (2025-12-06)
 
 ### Other Changes
 
 - Fix connection_pool shim recursion and support positional args (e4e8b382)
 
-## [0.16.18](https://github.com/hendripermana/permoney/compare/v0.16.17...v0.16.18) (2025-12-06)
+## [0.16.18](https://github.com/hendripermana/sure/compare/v0.16.17...v0.16.18) (2025-12-06)
 
 ### Other Changes
 
 - Guard connection_pool patch to prevent recursion (3d3bb3fb)
 
-## [0.16.17](https://github.com/hendripermana/permoney/compare/v0.16.16...v0.16.17) (2025-12-06)
+## [0.16.17](https://github.com/hendripermana/sure/compare/v0.16.16...v0.16.17) (2025-12-06)
 
 ### Other Changes
 
 - Patch connection_pool init early during boot (fb82eecf)
 
-## [0.16.16](https://github.com/hendripermana/permoney/compare/v0.16.15...v0.16.16) (2025-12-06)
+## [0.16.16](https://github.com/hendripermana/sure/compare/v0.16.15...v0.16.16) (2025-12-06)
 
 ### Other Changes
 
 - Fix connection_pool keyword compatibility for Redis cache (3199d84b)
 
-## [0.16.15](https://github.com/hendripermana/permoney/compare/v0.16.14...v0.16.15) (2025-12-06)
+## [0.16.15](https://github.com/hendripermana/sure/compare/v0.16.14...v0.16.15) (2025-12-06)
 
 ### Other Changes
 
@@ -368,61 +450,61 @@
 - Stabilize loan payable tests with fixed dates (5242f716)
 - Document isolated test DB flow and harden subscriptions (bed7be89)
 
-## [0.16.14](https://github.com/hendripermana/permoney/compare/v0.16.13...v0.16.14) (2025-12-06)
+## [0.16.14](https://github.com/hendripermana/sure/compare/v0.16.13...v0.16.14) (2025-12-06)
 
 ### Other Changes
 
 - Fix DS::Menu controller - store direct element references (48dc4f26)
 
-## [0.16.13](https://github.com/hendripermana/permoney/compare/v0.16.12...v0.16.13) (2025-12-06)
+## [0.16.13](https://github.com/hendripermana/sure/compare/v0.16.12...v0.16.13) (2025-12-06)
 
 ### Other Changes
 
 - Fix subscription table menu stacking and add clickable rows (a74161fe)
 
-## [0.16.12](https://github.com/hendripermana/permoney/compare/v0.16.11...v0.16.12) (2025-12-06)
+## [0.16.12](https://github.com/hendripermana/sure/compare/v0.16.11...v0.16.12) (2025-12-06)
 
 ### Other Changes
 
 - Fix edit subscription 500 error - add to_combobox_display to ServiceMerchant (a01407f7)
 
-## [0.16.11](https://github.com/hendripermana/permoney/compare/v0.16.10...v0.16.11) (2025-12-06)
+## [0.16.11](https://github.com/hendripermana/sure/compare/v0.16.10...v0.16.11) (2025-12-06)
 
 ### Other Changes
 
 - Improve subscription dashboard UI inspired by shadcnstudio (#85) (a7301830)
 
-## [0.16.10](https://github.com/hendripermana/permoney/compare/v0.16.9...v0.16.10) (2025-12-05)
+## [0.16.10](https://github.com/hendripermana/sure/compare/v0.16.9...v0.16.10) (2025-12-05)
 
 ### Other Changes
 
 - Add subscription analytics dashboard with wave charts and utility categories (a43de58a)
 
-## [0.16.9](https://github.com/hendripermana/permoney/compare/v0.16.8...v0.16.9) (2025-12-05)
+## [0.16.9](https://github.com/hendripermana/sure/compare/v0.16.8...v0.16.9) (2025-12-05)
 
 ### Other Changes
 
 - Fix service avg_monthly_cost currency display (#84) (2edcf4c0)
 
-## [0.16.8](https://github.com/hendripermana/permoney/compare/v0.16.7...v0.16.8) (2025-12-05)
+## [0.16.8](https://github.com/hendripermana/sure/compare/v0.16.7...v0.16.8) (2025-12-05)
 
 ### Other Changes
 
 - Improve subscription manager: alphabetical sorting, currency fix, duplicate detection (#83) (c4eae297)
 
-## [0.16.7](https://github.com/hendripermana/permoney/compare/v0.16.6...v0.16.7) (2025-12-05)
+## [0.16.7](https://github.com/hendripermana/sure/compare/v0.16.6...v0.16.7) (2025-12-05)
 
 ### Other Changes
 
 - Improve service dropdown to show all services with pagination (#82) (420f1c50)
 
-## [0.16.6](https://github.com/hendripermana/permoney/compare/v0.16.5...v0.16.6) (2025-12-03)
+## [0.16.6](https://github.com/hendripermana/sure/compare/v0.16.5...v0.16.6) (2025-12-03)
 
 ### Other Changes
 
 - Fix subscription service dropdown and add searchable combobox with logos (#81) (a2c9f124)
 
-## [0.16.5](https://github.com/hendripermana/permoney/compare/v0.16.4...v0.16.5) (2025-12-01)
+## [0.16.5](https://github.com/hendripermana/sure/compare/v0.16.4...v0.16.5) (2025-12-01)
 
 ### Other Changes
 
@@ -431,44 +513,44 @@
 - Tighten subscription payment linking with amount tolerance (3f8519cf)
 - Link subscriptions with manual transactions and improve subscription manager UI (8ac0d022)
 
-## [0.16.4](https://github.com/hendripermana/permoney/compare/v0.16.3...v0.16.4) (2025-11-30)
+## [0.16.4](https://github.com/hendripermana/sure/compare/v0.16.3...v0.16.4) (2025-11-30)
 
 ### Bug Fixes
 
 - fix: Make service_id nullable on subscription_plans (e492f6c4)
 
-## [0.16.3](https://github.com/hendripermana/permoney/compare/v0.16.2...v0.16.3) (2025-11-30)
+## [0.16.3](https://github.com/hendripermana/sure/compare/v0.16.2...v0.16.3) (2025-11-30)
 
 ### Bug Fixes
 
 - fix: Subscription form FK violation and services category title wrapping (8dc5a0cc)
 
-## [0.16.2](https://github.com/hendripermana/permoney/compare/v0.16.1...v0.16.2) (2025-11-30)
+## [0.16.2](https://github.com/hendripermana/sure/compare/v0.16.1...v0.16.2) (2025-11-30)
 
 ### Bug Fixes
 
 - fix: Currency defaulting and modal UX for services (8d4e9276)
 
-## [0.16.1](https://github.com/hendripermana/permoney/compare/v0.16.0...v0.16.1) (2025-11-30)
+## [0.16.1](https://github.com/hendripermana/sure/compare/v0.16.0...v0.16.1) (2025-11-30)
 
 ### Bug Fixes
 
 - fix: Use DS::Dialog instead of non-existent DS::Modal for services views (5847f9a6)
 
-## [0.16.0](https://github.com/hendripermana/permoney/compare/v0.15.0...v0.16.0) (2025-11-30)
+## [0.16.0](https://github.com/hendripermana/sure/compare/v0.15.0...v0.16.0) (2025-11-30)
 
 ### Features
 
 - feat: Merge Service into Merchant, fix Brandfetch logos, remove recurring remnants (139282c4)
 - feat: Improve subscription form consistency and add Services management (b54b6448)
 
-## [0.15.0](https://github.com/hendripermana/permoney/compare/v0.14.0...v0.15.0) (2025-11-30)
+## [0.15.0](https://github.com/hendripermana/sure/compare/v0.14.0...v0.15.0) (2025-11-30)
 
 ### Features
 
 - feat: Add Subscription Manager to navigation (c1064117)
 
-## [0.14.0](https://github.com/hendripermana/permoney/compare/v0.13.13...v0.14.0) (2025-11-30)
+## [0.14.0](https://github.com/hendripermana/sure/compare/v0.13.13...v0.14.0) (2025-11-30)
 
 ### Features
 
@@ -482,19 +564,19 @@
 
 - Merge pull request #79 from hendripermana/feature/subscription-manager (418036be)
 
-## [0.13.13](https://github.com/hendripermana/permoney/compare/v0.13.12...v0.13.13) (2025-11-28)
+## [0.13.13](https://github.com/hendripermana/sure/compare/v0.13.12...v0.13.13) (2025-11-28)
 
 ### Other Changes
 
 - Auto-heal stale syncs and clear sync banner cache on refresh (62b359c6)
 
-## [0.13.12](https://github.com/hendripermana/permoney/compare/v0.13.11...v0.13.12) (2025-11-28)
+## [0.13.12](https://github.com/hendripermana/sure/compare/v0.13.11...v0.13.12) (2025-11-28)
 
 ### Other Changes
 
 - Force full rebuild start from opening anchor; retry if calc empty (e91ede2e)
 
-## [0.13.11](https://github.com/hendripermana/permoney/compare/v0.13.10...v0.13.11) (2025-11-23)
+## [0.13.11](https://github.com/hendripermana/sure/compare/v0.13.10...v0.13.11) (2025-11-23)
 
 ### Other Changes
 
@@ -502,37 +584,37 @@
 - Namespace advisory lock for balance materializer (ef58edfb)
 - Add balance audit job and harden sync safeguards (4cd3b4da)
 
-## [0.13.10](https://github.com/hendripermana/permoney/compare/v0.13.9...v0.13.10) (2025-11-23)
+## [0.13.10](https://github.com/hendripermana/sure/compare/v0.13.9...v0.13.10) (2025-11-23)
 
 ### Other Changes
 
 - Guard windowed balance materialization when anchor missing (1e174c4f)
 
-## [0.13.9](https://github.com/hendripermana/permoney/compare/v0.13.8...v0.13.9) (2025-11-23)
+## [0.13.9](https://github.com/hendripermana/sure/compare/v0.13.8...v0.13.9) (2025-11-23)
 
 ### Other Changes
 
 - HOTFIX: Fix blank content validation error in streaming job (984e5960)
 
-## [0.13.8](https://github.com/hendripermana/permoney/compare/v0.13.7...v0.13.8) (2025-11-23)
+## [0.13.8](https://github.com/hendripermana/sure/compare/v0.13.7...v0.13.8) (2025-11-23)
 
 ### Other Changes
 
 - HOTFIX: Fix importmap paths for Action Cable - CRITICAL #3 (21fca680)
 
-## [0.13.7](https://github.com/hendripermana/permoney/compare/v0.13.6...v0.13.7) (2025-11-23)
+## [0.13.7](https://github.com/hendripermana/sure/compare/v0.13.6...v0.13.7) (2025-11-23)
 
 ### Other Changes
 
 - HOTFIX: Add @rails/actioncable to importmap - CRITICAL (cf27a232)
 
-## [0.13.6](https://github.com/hendripermana/permoney/compare/v0.13.5...v0.13.6) (2025-11-23)
+## [0.13.6](https://github.com/hendripermana/sure/compare/v0.13.5...v0.13.6) (2025-11-23)
 
 ### Other Changes
 
 - HOTFIX: Fix Action Cable import - CRITICAL PRODUCTION BUG (7c834498)
 
-## [0.13.5](https://github.com/hendripermana/permoney/compare/v0.13.4...v0.13.5) (2025-11-23)
+## [0.13.5](https://github.com/hendripermana/sure/compare/v0.13.4...v0.13.5) (2025-11-23)
 
 ### Other Changes
 
@@ -542,7 +624,7 @@
 - Add conditional console logging for production security (30016ead)
 - Fix onboarding loop, floating chat z-index, and enable real-time streaming (d2c5705e)
 
-## [0.13.4](https://github.com/hendripermana/permoney/compare/v0.13.3...v0.13.4) (2025-11-22)
+## [0.13.4](https://github.com/hendripermana/sure/compare/v0.13.3...v0.13.4) (2025-11-22)
 
 ### Other Changes
 
@@ -550,19 +632,19 @@
 - Fix broadcast methods with async and null safety (2789887f)
 - Enhance floating AI chat with real-time streaming and mobile UX improvements (f040cb8b)
 
-## [0.13.3](https://github.com/hendripermana/permoney/compare/v0.13.2...v0.13.3) (2025-11-22)
+## [0.13.3](https://github.com/hendripermana/sure/compare/v0.13.2...v0.13.3) (2025-11-22)
 
 ### Other Changes
 
 - Fix Chat Production Errors: 400 Bad Request & Turbo Frame Issues (#75) (ab401f09)
 
-## [0.13.2](https://github.com/hendripermana/permoney/compare/v0.13.1...v0.13.2) (2025-11-22)
+## [0.13.2](https://github.com/hendripermana/sure/compare/v0.13.1...v0.13.2) (2025-11-22)
 
 ### Other Changes
 
 - Improve Chat AI Feature: Error Handling & Generic Provider Support (#74) (1acbf905)
 
-## [0.13.1](https://github.com/hendripermana/permoney/compare/v0.13.0...v0.13.1) (2025-11-22)
+## [0.13.1](https://github.com/hendripermana/sure/compare/v0.13.0...v0.13.1) (2025-11-22)
 
 ### Other Changes
 
@@ -570,7 +652,7 @@
 - Apply code review feedback: optimize redundant method calls and add safe navigation (3ac7f1b9)
 - Implement community improvements: dashboard period sync and UI enhancements (b2348d93)
 
-## [0.13.0](https://github.com/hendripermana/permoney/compare/v0.12.1...v0.13.0) (2025-11-22)
+## [0.13.0](https://github.com/hendripermana/sure/compare/v0.12.1...v0.13.0) (2025-11-22)
 
 ### Features
 
@@ -583,19 +665,19 @@
 - Merge pull request #72 from hendripermana/feature/community-improvements (5dc8b90e)
 - test: Update flash notice expectation for account deletion (21896b22)
 
-## [0.12.1](https://github.com/hendripermana/permoney/compare/v0.12.0...v0.12.1) (2025-11-21)
+## [0.12.1](https://github.com/hendripermana/sure/compare/v0.12.0...v0.12.1) (2025-11-21)
 
 ### Other Changes
 
 - chore: Remove temporary diff file (7ed50997)
 
-## [0.12.0](https://github.com/hendripermana/permoney/compare/v0.11.8...v0.12.0) (2025-11-21)
+## [0.12.0](https://github.com/hendripermana/sure/compare/v0.11.8...v0.12.0) (2025-11-21)
 
 ### Features
 
 - Feat: Manual Recurring Transactions (#71) (0a58664d)
 
-## [0.11.8](https://github.com/hendripermana/permoney/compare/v0.11.7...v0.11.8) (2025-11-21)
+## [0.11.8](https://github.com/hendripermana/sure/compare/v0.11.7...v0.11.8) (2025-11-21)
 
 ### Other Changes
 
@@ -603,50 +685,50 @@
 - Add compose override for local hotfix builds (49e1b2cb)
 - Ensure DS::Link uses turbo method for non-GET links (c081e276)
 
-## [0.11.7](https://github.com/hendripermana/permoney/compare/v0.11.6...v0.11.7) (2025-11-21)
+## [0.11.7](https://github.com/hendripermana/sure/compare/v0.11.6...v0.11.7) (2025-11-21)
 
 ### Other Changes
 
 - Reduce sync health cache TTL for fresher banner (cc5757c3)
 
-## [0.11.6](https://github.com/hendripermana/permoney/compare/v0.11.5...v0.11.6) (2025-11-21)
+## [0.11.6](https://github.com/hendripermana/sure/compare/v0.11.5...v0.11.6) (2025-11-21)
 
 ### Other Changes
 
 - Merge pull request #69 from hendripermana/fix-sync-refresh-and-posthog (bb2c4414)
 - Fix sync-all refresh UX and stabilize version checker (2000059f)
 
-## [0.11.5](https://github.com/hendripermana/permoney/compare/v0.11.4...v0.11.5) (2025-11-21)
+## [0.11.5](https://github.com/hendripermana/sure/compare/v0.11.4...v0.11.5) (2025-11-21)
 
 ### Other Changes
 
 - Fix sync health refresh button and restore PostHog require (2d86df3a)
 
-## [0.11.4](https://github.com/hendripermana/permoney/compare/v0.11.3...v0.11.4) (2025-11-20)
+## [0.11.4](https://github.com/hendripermana/sure/compare/v0.11.3...v0.11.4) (2025-11-20)
 
 ### Other Changes
 
 - Implement PostHog proxy to bypass ad blockers (#68) (611a5904)
 
-## [0.11.3](https://github.com/hendripermana/permoney/compare/v0.11.2...v0.11.3) (2025-11-20)
+## [0.11.3](https://github.com/hendripermana/sure/compare/v0.11.2...v0.11.3) (2025-11-20)
 
 ### Other Changes
 
 - Fix HTML escaping in PostHog partial (#67) (d4bc8158)
 
-## [0.11.2](https://github.com/hendripermana/permoney/compare/v0.11.1...v0.11.2) (2025-11-19)
+## [0.11.2](https://github.com/hendripermana/sure/compare/v0.11.1...v0.11.2) (2025-11-19)
 
 ### Other Changes
 
 - Fix PostHog initializer: require gem and use correct client instantiation (#66) (30850f57)
 
-## [0.11.1](https://github.com/hendripermana/permoney/compare/v0.11.0...v0.11.1) (2025-11-19)
+## [0.11.1](https://github.com/hendripermana/sure/compare/v0.11.0...v0.11.1) (2025-11-19)
 
 ### Other Changes
 
 - Implement Sure Commits (Nov 19) (#65) (8a12a960)
 
-## [0.11.0](https://github.com/hendripermana/permoney/compare/v0.10.1...v0.11.0) (2025-11-19)
+## [0.11.0](https://github.com/hendripermana/sure/compare/v0.10.1...v0.11.0) (2025-11-19)
 
 ### Features
 
@@ -662,7 +744,7 @@
 - Merge pull request #64 from hendripermana/feature/implement-we-promise-sure-commits (f52b7da3)
 - Merge pull request #63 from hendripermana/fix/publish-fetch-depth (6d179029)
 
-## [0.10.1](https://github.com/hendripermana/permoney/compare/v0.10.0...v0.10.1) (2025-11-19)
+## [0.10.1](https://github.com/hendripermana/sure/compare/v0.10.0...v0.10.1) (2025-11-19)
 
 ### Bug Fixes
 
@@ -672,7 +754,7 @@
 
 - Merge pull request #62 from hendripermana/fix/version-sync-and-regex (4f5bdc35)
 
-## [0.10.0](https://github.com/hendripermana/permoney/compare/v0.9.7...v0.10.0) (2025-11-19)
+## [0.10.0](https://github.com/hendripermana/sure/compare/v0.9.7...v0.10.0) (2025-11-19)
 
 ### Features
 
@@ -741,16 +823,16 @@
 
 # Changelog
 
-## [0.9.7](https://github.com/hendripermana/permoney/compare/v0.9.6...v0.9.7) (2025-11-09)
+## [0.9.7](https://github.com/hendripermana/sure/compare/v0.9.6...v0.9.7) (2025-11-09)
 
 
 ### Features
 
-* Implement optimistic balance update for instant transaction deletion UX ([#optimistic-update](https://github.com/hendripermana/permoney/commit/COMMIT_HASH))
+* Implement optimistic balance update for instant transaction deletion UX ([#optimistic-update](https://github.com/hendripermana/sure/commit/COMMIT_HASH))
   - Transaction deletion now updates balance instantly (< 100ms) without flickering
   - Async sync job ensures accurate final balance
   - Improves user experience with smooth, professional UI updates
-* Optimize server configuration for 4 CPU 24GB RAM production environment ([#server-optimization](https://github.com/hendripermana/permoney/commit/COMMIT_HASH))
+* Optimize server configuration for 4 CPU 24GB RAM production environment ([#server-optimization](https://github.com/hendripermana/sure/commit/COMMIT_HASH))
   - Reduce RAILS_MAX_THREADS from 8 to 5 (industry best practice for stability)
   - Adjust DB_POOL from 52 to 45 (right-sized for new thread configuration)
   - Separate Redis databases: Sidekiq (db=1) and Cache (db=2) for better isolation
@@ -759,10 +841,10 @@
 
 ### Bug Fixes
 
-* Fix CacheMonitoringJob Redis::ConnectionPool class reference error ([#cache-monitoring-fix](https://github.com/hendripermana/permoney/commit/COMMIT_HASH))
+* Fix CacheMonitoringJob Redis::ConnectionPool class reference error ([#cache-monitoring-fix](https://github.com/hendripermana/sure/commit/COMMIT_HASH))
   - Correct `Redis::ConnectionPool` to `ConnectionPool` (connection_pool gem)
   - Cache monitoring now works properly, providing metrics every 5 minutes
-* Update production.rb SSL configuration for Caddy reverse proxy ([#ssl-config](https://github.com/hendripermana/permoney/commit/COMMIT_HASH))
+* Update production.rb SSL configuration for Caddy reverse proxy ([#ssl-config](https://github.com/hendripermana/sure/commit/COMMIT_HASH))
 
 
 ### Documentation
@@ -779,137 +861,137 @@
 * Memory efficiency: 7.8GB/24GB usage (excellent headroom)
 * Sidekiq health: 99.67% success rate (maintained)
 
-## [0.9.6](https://github.com/hendripermana/permoney/compare/v0.9.5...v0.9.6) (2025-11-08)
+## [0.9.6](https://github.com/hendripermana/sure/compare/v0.9.5...v0.9.6) (2025-11-08)
 
 
 ### Features
 
-* Add privacy toggle to KPI cards so sensitive metrics can be hidden on shared screens ([a331143](https://github.com/hendripermana/permoney/commit/a331143e5860ee7b36a60d5bbbb1d2f0a32054c4))
-* Add fluid typography to KPI card values for better readability across breakpoints ([f627588](https://github.com/hendripermana/permoney/commit/f627588a09393a6c05befc578f4c50add94b20a3))
-* Deliver F1-level performance tuning on Rails 8.1 (faster queries, leaner Turbo) ([8c57ef9](https://github.com/hendripermana/permoney/commit/8c57ef9334dc9fdf1f1b5b8deb0a7b0c9773e0ee))
-* Comprehensive Docker + Tailwind v4.1.8 optimizations for production builds ([33dc785](https://github.com/hendripermana/permoney/commit/33dc78576d4f9c62c731fc2fd302dd25a9819f27))
+* Add privacy toggle to KPI cards so sensitive metrics can be hidden on shared screens ([a331143](https://github.com/hendripermana/sure/commit/a331143e5860ee7b36a60d5bbbb1d2f0a32054c4))
+* Add fluid typography to KPI card values for better readability across breakpoints ([f627588](https://github.com/hendripermana/sure/commit/f627588a09393a6c05befc578f4c50add94b20a3))
+* Deliver F1-level performance tuning on Rails 8.1 (faster queries, leaner Turbo) ([8c57ef9](https://github.com/hendripermana/sure/commit/8c57ef9334dc9fdf1f1b5b8deb0a7b0c9773e0ee))
+* Comprehensive Docker + Tailwind v4.1.8 optimizations for production builds ([33dc785](https://github.com/hendripermana/sure/commit/33dc78576d4f9c62c731fc2fd302dd25a9819f27))
 
 
 ### Bug Fixes
 
-* Ensure Pagy 43 pagination helpers load correctly on Rails 8.1 ([bd50a56](https://github.com/hendripermana/permoney/commit/bd50a56c7bead410aeb495701a6e23827bab3af9))
-* Upgrade Pagy integration and controllers to the new API to unblock /transactions ([996b643](https://github.com/hendripermana/permoney/commit/996b6436c24022f43a154583f606860cf00e62fb))
-* Fix API namespace autoloading / lint issues that broke CI ([d511cd4](https://github.com/hendripermana/permoney/commit/d511cd46caa844b4db87837022159d64fc467522))
-* Harden Docker logging, cleanup, and image pinning for stable deploys ([ef80cf3](https://github.com/hendripermana/permoney/commit/ef80cf369c664b038c391c820f41210fa332621c), [5a9d117](https://github.com/hendripermana/permoney/commit/5a9d117ecfd9de0b5b6b5d76488ab8f2c0eedc25))
-* Resolve lint/security noise (Rubocop, Brakeman, build warnings) to keep CI green ([fb93039](https://github.com/hendripermana/permoney/commit/fb9303925a5079304cb6fa94bb9573ad710a4623), [2431fa2](https://github.com/hendripermana/permoney/commit/2431fa2e5937fb560ea87aaef06c3cc51656fe49))
+* Ensure Pagy 43 pagination helpers load correctly on Rails 8.1 ([bd50a56](https://github.com/hendripermana/sure/commit/bd50a56c7bead410aeb495701a6e23827bab3af9))
+* Upgrade Pagy integration and controllers to the new API to unblock /transactions ([996b643](https://github.com/hendripermana/sure/commit/996b6436c24022f43a154583f606860cf00e62fb))
+* Fix API namespace autoloading / lint issues that broke CI ([d511cd4](https://github.com/hendripermana/sure/commit/d511cd46caa844b4db87837022159d64fc467522))
+* Harden Docker logging, cleanup, and image pinning for stable deploys ([ef80cf3](https://github.com/hendripermana/sure/commit/ef80cf369c664b038c391c820f41210fa332621c), [5a9d117](https://github.com/hendripermana/sure/commit/5a9d117ecfd9de0b5b6b5d76488ab8f2c0eedc25))
+* Resolve lint/security noise (Rubocop, Brakeman, build warnings) to keep CI green ([fb93039](https://github.com/hendripermana/sure/commit/fb9303925a5079304cb6fa94bb9573ad710a4623), [2431fa2](https://github.com/hendripermana/sure/commit/2431fa2e5937fb560ea87aaef06c3cc51656fe49))
 
-## [0.9.5](https://github.com/hendripermana/permoney/compare/v0.9.4...v0.9.5) (2025-11-04)
-
-
-### Bug Fixes
-
-* Resolve production blockers for Rails 8 + Puma 6 ([c102840](https://github.com/hendripermana/permoney/commit/c1028407e7023260255c0ab4fcde800a2487a510))
-
-## [0.9.4](https://github.com/hendripermana/permoney/compare/v0.9.3...v0.9.4) (2025-11-04)
+## [0.9.5](https://github.com/hendripermana/sure/compare/v0.9.4...v0.9.5) (2025-11-04)
 
 
 ### Bug Fixes
 
-* Simplify Docker build and fix asset precompilation ([785bc83](https://github.com/hendripermana/permoney/commit/785bc83cacb18cede7a7b3375f7bdfbfc03af432))
-* Suppress database warnings during asset precompilation ([892d1cd](https://github.com/hendripermana/permoney/commit/892d1cd18371b74fece285defc775e6a3dfc359c))
+* Resolve production blockers for Rails 8 + Puma 6 ([c102840](https://github.com/hendripermana/sure/commit/c1028407e7023260255c0ab4fcde800a2487a510))
 
-## [0.9.3](https://github.com/hendripermana/permoney/compare/v0.9.2...v0.9.3) (2025-11-04)
-
-
-### Bug Fixes
-
-* Update Ruby to 3.4.7 and Bundler to 2.7.2 in Dockerfile ([e0eecde](https://github.com/hendripermana/permoney/commit/e0eecdec74144e2d02b244161bf06d5333cd5150))
-
-## [0.9.2](https://github.com/hendripermana/permoney/compare/v0.9.1...v0.9.2) (2025-11-04)
+## [0.9.4](https://github.com/hendripermana/sure/compare/v0.9.3...v0.9.4) (2025-11-04)
 
 
 ### Bug Fixes
 
-* Add missing Sentry mock methods and loan validations ([e00b485](https://github.com/hendripermana/permoney/commit/e00b485f4901efa1cd6f779ccabbf9f7a167472e))
-* Correct syntax error in loan form component test ([6fa9cad](https://github.com/hendripermana/permoney/commit/6fa9cada2fe0d6e76e4207ab5876a078b05d4eca))
-* Decouple Docker build from test suite ([dcdfd13](https://github.com/hendripermana/permoney/commit/dcdfd13fa95e3c57d7f00253aae05fbe3907bfe4))
-* Use hardcoded Node version instead of node-version-file ([538eeb9](https://github.com/hendripermana/permoney/commit/538eeb97379eccb284a26d667f329a6646d0d31f))
+* Simplify Docker build and fix asset precompilation ([785bc83](https://github.com/hendripermana/sure/commit/785bc83cacb18cede7a7b3375f7bdfbfc03af432))
+* Suppress database warnings during asset precompilation ([892d1cd](https://github.com/hendripermana/sure/commit/892d1cd18371b74fece285defc775e6a3dfc359c))
 
-## [0.9.1](https://github.com/hendripermana/permoney/compare/v0.9.0...v0.9.1) (2025-11-04)
+## [0.9.3](https://github.com/hendripermana/sure/compare/v0.9.2...v0.9.3) (2025-11-04)
 
 
 ### Bug Fixes
 
-* Apply linting fixes for CI/CD pipeline ([ba7b28f](https://github.com/hendripermana/permoney/commit/ba7b28f707da1b27db517c610a245748c862bd88))
-* Update brakeman ignore and fix Sentry mock for tests ([03f5978](https://github.com/hendripermana/permoney/commit/03f5978a39add0c6b70d4fc9cf8588dd797db58b))
+* Update Ruby to 3.4.7 and Bundler to 2.7.2 in Dockerfile ([e0eecde](https://github.com/hendripermana/sure/commit/e0eecdec74144e2d02b244161bf06d5333cd5150))
 
-## [0.9.0](https://github.com/hendripermana/permoney/compare/v0.8.2...v0.9.0) (2025-11-04)
+## [0.9.2](https://github.com/hendripermana/sure/compare/v0.9.1...v0.9.2) (2025-11-04)
+
+
+### Bug Fixes
+
+* Add missing Sentry mock methods and loan validations ([e00b485](https://github.com/hendripermana/sure/commit/e00b485f4901efa1cd6f779ccabbf9f7a167472e))
+* Correct syntax error in loan form component test ([6fa9cad](https://github.com/hendripermana/sure/commit/6fa9cada2fe0d6e76e4207ab5876a078b05d4eca))
+* Decouple Docker build from test suite ([dcdfd13](https://github.com/hendripermana/sure/commit/dcdfd13fa95e3c57d7f00253aae05fbe3907bfe4))
+* Use hardcoded Node version instead of node-version-file ([538eeb9](https://github.com/hendripermana/sure/commit/538eeb97379eccb284a26d667f329a6646d0d31f))
+
+## [0.9.1](https://github.com/hendripermana/sure/compare/v0.9.0...v0.9.1) (2025-11-04)
+
+
+### Bug Fixes
+
+* Apply linting fixes for CI/CD pipeline ([ba7b28f](https://github.com/hendripermana/sure/commit/ba7b28f707da1b27db517c610a245748c862bd88))
+* Update brakeman ignore and fix Sentry mock for tests ([03f5978](https://github.com/hendripermana/sure/commit/03f5978a39add0c6b70d4fc9cf8588dd797db58b))
+
+## [0.9.0](https://github.com/hendripermana/sure/compare/v0.8.2...v0.9.0) (2025-11-04)
 
 
 ### Features
 
-* Add comprehensive PayLater/BNPL system with Indonesian provider support ([da0d923](https://github.com/hendripermana/permoney/commit/da0d923feb4d176c50017830d722942387783e83))
-* Add comprehensive PayLater/BNPL system with Indonesian provider… ([c002b42](https://github.com/hendripermana/permoney/commit/c002b429685c34f1e6d1a1fd53cc150bf34987a5))
+* Add comprehensive PayLater/BNPL system with Indonesian provider support ([da0d923](https://github.com/hendripermana/sure/commit/da0d923feb4d176c50017830d722942387783e83))
+* Add comprehensive PayLater/BNPL system with Indonesian provider… ([c002b42](https://github.com/hendripermana/sure/commit/c002b429685c34f1e6d1a1fd53cc150bf34987a5))
 
 
 ### Bug Fixes
 
-* Address Kodus AI bot review feedback for PayLater system ([3c1809e](https://github.com/hendripermana/permoney/commit/3c1809edb27bd7df3d669a0c9c706748cf36276f))
+* Address Kodus AI bot review feedback for PayLater system ([3c1809e](https://github.com/hendripermana/sure/commit/3c1809edb27bd7df3d669a0c9c706748cf36276f))
 
-## [0.8.2](https://github.com/hendripermana/permoney/compare/v0.8.1...v0.8.2) (2025-11-03)
-
-
-### Bug Fixes
-
-* Correct database names from 'sure' to 'permoney' ([1793119](https://github.com/hendripermana/permoney/commit/1793119edad4a07bbd3f1c9036c724699c291fca))
-* database setup and migrations ([baadad5](https://github.com/hendripermana/permoney/commit/baadad5fca7dc7745210c4b87c7d689d1d6873fc))
-* mass assignment security warnings in PayLaterController ([3a70bcc](https://github.com/hendripermana/permoney/commit/3a70bcc0f494ef62564a008fc92d1ef82818920d))
-* Replace deprecated Windows platforms with :windows ([0e5f747](https://github.com/hendripermana/permoney/commit/0e5f747dd7902314b78b8c4434ba4e5ea7ed5fd4))
-* Replace deprecated Windows platforms with :windows ([f04f62f](https://github.com/hendripermana/permoney/commit/f04f62fa360bce3c40aa0e3989a509f81c2255f9))
-* Update database schema after running migrations ([23feb9c](https://github.com/hendripermana/permoney/commit/23feb9cedd593fabce2016f50b5f93b42c3b3a52))
-
-## [0.8.1](https://github.com/hendripermana/permoney/compare/v0.8.0...v0.8.1) (2025-11-03)
+## [0.8.2](https://github.com/hendripermana/sure/compare/v0.8.1...v0.8.2) (2025-11-03)
 
 
 ### Bug Fixes
 
-* Remove empty matrix strategy from reusable workflows ([a2a862e](https://github.com/hendripermana/permoney/commit/a2a862e6c93ec8871e55a3d7a0f3b90d3ca3d30a))
+* Correct database names from 'sure' to 'Sure' ([1793119](https://github.com/hendripermana/sure/commit/1793119edad4a07bbd3f1c9036c724699c291fca))
+* database setup and migrations ([baadad5](https://github.com/hendripermana/sure/commit/baadad5fca7dc7745210c4b87c7d689d1d6873fc))
+* mass assignment security warnings in PayLaterController ([3a70bcc](https://github.com/hendripermana/sure/commit/3a70bcc0f494ef62564a008fc92d1ef82818920d))
+* Replace deprecated Windows platforms with :windows ([0e5f747](https://github.com/hendripermana/sure/commit/0e5f747dd7902314b78b8c4434ba4e5ea7ed5fd4))
+* Replace deprecated Windows platforms with :windows ([f04f62f](https://github.com/hendripermana/sure/commit/f04f62fa360bce3c40aa0e3989a509f81c2255f9))
+* Update database schema after running migrations ([23feb9c](https://github.com/hendripermana/sure/commit/23feb9cedd593fabce2016f50b5f93b42c3b3a52))
 
-## [0.8.0](https://github.com/hendripermana/permoney/compare/v0.7.0...v0.8.0) (2025-11-03)
+## [0.8.1](https://github.com/hendripermana/sure/compare/v0.8.0...v0.8.1) (2025-11-03)
+
+
+### Bug Fixes
+
+* Remove empty matrix strategy from reusable workflows ([a2a862e](https://github.com/hendripermana/sure/commit/a2a862e6c93ec8871e55a3d7a0f3b90d3ca3d30a))
+
+## [0.8.0](https://github.com/hendripermana/sure/compare/v0.7.0...v0.8.0) (2025-11-03)
 
 
 ### Features
 
-* Add modern Breadcrumb component with icon support ([c001bbe](https://github.com/hendripermana/permoney/commit/c001bbeec2b4f1e3f831a533e2bc15c0fefee1d0))
-* Add modern KPI cards to dashboard with real-time metrics ([937ea76](https://github.com/hendripermana/permoney/commit/937ea767663555df7030203378ec4b8ac2a4421f))
-* Enhance breadcrumb navigation with icon support ([b049316](https://github.com/hendripermana/permoney/commit/b0493169756663eb40002e25dc2175387ae302c3))
-* Sync upstream sure updates and configure CI/CD ([bd67e61](https://github.com/hendripermana/permoney/commit/bd67e613e4e8a08cc078530c9703e6e804530ed0))
+* Add modern Breadcrumb component with icon support ([c001bbe](https://github.com/hendripermana/sure/commit/c001bbeec2b4f1e3f831a533e2bc15c0fefee1d0))
+* Add modern KPI cards to dashboard with real-time metrics ([937ea76](https://github.com/hendripermana/sure/commit/937ea767663555df7030203378ec4b8ac2a4421f))
+* Enhance breadcrumb navigation with icon support ([b049316](https://github.com/hendripermana/sure/commit/b0493169756663eb40002e25dc2175387ae302c3))
+* Sync upstream sure updates and configure CI/CD ([bd67e61](https://github.com/hendripermana/sure/commit/bd67e613e4e8a08cc078530c9703e6e804530ed0))
 
 
 ### Bug Fixes
 
-* Improve import system security and personal loan handling ([559d0f6](https://github.com/hendripermana/permoney/commit/559d0f602c0e37d9c4032c5c9792d02eb6d652a9))
+* Improve import system security and personal loan handling ([559d0f6](https://github.com/hendripermana/sure/commit/559d0f602c0e37d9c4032c5c9792d02eb6d652a9))
 
-## [0.7.0](https://github.com/hendripermana/permoney/compare/v0.6.0...v0.7.0) (2025-10-31)
+## [0.7.0](https://github.com/hendripermana/sure/compare/v0.6.0...v0.7.0) (2025-10-31)
 
 
 ### Features
 
-* implement comprehensive performance optimization ([a1d0b3c](https://github.com/hendripermana/permoney/commit/a1d0b3ca1cc1f0263d4b25a9d8984ff2bd988dec))
+* implement comprehensive performance optimization ([a1d0b3c](https://github.com/hendripermana/sure/commit/a1d0b3ca1cc1f0263d4b25a9d8984ff2bd988dec))
 
 
 ### Bug Fixes
 
-* resolve Rails 8 compatibility issues ([7de44e7](https://github.com/hendripermana/permoney/commit/7de44e792b747ebfd4d8b9a290cfbe109780fc18))
-* use Puma single mode in development to avoid macOS fork issues ([3a5f2df](https://github.com/hendripermana/permoney/commit/3a5f2dffe4647c60620e2027650c08b1f4822d69))
-* use system jemalloc instead of deprecated gem ([bf15343](https://github.com/hendripermana/permoney/commit/bf15343f2df1a8c39ab2fcb9ee482e637f7fdf37))
+* resolve Rails 8 compatibility issues ([7de44e7](https://github.com/hendripermana/sure/commit/7de44e792b747ebfd4d8b9a290cfbe109780fc18))
+* use Puma single mode in development to avoid macOS fork issues ([3a5f2df](https://github.com/hendripermana/sure/commit/3a5f2dffe4647c60620e2027650c08b1f4822d69))
+* use system jemalloc instead of deprecated gem ([bf15343](https://github.com/hendripermana/sure/commit/bf15343f2df1a8c39ab2fcb9ee482e637f7fdf37))
 
-## [0.6.0](https://github.com/hendripermana/permoney/compare/v0.5.0...v0.6.0) (2025-10-19)
+## [0.6.0](https://github.com/hendripermana/sure/compare/v0.5.0...v0.6.0) (2025-10-19)
 
 
 ### Features
 
-* add database restore script and documentation ([29e6991](https://github.com/hendripermana/permoney/commit/29e6991a82bac3e3fd1daba8e9a308ab781a0947))
+* add database restore script and documentation ([29e6991](https://github.com/hendripermana/sure/commit/29e6991a82bac3e3fd1daba8e9a308ab781a0947))
 
 
 ### Bug Fixes
 
-* Check user's theme preference during page load ([#156](https://github.com/hendripermana/permoney/issues/156)) ([6a5c85f](https://github.com/hendripermana/permoney/commit/6a5c85f109939368a0a22588526df3c61819c72b))
+* Check user's theme preference during page load ([#156](https://github.com/hendripermana/sure/issues/156)) ([6a5c85f](https://github.com/hendripermana/sure/commit/6a5c85f109939368a0a22588526df3c61819c72b))
 
 ## [Unreleased]
 
@@ -949,85 +1031,85 @@
 
 ### Notes
 
-This release integrates 16 upstream improvements from we-promise/sure (v0.6.4) while preserving ALL Permoney features:
+This release integrates 16 upstream improvements from we-promise/sure (v0.6.4) while preserving ALL Sure features:
 
 - ✅ Loan Management System (fully preserved)
 - ✅ Personal Lending System (fully preserved)
 - ✅ Pay Later/BNPL System (fully preserved)
 - ✅ Indonesian Finance Features (fully preserved)
-- ✅ Permoney Branding (fully preserved)
+- ✅ Sure Branding (fully preserved)
 
 See `docs/UPSTREAM_SYNC_COMPLETION_REPORT.md` for detailed integration report.
 
-## [0.5.0](https://github.com/hendripermana/permoney/compare/v0.4.1...v0.5.0) (2025-10-19)
+## [0.5.0](https://github.com/hendripermana/sure/compare/v0.4.1...v0.5.0) (2025-10-19)
 
 ### Features
 
-- add loan reminders job and enhance loan schedule options in forms ([f1624c7](https://github.com/hendripermana/permoney/commit/f1624c771b5bd44d8827fd74e779a5b04a6ca139))
-- add rate suggestion text and logic for display based on sharia, personal, or institutional modes ([cfe82d2](https://github.com/hendripermana/permoney/commit/cfe82d28347c1f03cd1b3d9f56560dc95662a7f4))
-- add tooltips and helper for loan form fields, and existing loan toggle in the form component. ([fbb209d](https://github.com/hendripermana/permoney/commit/fbb209dd0e3e07a628800e2c5e57456b294e393c))
-- enhance loan feature with comprehensive improvements ([4fc6631](https://github.com/hendripermana/permoney/commit/4fc66311f587f4604592ac71d61d2b71071a14a4))
-- enhance loan form with smart UX improvements ([939d7e6](https://github.com/hendripermana/permoney/commit/939d7e6069c87ee6bcc837b691910eb5b8d151bf))
-- enhance select and collection_select methods with better config handling and include_blank support ([ef622d8](https://github.com/hendripermana/permoney/commit/ef622d8676fe69957fe63dcef3f689ef1a069de8))
+- add loan reminders job and enhance loan schedule options in forms ([f1624c7](https://github.com/hendripermana/sure/commit/f1624c771b5bd44d8827fd74e779a5b04a6ca139))
+- add rate suggestion text and logic for display based on sharia, personal, or institutional modes ([cfe82d2](https://github.com/hendripermana/sure/commit/cfe82d28347c1f03cd1b3d9f56560dc95662a7f4))
+- add tooltips and helper for loan form fields, and existing loan toggle in the form component. ([fbb209d](https://github.com/hendripermana/sure/commit/fbb209dd0e3e07a628800e2c5e57456b294e393c))
+- enhance loan feature with comprehensive improvements ([4fc6631](https://github.com/hendripermana/sure/commit/4fc66311f587f4604592ac71d61d2b71071a14a4))
+- enhance loan form with smart UX improvements ([939d7e6](https://github.com/hendripermana/sure/commit/939d7e6069c87ee6bcc837b691910eb5b8d151bf))
+- enhance select and collection_select methods with better config handling and include_blank support ([ef622d8](https://github.com/hendripermana/sure/commit/ef622d8676fe69957fe63dcef3f689ef1a069de8))
 
 ### Bug Fixes
 
-- correct data-action attribute in loan form ([09460c1](https://github.com/hendripermana/permoney/commit/09460c12729f1a4c56c0ff3f9ced23923e0fac76))
-- show rate suggestion only on 'terms' step ([ef98463](https://github.com/hendripermana/permoney/commit/ef98463bf1a4c463fae0dc1abef3fff2b20ca220))
-- update loan form tooltips and modify loan wizard behavior to streamline next/submit actions. ([0d39ef2](https://github.com/hendripermana/permoney/commit/0d39ef23359efa5c1f794c432202e5435cca0730))
+- correct data-action attribute in loan form ([09460c1](https://github.com/hendripermana/sure/commit/09460c12729f1a4c56c0ff3f9ced23923e0fac76))
+- show rate suggestion only on 'terms' step ([ef98463](https://github.com/hendripermana/sure/commit/ef98463bf1a4c463fae0dc1abef3fff2b20ca220))
+- update loan form tooltips and modify loan wizard behavior to streamline next/submit actions. ([0d39ef2](https://github.com/hendripermana/sure/commit/0d39ef23359efa5c1f794c432202e5435cca0730))
 
-## [0.4.1](https://github.com/hendripermana/permoney/compare/v0.4.0...v0.4.1) (2025-09-20)
+## [0.4.1](https://github.com/hendripermana/sure/compare/v0.4.0...v0.4.1) (2025-09-20)
 
 ### Bug Fixes
 
-- **data_cleaner:** remove when cleaning demo data ([1213da1](https://github.com/hendripermana/permoney/commit/1213da1c16f70b5efad825dc5d067f84805012bc))
-- **data_cleaner:** remove when cleaning demo data ([6286ff0](https://github.com/hendripermana/permoney/commit/6286ff04d3229763a3aa44e558da72acdeeb10ab))
+- **data_cleaner:** remove when cleaning demo data ([1213da1](https://github.com/hendripermana/sure/commit/1213da1c16f70b5efad825dc5d067f84805012bc))
+- **data_cleaner:** remove when cleaning demo data ([6286ff0](https://github.com/hendripermana/sure/commit/6286ff04d3229763a3aa44e558da72acdeeb10ab))
 
-## [0.4.0](https://github.com/hendripermana/permoney/compare/v0.3.1...v0.4.0) (2025-09-20)
+## [0.4.0](https://github.com/hendripermana/sure/compare/v0.3.1...v0.4.0) (2025-09-20)
 
 ### Features
 
-- adding IDR demo data ([47e4c40](https://github.com/hendripermana/permoney/commit/47e4c40af994caa8ba67b99294b0d5796893ccab))
-- adding IDR demo data ([a26b1b9](https://github.com/hendripermana/permoney/commit/a26b1b9b3e3149355a771c12fa9e00a96059e315))
-- **demo:** add loan proceeds, use transfers for investments, ([2eed0b2](https://github.com/hendripermana/permoney/commit/2eed0b276f23448ad46029e546d09c579e13265a))
-- **demo:** generate realistic IDR demo data and fix amounts ([dcc81d5](https://github.com/hendripermana/permoney/commit/dcc81d50e3eb559ce9f106b754b9a373c876460d))
+- adding IDR demo data ([47e4c40](https://github.com/hendripermana/sure/commit/47e4c40af994caa8ba67b99294b0d5796893ccab))
+- adding IDR demo data ([a26b1b9](https://github.com/hendripermana/sure/commit/a26b1b9b3e3149355a771c12fa9e00a96059e315))
+- **demo:** add loan proceeds, use transfers for investments, ([2eed0b2](https://github.com/hendripermana/sure/commit/2eed0b276f23448ad46029e546d09c579e13265a))
+- **demo:** generate realistic IDR demo data and fix amounts ([dcc81d5](https://github.com/hendripermana/sure/commit/dcc81d50e3eb559ce9f106b754b9a373c876460d))
 
 ### Bug Fixes
 
-- **demo:** use transfers for loan originations and improve data cleanup ([12a6693](https://github.com/hendripermana/permoney/commit/12a6693f1f3190a322442bda8b57ca35be9cec59))
+- **demo:** use transfers for loan originations and improve data cleanup ([12a6693](https://github.com/hendripermana/sure/commit/12a6693f1f3190a322442bda8b57ca35be9cec59))
 
-## [0.3.1](https://github.com/hendripermana/permoney/compare/v0.3.0...v0.3.1) (2025-09-19)
+## [0.3.1](https://github.com/hendripermana/sure/compare/v0.3.0...v0.3.1) (2025-09-19)
 
 ### Bug Fixes
 
-- **auth:** remove redundant redirect-loop checks in auth controllers ([6045193](https://github.com/hendripermana/permoney/commit/60451935d542925d36cbc0db06dc002b67a1298f))
-- **onboarding:** prevent redirect loops and tidy ([ba47c90](https://github.com/hendripermana/permoney/commit/ba47c90be7c3bc1534e48bbd311bed0e706cdc95))
-- **onboarding:** prevent redirect loops and tidy ([daced15](https://github.com/hendripermana/permoney/commit/daced1526399d86af3cf0ddf8d5aed278a9f5266))
+- **auth:** remove redundant redirect-loop checks in auth controllers ([6045193](https://github.com/hendripermana/sure/commit/60451935d542925d36cbc0db06dc002b67a1298f))
+- **onboarding:** prevent redirect loops and tidy ([ba47c90](https://github.com/hendripermana/sure/commit/ba47c90be7c3bc1534e48bbd311bed0e706cdc95))
+- **onboarding:** prevent redirect loops and tidy ([daced15](https://github.com/hendripermana/sure/commit/daced1526399d86af3cf0ddf8d5aed278a9f5266))
 
-## [0.3.0](https://github.com/hendripermana/permoney/compare/v0.2.1...v0.3.0) (2025-09-18)
+## [0.3.0](https://github.com/hendripermana/sure/compare/v0.2.1...v0.3.0) (2025-09-18)
 
 ### Features
 
-- Comprehensive Borrowed Loans Enhancement with Schedule Management ([89942f3](https://github.com/hendripermana/permoney/commit/89942f399b5810d979426f7805c5de49722ead34))
-- Comprehensive Borrowed Loans Enhancement with Schedule Management ([4bbe830](https://github.com/hendripermana/permoney/commit/4bbe8308365061b38c3f9844e83fcfbcec6e4e2d))
-- Enhance loan management with accurate balance calculations and improved UX ([426ed05](https://github.com/hendripermana/permoney/commit/426ed05b5efad74ef98eab9b4d93f6f316806558))
-- **loan:** create transfer-driven entries and adjust tests ([f9ea6d9](https://github.com/hendripermana/permoney/commit/f9ea6d9881dc68f8418e26c56b50ca261eb37837))
-- **loans:** add balloon support and normalize rates; improve posting ([e28c596](https://github.com/hendripermana/permoney/commit/e28c596af4b54e274c3d465f1af625904d516a98))
-- **loans:** enhance schedule preview UI and loan form behavior ([1272e0f](https://github.com/hendripermana/permoney/commit/1272e0f3db70f6859c4fed4b0bf4ea358e476210))
+- Comprehensive Borrowed Loans Enhancement with Schedule Management ([89942f3](https://github.com/hendripermana/sure/commit/89942f399b5810d979426f7805c5de49722ead34))
+- Comprehensive Borrowed Loans Enhancement with Schedule Management ([4bbe830](https://github.com/hendripermana/sure/commit/4bbe8308365061b38c3f9844e83fcfbcec6e4e2d))
+- Enhance loan management with accurate balance calculations and improved UX ([426ed05](https://github.com/hendripermana/sure/commit/426ed05b5efad74ef98eab9b4d93f6f316806558))
+- **loan:** create transfer-driven entries and adjust tests ([f9ea6d9](https://github.com/hendripermana/sure/commit/f9ea6d9881dc68f8418e26c56b50ca261eb37837))
+- **loans:** add balloon support and normalize rates; improve posting ([e28c596](https://github.com/hendripermana/sure/commit/e28c596af4b54e274c3d465f1af625904d516a98))
+- **loans:** enhance schedule preview UI and loan form behavior ([1272e0f](https://github.com/hendripermana/sure/commit/1272e0f3db70f6859c4fed4b0bf4ea358e476210))
 
 ### Bug Fixes
 
-- Add defensive programming to API controller ([d6d12f0](https://github.com/hendripermana/permoney/commit/d6d12f067378d599beac95a688af8cbc8f6df2e3))
-- Address all PR code review suggestions ([a951bdb](https://github.com/hendripermana/permoney/commit/a951bdbf6b5474f35b3718e3de370e5142964ab6))
-- Address all PR code suggestions for improved robustness ([6ba7ced](https://github.com/hendripermana/permoney/commit/6ba7cedc7b40e4d5eeba2d66a46c34390a52dae0))
-- Address all PR code suggestions for improved robustness ([d49491b](https://github.com/hendripermana/permoney/commit/d49491b9039a934237e8f9a871e2cd3636f85e60))
-- Address HTTP verb confusion warning ([8a998c2](https://github.com/hendripermana/permoney/commit/8a998c23b96df835d020cb8480cef956c4400a6e))
-- Correct borrowing transaction amount for proper balance calculation ([c97af3d](https://github.com/hendripermana/permoney/commit/c97af3d14ffb2a033ebbb04a4fb64c1981ab9c66))
-- Force synchronous account sync for immediate balance update ([3e45c0f](https://github.com/hendripermana/permoney/commit/3e45c0f829cbbfbe9b6589f2aaf77bdee7f6bca4))
-- Resolve loan creation test failures ([f4516ca](https://github.com/hendripermana/permoney/commit/f4516ca14756948292d84ebc40ebc8bf325049f4))
-- Resolve test failures and route issues ([c586fa0](https://github.com/hendripermana/permoney/commit/c586fa0c412782ef0f677acc7fabd843a5cc91ff))
-- **schema:** normalize array literal in virtual column expression ([bf0f0b8](https://github.com/hendripermana/permoney/commit/bf0f0b84183b22f3eac8ea4ab48f9ba631198c64))
-- Update loan principal amount when additional borrowing occurs ([d50c2ef](https://github.com/hendripermana/permoney/commit/d50c2ef4e4db9bc5b4fb0dc80a968ebb2c53a81f))
+- Add defensive programming to API controller ([d6d12f0](https://github.com/hendripermana/sure/commit/d6d12f067378d599beac95a688af8cbc8f6df2e3))
+- Address all PR code review suggestions ([a951bdb](https://github.com/hendripermana/sure/commit/a951bdbf6b5474f35b3718e3de370e5142964ab6))
+- Address all PR code suggestions for improved robustness ([6ba7ced](https://github.com/hendripermana/sure/commit/6ba7cedc7b40e4d5eeba2d66a46c34390a52dae0))
+- Address all PR code suggestions for improved robustness ([d49491b](https://github.com/hendripermana/sure/commit/d49491b9039a934237e8f9a871e2cd3636f85e60))
+- Address HTTP verb confusion warning ([8a998c2](https://github.com/hendripermana/sure/commit/8a998c23b96df835d020cb8480cef956c4400a6e))
+- Correct borrowing transaction amount for proper balance calculation ([c97af3d](https://github.com/hendripermana/sure/commit/c97af3d14ffb2a033ebbb04a4fb64c1981ab9c66))
+- Force synchronous account sync for immediate balance update ([3e45c0f](https://github.com/hendripermana/sure/commit/3e45c0f829cbbfbe9b6589f2aaf77bdee7f6bca4))
+- Resolve loan creation test failures ([f4516ca](https://github.com/hendripermana/sure/commit/f4516ca14756948292d84ebc40ebc8bf325049f4))
+- Resolve test failures and route issues ([c586fa0](https://github.com/hendripermana/sure/commit/c586fa0c412782ef0f677acc7fabd843a5cc91ff))
+- **schema:** normalize array literal in virtual column expression ([bf0f0b8](https://github.com/hendripermana/sure/commit/bf0f0b84183b22f3eac8ea4ab48f9ba631198c64))
+- Update loan principal amount when additional borrowing occurs ([d50c2ef](https://github.com/hendripermana/sure/commit/d50c2ef4e4db9bc5b4fb0dc80a968ebb2c53a81f))
 
 ## Unreleased
 

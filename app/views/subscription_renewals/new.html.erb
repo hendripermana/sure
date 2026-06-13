@@ -1,0 +1,32 @@
+<%= render DS::Dialog.new(width: "md") do |dialog| %>
+  <% dialog.with_header(title: "Record Payment") %>
+
+  <% dialog.with_body do %>
+    <%= styled_form_with model: @renewal_form, url: subscription_plan_subscription_renewals_path(@subscription_plan), method: :post, id: "renewal-form", class: "space-y-4", data: { turbo: true } do |f| %>
+      <% if @renewal_form.errors.any? %>
+        <%= render "shared/form_errors", model: @renewal_form %>
+      <% end %>
+
+      <%= f.collection_select :account_id, @accounts, :id, :name, { label: "Payment Account", required: true } %>
+
+      <%= f.collection_select :category_id, @categories, :id, :name, { label: "Category", required: true } %>
+
+      <div class="flex items-center gap-3 py-1">
+        <%= f.toggle :update_default_account %>
+        <label for="subscription_plan_renewal_form_update_default_account" class="text-sm font-medium text-ink cursor-pointer select-none">
+          Set this account as permanent default for future bills
+        </label>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <%= f.money_field :actual_amount, label: "Amount", required: true, default_currency: @subscription_plan.currency, hide_currency: true %>
+        <%= f.money_field :admin_fee, label: "Admin Fee", default_currency: @subscription_plan.currency, hide_currency: true %>
+      </div>
+
+      <%= f.date_field :paid_at, label: "Date Paid", required: true %>
+    <% end %>
+  <% end %>
+
+  <% dialog.with_action(text: "Record Payment", variant: :primary, type: "submit", form: "renewal-form") %>
+  <% dialog.with_action(text: "Cancel", variant: :outline, cancel_action: true) %>
+<% end %>

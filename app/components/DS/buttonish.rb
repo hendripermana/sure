@@ -1,8 +1,8 @@
 class DS::Buttonish < DesignSystemComponent
   VARIANTS = {
     primary: {
-      container_classes: "text-inverse bg-inverse hover:bg-inverse-hover disabled:bg-gray-500 theme-dark:disabled:bg-gray-400",
-      icon_classes: "fg-inverse"
+      container_classes: "bg-primary text-on-primary hover:bg-primary-hover disabled:bg-gray-300 disabled:text-gray-600",
+      icon_classes: "text-on-primary"
     },
     secondary: {
       container_classes: "text-primary bg-gray-50 theme-dark:bg-gray-700 hover:bg-gray-100 theme-dark:hover:bg-gray-600 disabled:bg-gray-200 theme-dark:disabled:bg-gray-600",
@@ -38,19 +38,19 @@ class DS::Buttonish < DesignSystemComponent
     sm: {
       container_classes: "px-2 py-1",
       icon_container_classes: "inline-flex items-center justify-center w-8 h-8",
-      radius_classes: "rounded-md",
+      radius_classes: "rounded-[24px]",
       text_classes: "text-sm"
     },
     md: {
       container_classes: "px-3 py-2",
       icon_container_classes: "inline-flex items-center justify-center w-9 h-9",
-      radius_classes: "rounded-lg",
+      radius_classes: "rounded-[24px]",
       text_classes: "text-sm"
     },
     lg: {
       container_classes: "px-4 py-3",
       icon_container_classes: "inline-flex items-center justify-center w-10 h-10",
-      radius_classes: "rounded-xl",
+      radius_classes: "rounded-[24px]",
       text_classes: "text-base"
     }
   }.freeze
@@ -93,7 +93,7 @@ class DS::Buttonish < DesignSystemComponent
     # Map variant to icon color for the icon helper
     case variant
     when :primary, :icon_inverse
-      :white
+      :current
     when :destructive, :outline_destructive
       :destructive
     else

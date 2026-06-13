@@ -388,6 +388,7 @@ class TransactionsController < ApplicationController
 
     # Check if a recurring transaction already exists for this pattern
     existing = Current.family.recurring_transactions.find_by(
+      account_id: transaction.entry.account_id,
       merchant_id: transaction.merchant_id,
       name: transaction.merchant_id.present? ? nil : transaction.entry.name,
       currency: transaction.entry.currency,
@@ -474,21 +475,7 @@ class TransactionsController < ApplicationController
       subscription = Current.family.subscription_plans.find_by(id: subscription_plan_id)
       return unless subscription
 
-      # Only treat outflows, matching currency, account, and a similar amount
-      # as valid subscription payments.
-      return unless entry.amount.positive?
-      return unless entry.currency == subscription.currency
-      return unless subscription.account_id == entry.account_id
-
-      # Require the payment amount to be reasonably close to the
-      # subscription amount so that unrelated expenses do not
-      # accidentally advance the billing schedule. We accept payments
-      # within ~10% of the configured subscription amount.
-      amount_tolerance = subscription.amount / 10
-      difference = (entry.amount - subscription.amount).abs
-      return unless difference <= amount_tolerance
-
-      billing_advanced = subscription.record_manual_payment!(paid_at: entry.date)
+      billing_advanced = subscription.record_payment_entry!(entry)
       if billing_advanced
         flash[:notice] = "Transaction created. #{subscription.name} billing advanced to #{subscription.next_billing_at.strftime('%b %d, %Y')}."
       end

@@ -16,6 +16,9 @@ class Account < ApplicationRecord
   has_many :balances, dependent: :destroy
   has_many :loan_installments, dependent: :destroy
   has_many :subscription_plans, dependent: :destroy
+  has_many :subscription_renewals, dependent: :nullify
+  has_many :recurring_transactions, dependent: :destroy
+  has_many :recurring_transaction_suppressions, dependent: :destroy
 
   monetize :balance, :cash_balance
 

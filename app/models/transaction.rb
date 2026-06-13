@@ -1,6 +1,14 @@
 class Transaction < ApplicationRecord
   include Entryable, Transferable, Ruleable
 
+  TRANSFER_KINDS = %w[
+    funds_movement
+    cc_payment
+    loan_payment
+    personal_lending
+    personal_borrowing
+  ].freeze
+
   belongs_to :category, optional: true
   belongs_to :merchant, optional: true
 
@@ -47,7 +55,7 @@ class Transaction < ApplicationRecord
 
   # Overarching grouping method for all transfer-type transactions
   def transfer?
-    funds_movement? || cc_payment? || loan_payment? || personal_lending? || personal_borrowing?
+    kind.in?(TRANSFER_KINDS)
   end
 
   # Islamic finance transaction grouping

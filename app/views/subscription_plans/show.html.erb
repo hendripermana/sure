@@ -21,53 +21,90 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <% if @subscription_plan.active_or_trial? %>
+          <%= link_to new_subscription_plan_subscription_renewal_path(@subscription_plan),
+              data: { turbo_frame: "modal" },
+              class: "inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-5 py-2 font-semibold text-gray-900 shadow-border-xs transition-colors hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+              title: "Record Payment" do %>
+            <%= icon "credit-card", class: "h-4 w-4" %>
+            Record Payment
+          <% end %>
+        <% end %>
+
         <%= link_to edit_subscription_plan_path(@subscription_plan), class: "inline-flex items-center gap-2 px-4 py-2 bg-container border border-primary rounded-lg hover:bg-gray-50 transition-colors" do %>
           <%= icon "edit", class: "h-4 w-4" %>
           Edit
         <% end %>
 
         <% if @subscription_plan.active? %>
-          <%= link_to pause_subscription_plan_path(@subscription_plan), method: :patch, class: "inline-flex items-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-200 theme-dark:bg-yellow-900/20 theme-dark:text-yellow-200 theme-dark:border-yellow-800 rounded-lg hover:bg-yellow-100 transition-colors" do %>
+          <%= link_to pause_subscription_plan_path(@subscription_plan), data: { turbo_method: :patch }, class: "inline-flex items-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-200 theme-dark:bg-yellow-900/20 theme-dark:text-yellow-200 theme-dark:border-yellow-800 rounded-lg hover:bg-yellow-100 transition-colors" do %>
             <%= icon "pause", class: "h-4 w-4" %>
             Pause
           <% end %>
         <% elsif @subscription_plan.paused? %>
-          <%= link_to resume_subscription_plan_path(@subscription_plan), method: :patch, class: "inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 border border-green-200 theme-dark:bg-green-900/20 theme-dark:text-green-200 theme-dark:border-green-800 rounded-lg hover:bg-green-100 transition-colors" do %>
+          <%= link_to resume_subscription_plan_path(@subscription_plan), data: { turbo_method: :patch }, class: "inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 border border-green-200 theme-dark:bg-green-900/20 theme-dark:text-green-200 theme-dark:border-green-800 rounded-lg hover:bg-green-100 transition-colors" do %>
             <%= icon "play", class: "h-4 w-4" %>
             Resume
           <% end %>
         <% end %>
 
         <% unless @subscription_plan.cancelled? || @subscription_plan.expired? %>
-          <%= link_to cancel_subscription_plan_path(@subscription_plan), method: :patch, data: { confirm: "Are you sure you want to cancel this subscription?" }, class: "inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 border border-red-200 theme-dark:bg-red-900/30 theme-dark:text-red-300 theme-dark:border-red-800 rounded-lg hover:bg-red-100 transition-colors" do %>
-            <%= icon "x-circle", class: "h-4 w-4" %>
-            Cancel
+          <%= render DS::Menu.new(variant: "button", placement: "bottom-end") do |menu| %>
+            <% menu.with_button(
+              class: "inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-red-700 transition-colors hover:bg-red-100 theme-dark:border-red-800 theme-dark:bg-red-900/30 theme-dark:text-red-300"
+            ) do %>
+              <%= icon "x-circle", class: "h-4 w-4" %>
+              Cancel
+              <%= icon "chevron-down", class: "h-4 w-4" %>
+            <% end %>
+
+            <% if @subscription_plan.pending_cancellation? %>
+              <% menu.with_item(
+                variant: "button",
+                text: "Keep subscription",
+                href: undo_cancellation_subscription_plan_path(@subscription_plan),
+                icon: "rotate-ccw",
+                method: :patch,
+                confirm: "Remove the scheduled cancellation and keep this subscription active?"
+              ) %>
+            <% else %>
+              <% menu.with_item(
+                variant: "button",
+                text: "Cancel at renewal",
+                href: cancel_subscription_plan_path(@subscription_plan, timing: "period_end"),
+                icon: "calendar-x",
+                method: :patch,
+                confirm: "Keep access until the next renewal, then cancel this subscription?"
+              ) %>
+            <% end %>
+            <% menu.with_item(
+              variant: "button",
+              text: "Cancel now",
+              href: cancel_subscription_plan_path(@subscription_plan, timing: "immediate"),
+              icon: "x-circle",
+              method: :patch,
+              destructive: true,
+              confirm: "Cancel immediately? Access and future billing may stop now."
+            ) %>
           <% end %>
         <% end %>
 
-        <% if @subscription_plan.active_or_trial? %>
-          <%= link_to new_transaction_path(
-                        account_id: @subscription_plan.account_id,
-                        nature: "outflow",
-                        subscription_plan_id: @subscription_plan.id
-                      ),
-                      class: "inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 theme-dark:bg-blue-900/20 theme-dark:text-blue-200 theme-dark:border-blue-800 rounded-lg hover:bg-blue-100 transition-colors",
-                      data: {
-                        turbo_frame: :modal,
-                        turbo_confirm: "Record payment of #{number_to_currency(@subscription_plan.amount, unit: @subscription_plan.currency + ' ')} for #{@subscription_plan.name}?\n\nThis will advance billing to the next cycle if within payment window."
-                      } do %>
-            <%= icon "credit-card", class: "h-4 w-4" %>
-            Record payment
-          <% end %>
-        <% else %>
-          <span class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-400 border border-gray-200 rounded-lg cursor-not-allowed theme-dark:bg-gray-800 theme-dark:text-gray-500 theme-dark:border-gray-700" title="Subscription is <%= @subscription_plan.status %>">
-            <%= icon "credit-card", class: "h-4 w-4" %>
-            Record payment
-          </span>
-        <% end %>
       </div>
     </div>
   </div>
+
+  <% if @subscription_plan.paused? %>
+    <div class="mb-6 flex items-start gap-3 rounded-[24px] border border-warning bg-yellow-tint-5 p-5 text-warning-content theme-dark:bg-yellow-tint-10">
+      <%= icon "shield-alert", class: "mt-0.5 h-5 w-5 shrink-0" %>
+      <div>
+        <p class="font-semibold">Renewal payments are paused</p>
+        <p class="mt-1 text-sm">
+          Record Payment is disabled for this lifecycle state. A matching charge imported or entered through Transactions
+          will be flagged as an unexpected renewal without resuming the subscription.
+        </p>
+      </div>
+    </div>
+  <% end %>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 space-y-6">
@@ -100,6 +137,17 @@
           <div>
             <dt class="text-sm text-secondary">Billing Cycle</dt>
             <dd class="mt-1 text-primary"><%= @subscription_plan.formatted_billing_cycle %></dd>
+          </div>
+
+          <div>
+            <dt class="text-sm text-secondary">Reminder Policy</dt>
+            <dd class="mt-1 text-primary">
+              <% if @subscription_plan.trial? %>
+                Trial alerts 3, 2, and 1 days before expiry
+              <% else %>
+                Renewal alerts 3 and 1 days before billing
+              <% end %>
+            </dd>
           </div>
 
           <div>
@@ -192,6 +240,33 @@
           <p class="text-primary"><%= @subscription_plan.payment_notes %></p>
         </div>
       <% end %>
+
+      <div class="bg-container rounded-lg border border-primary p-6">
+        <h2 class="text-lg font-semibold text-primary mb-4">Payment History</h2>
+
+        <% if @entries.empty? %>
+          <div class="text-center py-8 bg-canvas-soft border border-dashed border-primary rounded-xl">
+            <%= icon "history", class: "h-8 w-8 text-secondary mx-auto mb-2" %>
+            <p class="text-sm font-medium text-primary">No Payment History Yet</p>
+            <p class="text-xs text-secondary mt-1">Payments recorded for this subscription will appear here.</p>
+          </div>
+        <% else %>
+          <div class="grid bg-container-inset rounded-xl grid-cols-12 items-center uppercase text-xs font-medium text-secondary px-5 py-3 mb-4">
+            <div class="pl-0.5 col-span-8 flex items-center gap-4">
+              <p>Date</p>
+            </div>
+            <p class="col-span-4 justify-self-end">Amount</p>
+          </div>
+
+          <div class="space-y-4">
+            <%= entries_by_date(@entries) do |entries| %>
+              <% entries.each_with_index do |entry, index| %>
+                <%= render entry, view_ctx: "account" %>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
     </div>
 
     <div class="space-y-6">
@@ -221,7 +296,11 @@
           <div>
             <div class="text-sm text-secondary">Yearly Cost</div>
             <div class="text-lg font-semibold text-primary">
-              <%= number_to_currency(@subscription_plan.yearly_equivalent_amount, unit: @subscription_plan.currency + " ") %>
+              <% if @subscription_plan.schedule.once? %>
+                Not recurring
+              <% else %>
+                <%= number_to_currency(@subscription_plan.yearly_equivalent_amount, unit: @subscription_plan.currency + " ") %>
+              <% end %>
             </div>
           </div>
         </div>
@@ -284,6 +363,34 @@
           </div>
         <% else %>
           <p class="text-secondary">No account linked</p>
+        <% end %>
+      </div>
+
+      <div class="bg-container rounded-lg border border-primary p-6">
+        <h2 class="text-lg font-semibold text-primary mb-4">Lifecycle Timeline</h2>
+
+        <% if @timeline_events.any? %>
+          <div class="space-y-4">
+            <% @timeline_events.each do |event| %>
+              <div class="flex items-start gap-3">
+                <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full <%= event.changeset["severity"] == "warning" ? "bg-warning" : "bg-success" %>"></span>
+                <div>
+                  <p class="text-sm font-medium text-primary"><%= event.changeset["title"] || event.event.humanize %></p>
+                  <% if event.changeset["detail"].present? %>
+                    <p class="mt-1 text-xs text-secondary"><%= event.changeset["detail"] %></p>
+                  <% elsif event.event == "update" %>
+                    <p class="mt-1 text-xs text-secondary"><%= event.changeset.keys.map(&:humanize).to_sentence %> changed</p>
+                  <% end %>
+                  <p class="mt-1 text-xs text-secondary">
+                    <%= event.user_id.present? ? "User" : "System or provider" %>
+                    · <%= l(event.created_at, format: :short) %>
+                  </p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-secondary">Lifecycle changes and reconciliation events will appear here.</p>
         <% end %>
       </div>
     </div>

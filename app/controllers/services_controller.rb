@@ -7,16 +7,14 @@ class ServicesController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        # All services sorted alphabetically - no distinction between popular and custom
-        @services = ServiceMerchant.order(:name)
+        @services = ServiceMerchant.available_to(Current.family)
       end
       format.turbo_stream do
         # Combobox search endpoint - return services matching search query with pagination
         per_page = 50
         page = (params[:page] || 1).to_i
 
-        # Sort all services alphabetically - no distinction between popular and custom
-        base_query = ServiceMerchant.search(params[:q]).order(:name)
+        base_query = ServiceMerchant.available_to(Current.family).search(params[:q])
 
         total_count = base_query.count
         @services = base_query.offset((page - 1) * per_page).limit(per_page)
@@ -28,18 +26,27 @@ class ServicesController < ApplicationController
   end
 
   def new
-    @service = ServiceMerchant.new
+    @service = ServiceMerchant.new(family: Current.family)
     @categories = ServiceMerchant::CATEGORIES
   end
 
   def create
-    @service = ServiceMerchant.new(service_params)
+    @service = ServiceMerchant.new(service_params.merge(family: Current.family))
 
     respond_to do |format|
       if @service.save
         flash[:notice] = "Service created successfully!"
-        format.html { redirect_to services_path, notice: "Service created successfully!" }
-        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, services_path) }
+        return_to = params[:return_to]
+        format.html { redirect_to return_to || services_path, notice: "Service created successfully!" }
+        format.turbo_stream do
+          if return_to.present?
+            # When inside a modal, turbo frame navigation expects turbo_stream to either redirect or update.
+            # Turbo Stream action redirect handles full frame redirects.
+            render turbo_stream: turbo_stream.action(:redirect, return_to)
+          else
+            render turbo_stream: turbo_stream.action(:redirect, services_path)
+          end
+        end
       else
         @categories = ServiceMerchant::CATEGORIES
         format.html { render :new, status: :unprocessable_entity }
@@ -91,12 +98,13 @@ class ServicesController < ApplicationController
     end
 
     def set_service
-      @service = ServiceMerchant.find(params[:id])
+      @service = ServiceMerchant.owned_by(Current.family).find(params[:id])
     end
 
     def service_params
       params.require(:service_merchant).permit(
         :name, :subscription_category, :billing_frequency,
+        :default_interval_count, :default_interval_unit,
         :avg_monthly_cost, :description, :website_url
       )
     end

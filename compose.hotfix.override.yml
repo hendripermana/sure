@@ -1,6 +1,6 @@
 # Minimal override to build and ship a hotfix image from the current working tree.
 # Usage:
-#   PERMONEY_IMAGE=permoney:hotfix docker compose -f compose.example.yml -f compose.hotfix.override.yml up --build -d web worker
+#   SURE_IMAGE=sure:hotfix docker compose -f compose.example.yml -f compose.hotfix.override.yml up --build -d web worker
 #
 # This keeps all base settings from compose.example.yml while forcing a local build
 # so fixes can be applied immediately without waiting for CI/CD image publication.
@@ -9,10 +9,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ${PERMONEY_IMAGE:-permoney:hotfix}
+    image: ${SURE_IMAGE:-sure:hotfix}
 
   worker:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ${PERMONEY_IMAGE:-permoney:hotfix}
+    image: ${SURE_IMAGE:-sure:hotfix}
