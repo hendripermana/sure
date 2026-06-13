@@ -12,11 +12,11 @@ require "bootsnap/setup" # Speed up boot time by caching expensive operations.
 begin
   require "connection_pool"
 
-  unless ConnectionPool.instance_variable_defined?(:@__permoney_patched)
-    ConnectionPool.instance_variable_set(:@__permoney_patched, true)
+  unless ConnectionPool.instance_variable_defined?(:@__sure_patched)
+    ConnectionPool.instance_variable_set(:@__sure_patched, true)
 
     ConnectionPool.class_eval do
-      __permoney_orig_initialize = instance_method(:initialize)
+      __sure_orig_initialize = instance_method(:initialize)
 
       define_method(:initialize) do |*args, **kwargs, &block|
         if kwargs.empty?
@@ -32,19 +32,19 @@ begin
           end
         end
 
-        __permoney_orig_initialize.bind_call(self, *args, **kwargs, &block)
+        __sure_orig_initialize.bind_call(self, *args, **kwargs, &block)
       end
     end
 
     ConnectionPool::TimedStack.class_eval do
-      __permoney_orig_pop = instance_method(:pop)
+      __sure_orig_pop = instance_method(:pop)
 
       define_method(:pop) do |*args, **kwargs|
         if args.any? && !kwargs.key?(:timeout)
           kwargs = kwargs.merge(timeout: args.first)
         end
 
-        __permoney_orig_pop.bind_call(self, **kwargs)
+        __sure_orig_pop.bind_call(self, **kwargs)
       end
     end
   end

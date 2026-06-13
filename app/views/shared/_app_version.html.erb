@@ -1,10 +1,10 @@
-<% update_available = Permoney.latest_version_available? %>
+<% update_available = Sure.latest_version_available? %>
 <div class="flex items-center py-0.5 px-0.5 gap-1 fixed right-1 top-1 shadow-xs border <%= update_available ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' : 'border-alpha-black-50 bg-container' %> rounded-md">
   <p class="text-xs <%= update_available ? 'text-yellow-700 dark:text-yellow-300' : 'text-secondary' %> pl-2">
-    Version: <%= Permoney.version.to_release_tag %>
+    Version: <%= Sure.version.to_release_tag %>
     <% if update_available %>
       <span class="inline-block ml-1 px-1.5 py-0.5 bg-yellow-500 text-white rounded text-xs font-medium">
-        <%= link_to "Update available", Permoney.latest_release_url, target: "_blank", rel: "noopener noreferrer", class: "hover:underline" %>
+        <%= link_to "Update available", Sure.latest_release_url, target: "_blank", rel: "noopener noreferrer", class: "hover:underline" %>
       </span>
     <% end %>
   </p>

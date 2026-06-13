@@ -1,15 +1,15 @@
 apiVersion: v2
 name: permoney
-description: Official Helm chart for deploying the Permoney Rails app (web + Sidekiq) on Kubernetes with optional HA PostgreSQL (CloudNativePG) and Redis.
+description: Official Helm chart for deploying the Sure Rails app (web + Sidekiq) on Kubernetes with optional HA PostgreSQL (CloudNativePG) and Redis.
 type: application
 version: 0.1.0
 appVersion: "0.17.5"
 
 kubeVersion: ">=1.25.0-0"
 
-home: https://github.com/hendripermana/permoney
+home: https://github.com/hendripermana/sure
 sources:
-  - https://github.com/hendripermana/permoney
+  - https://github.com/hendripermana/sure
 keywords:
   - rails
   - sidekiq
@@ -17,8 +17,8 @@ keywords:
   - cloudnativepg
   - redis
 maintainers:
-  - name: Permoney maintainers
-    url: https://github.com/hendripermana/permoney
+  - name: Sure maintainers
+    url: https://github.com/hendripermana/sure
 
 # Optional subcharts for turnkey self-hosting
 # Users must `helm repo add` the below repositories before installing this chart.

@@ -57,12 +57,10 @@ class AssistantMessageTest < ActiveSupport::TestCase
       ai_model: "gpt-4.1"
     )
 
-    # Stub chat to return nil
-    message.stub :chat, nil do
-      # Should not raise error and should not enqueue job
-      assert_no_enqueued_jobs only: Turbo::Streams::BroadcastJob do
-        message.send(:broadcast_replace_to_with_morph)
-      end
+    message.stubs(:chat).returns(nil)
+
+    assert_no_enqueued_jobs only: Turbo::Streams::BroadcastJob do
+      message.send(:broadcast_replace_to_with_morph)
     end
   end
 end

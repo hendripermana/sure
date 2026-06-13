@@ -51,7 +51,7 @@ class DS::MenuItem < DesignSystemComponent
       data = merged_opts.delete(:data) || {}
 
       if confirm.present?
-        data = data.merge(turbo_confirm: confirm.to_data_attribute)
+        data = data.merge(turbo_confirm: turbo_confirm_data(confirm))
       end
 
       # Rails 8.1: Frame parameter takes precedence over everything

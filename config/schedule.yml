@@ -7,6 +7,24 @@ import_market_data:
     mode: "full"
     clear_cache: false
   
+gold_price_fetch:
+  cron: "0 2 * * *" # 02:00 UTC = 09:00 WIB (Jakarta)
+  class: "GoldPriceFetchJob"
+  queue: "scheduled"
+  description: "Fetches daily Indonesian gold prices from harga-emas.org"
+
+subscription_renewals:
+  cron: "0 7 * * *"
+  class: "SubscriptionRenewalJob"
+  queue: "scheduled"
+  description: "Processes subscription lifecycle changes and sends renewal reminders"
+
+recurring_intelligence:
+  cron: "30 7 * * *"
+  class: "RecurringIntelligenceJob"
+  queue: "scheduled"
+  description: "Identifies and reconciles recurring cash-flow patterns"
+
 clean_syncs:
   cron: "0 * * * *" # every hour
   class: "SyncCleanerJob"
@@ -80,4 +98,3 @@ sync_all_accounts:
   class: "SyncAllAccountsJob"
   queue: "scheduled"
   description: "Triggers sync for all linked accounts across all families"
-

@@ -85,4 +85,40 @@ class TransfersControllerTest < ActionDispatch::IntegrationTest
       transfer.reload
     end
   end
+
+  test "marks a transfer as recurring" do
+    transfer = transfers(:one)
+
+    assert_difference "RecurringTransaction.count", 1 do
+      post mark_as_recurring_transfer_url(transfer)
+    end
+
+    recurring = RecurringTransaction.order(:created_at).last
+    assert_redirected_to recurring_transactions_path
+    assert_equal transfer.from_account, recurring.account
+    assert_equal transfer.to_account, recurring.destination_account
+  end
+
+  test "show exposes recurring transfer action" do
+    transfer = transfers(:one)
+
+    get transfer_url(transfer)
+
+    assert_response :success
+    assert_select "form[action='#{mark_as_recurring_transfer_path(transfer)}']" do
+      assert_select "button", text: /Mark recurring/
+    end
+  end
+
+  test "does not create the same recurring transfer twice" do
+    transfer = transfers(:one)
+    RecurringTransaction.create_from_transfer(transfer)
+
+    assert_no_difference "RecurringTransaction.count" do
+      post mark_as_recurring_transfer_url(transfer)
+    end
+
+    assert_redirected_to transactions_path
+    assert_equal "This recurring transfer already exists or is invalid.", flash[:alert]
+  end
 end

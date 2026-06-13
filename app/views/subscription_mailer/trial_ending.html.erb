@@ -1,0 +1,13 @@
+<h1>Your <%= @subscription.name %> trial ends soon</h1>
+
+<p>
+  The trial ends in <%= pluralize(@days_left, "day") %>
+  on <%= @subscription.trial_ends_at.strftime("%B %d, %Y") %>.
+</p>
+
+<p>
+  Review the subscription before it renews for
+  <strong><%= number_to_currency(@subscription.amount, unit: "#{@subscription.currency} ") %></strong>.
+</p>
+
+<%= link_to "Review subscription", subscription_plan_url(@subscription) %>

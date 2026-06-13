@@ -3,6 +3,16 @@
 <%= render DS::Menu.new(testid: "account-menu") do |menu| %>
   <% menu.with_item(variant: "link", text: "Edit", href: edit_account_path(account), icon: "pencil-line", frame: "modal") %>
 
+  <% unless account.linked? %>
+    <% menu.with_item(
+      variant: "link",
+      text: "Reconcile Balance",
+      href: new_account_reconciliation_path(account),
+      icon: "git-compare",
+      frame: "modal"
+    ) %>
+  <% end %>
+
   <% unless account.crypto? %>
     <% menu.with_item(
       variant: "link",

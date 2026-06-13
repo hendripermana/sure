@@ -1,12 +1,12 @@
 # Onboarding Guide
 
-Welcome to Permoney! This guide will help you get started with your personal finance management.
+Welcome to Sure! This guide will help you get started with your personal finance management.
 
 ## Getting Started
 
 ### 1. Create Your Account
 
-1. Visit your Permoney instance
+1. Visit your Sure instance
 2. Click "Create Account"
 3. Enter your email and password
 4. Verify your email address
@@ -51,7 +51,7 @@ If you're using Plaid integration:
 1. Go to Settings > Imports
 2. Download your bank statements
 3. Upload CSV files
-4. Map columns to Permoney fields
+4. Map columns to Sure fields
 5. Review and confirm the import
 
 ## Key Features
@@ -128,9 +128,9 @@ If you're using Plaid integration:
 
 ### Getting Help
 
-- **Documentation**: Check our [docs/](https://github.com/hendripermana/permoney/tree/main/docs)
-- **Issues**: Open an [issue](https://github.com/hendripermana/permoney/issues/new/choose)
-- **Discussions**: Start a [discussion](https://github.com/hendripermana/permoney/discussions)
+- **Documentation**: Check our [docs/](https://github.com/hendripermana/sure/tree/main/docs)
+- **Issues**: Open an [issue](https://github.com/hendripermana/sure/issues/new/choose)
+- **Discussions**: Start a [discussion](https://github.com/hendripermana/sure/discussions)
 - **Community**: Join our [Discord](https://discord.gg/36ZGBsxYEK)
 
 ## Next Steps
@@ -147,9 +147,9 @@ Once you're comfortable with the basics:
 
 Need help? We're here for you:
 
-- **Documentation**: [docs/](https://github.com/hendripermana/permoney/tree/main/docs)
-- **Issues**: [GitHub Issues](https://github.com/hendripermana/permoney/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/hendripermana/permoney/discussions)
+- **Documentation**: [docs/](https://github.com/hendripermana/sure/tree/main/docs)
+- **Issues**: [GitHub Issues](https://github.com/hendripermana/sure/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/hendripermana/sure/discussions)
 - **Discord**: [Join our community](https://discord.gg/36ZGBsxYEK)
 
-Welcome to Permoney! 🎉
+Welcome to Sure! 🎉

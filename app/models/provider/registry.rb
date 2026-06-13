@@ -110,10 +110,10 @@ class Provider::Registry
     def available_providers
       case concept
       when :exchange_rates
-        # Merged: Keep both Permoney's alpha_vantage AND upstream's yahoo_finance
+        # Merged: Keep both Sure's alpha_vantage AND upstream's yahoo_finance
         %i[twelve_data alpha_vantage yahoo_finance]
       when :securities
-        # Merged: Keep both Permoney's alpha_vantage AND upstream's yahoo_finance
+        # Merged: Keep both Sure's alpha_vantage AND upstream's yahoo_finance
         %i[twelve_data alpha_vantage yahoo_finance]
       when :llm
         %i[openai]

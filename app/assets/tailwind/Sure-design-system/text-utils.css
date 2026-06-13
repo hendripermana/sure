@@ -1,0 +1,23 @@
+@utility text-primary {
+  @apply text-gray-900 theme-dark:text-white;
+}
+
+@utility text-on-primary {
+  color: var(--color-on-primary);
+}
+
+@utility text-inverse {
+  @apply text-white theme-dark:text-gray-900;
+}
+
+@utility text-secondary {
+  @apply text-gray-500 theme-dark:text-gray-400;
+}
+
+@utility text-subdued {
+  @apply text-gray-400 theme-dark:text-gray-600;
+}
+
+@utility text-link {
+  @apply text-blue-600 theme-dark:text-blue-500;
+}

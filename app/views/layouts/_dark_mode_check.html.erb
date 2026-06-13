@@ -1,5 +1,16 @@
 <script>
-  if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.setAttribute("data-theme", "dark");
-  }
+  (() => {
+    const root = document.documentElement;
+    const serverPreference = root.dataset.themeUserPreferenceValue || root.dataset.theme || "system";
+    const preference = serverPreference === "system"
+      ? (localStorage.getItem("themePreference") || "system")
+      : serverPreference;
+    const resolvedTheme = preference === "system"
+      ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+      : preference;
+
+    root.setAttribute("data-theme", resolvedTheme);
+    localStorage.setItem("themePreference", preference);
+    localStorage.setItem("theme", resolvedTheme);
+  })();
 </script>

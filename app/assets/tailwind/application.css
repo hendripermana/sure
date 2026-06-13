@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-@import "./permoney-design-system.css";
+@import "./Sure-design-system.css";
 
 @import "./geist-font.css";
 @import "./geist-mono-font.css";
@@ -43,19 +43,6 @@
   from {
     opacity: 0;
     transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Enhanced animations for Floating Chat & Streaming */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
   }
 
   to {
@@ -861,7 +848,7 @@
 }
 
 .prose--ai-chat {
-  @apply break-words;
+  @apply wrap-break-word;
 
   p,
   li {

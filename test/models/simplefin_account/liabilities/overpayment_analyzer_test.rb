@@ -57,7 +57,7 @@ class SimplefinAccount::Liabilities::OverpaymentAnalyzerTest < ActiveSupport::Te
   end
 
   test "classifies credit when payments exceed charges roughly by observed amount" do
-    # Create transactions in Permoney convention for liabilities:
+    # Create transactions in Sure convention for liabilities:
     # charges/spend: positive; payments: negative
     # Observed abs is 22.72; make payments exceed charges by ~22.72
     @acct.entries.delete_all
@@ -90,7 +90,7 @@ class SimplefinAccount::Liabilities::OverpaymentAnalyzerTest < ActiveSupport::Te
   test "fallback to raw payload when no entries present" do
     @acct.entries.delete_all
     # Provide raw transactions in provider convention (expenses negative, income positive)
-    # We must negate in analyzer to convert to Permoney convention.
+    # We must negate in analyzer to convert to Sure convention.
     @sfa.update!(raw_transactions_payload: [
       { id: "t1", amount: -100, posted: (10.days.ago.to_date.to_s) }, # charge (-> +100)
       { id: "t2", amount: 150,  posted: (8.days.ago.to_date.to_s) }   # payment (-> -150)

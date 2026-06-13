@@ -1,13 +1,13 @@
-# Permoney Codebase Structure
+# Sure Codebase Structure
 
 ## Directory Layout
 
 ```
-permoney/
+Sure/
 ├── app/                          # Application code
 │   ├── assets/                   # CSS, images, fonts
 │   │   └── tailwind/             # Tailwind CSS files
-│   │       └── permoney-design-system.css
+│   │       └── Sure-design-system.css
 │   ├── components/               # ViewComponents
 │   ├── controllers/              # Rails controllers
 │   │   ├── api/v1/               # External API controllers
@@ -23,7 +23,7 @@ permoney/
 │   ├── middleware/               # Custom middleware
 │   ├── models/                   # ActiveRecord models
 │   │   └── concerns/             # Shared model logic
-│   ├── services/                 # Business logic services
+│   ├── models/                   # Domain models, POROs, and concerns
 │   └── views/                    # ERB templates
 │       ├── layouts/              # Layout templates
 │       └── [controller]/         # Controller-specific views
@@ -144,7 +144,7 @@ permoney/
 - `.env.local.example` - Environment template
 
 ### Assets
-- `app/assets/tailwind/permoney-design-system.css` - Design tokens
+- `app/assets/tailwind/Sure-design-system.css` - Design tokens
 - `app/javascript/application.js` - Main JS entry point
 - `app/javascript/stimulus-loading.js` - Controller loader
 
@@ -157,7 +157,7 @@ permoney/
 ## Database Schema Key Points
 
 - **UUID primary keys** for most tables
-- **Soft deletes** using `deleted_at` columns
+- **Soft deletion/archive behavior** varies by domain model; verify schema and model scopes
 - **Polymorphic associations** for entries
 - **Multi-currency support** with `Money` objects
 - **Audit trail** for sensitive operations
@@ -168,7 +168,7 @@ permoney/
 
 - **Plaid**: Bank account syncing and transactions
 - **OpenAI**: AI chat and transaction categorization
-- **Stripe**: Subscription and payment processing
+- **Stripe**: Managed-hosting billing plus optional SubscriptionPlan lifecycle synchronization
 - **AWS S3**: Document/attachment storage
 - **Sentry**: Error tracking and APM
 - **Redis**: Caching and Sidekiq jobs

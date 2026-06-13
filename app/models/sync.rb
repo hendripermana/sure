@@ -21,23 +21,6 @@ class Sync < ApplicationRecord
   scope :recent, -> { order(created_at: :desc).limit(100) }
   scope :with_status, ->(status) { where(status: status) }
 
-  # Returns syncs belonging to the given family — either directly (Family syncable)
-  # or through accounts and provider items owned by the family.
-  scope :for_family, ->(family) {
-    where(
-      "(syncs.syncable_type = 'Family' AND syncs.syncable_id = :family_id) OR " \
-      "(syncs.syncable_type = 'Account' AND syncs.syncable_id IN (:account_ids)) OR " \
-      "(syncs.syncable_type = 'PlaidItem' AND syncs.syncable_id IN (:plaid_item_ids)) OR " \
-      "(syncs.syncable_type = 'SimpleFinItem' AND syncs.syncable_id IN (:simplefin_item_ids)) OR " \
-      "(syncs.syncable_type = 'LunchflowItem' AND syncs.syncable_id IN (:lunchflow_item_ids))",
-      family_id: family.id,
-      account_ids: family.accounts.select(:id),
-      plaid_item_ids: family.plaid_items.select(:id),
-      simplefin_item_ids: family.simplefin_items.select(:id),
-      lunchflow_item_ids: family.lunchflow_items.select(:id)
-    )
-  }
-
   after_commit :update_family_sync_timestamp
   after_commit :enqueue_sync_job, on: :create
 
@@ -75,8 +58,12 @@ class Sync < ApplicationRecord
 
   class << self
     def clean
+      stale_count = 0
+
       # Clean syncs yang sudah terlalu lama (24 jam)
-      incomplete.where("syncs.created_at < ?", STALE_AFTER.ago).find_each(&:mark_stale!)
+      stale_24h = incomplete.where("syncs.created_at < ?", STALE_AFTER.ago)
+      stale_count += stale_24h.count
+      stale_24h.find_each(&:mark_stale!)
 
       # Clean syncs yang stuck di syncing state lebih dari 10 menit (lebih agresif)
       # Ini untuk menangani kasus dimana sync job crash atau timeout tapi state tidak ter-update
@@ -88,9 +75,14 @@ class Sync < ApplicationRecord
       if stuck_count > 0
         Rails.logger.warn("Found #{stuck_count} stuck syncing syncs. Marking as stale.")
         stuck_syncing.find_each do |sync|
-          sync.mark_stale! if sync.may_mark_stale?
+          if sync.may_mark_stale?
+            sync.mark_stale!
+            stale_count += 1
+          end
         end
       end
+
+      stale_count
     end
 
     def latest_stats_map_for(syncable_type:, syncable_ids:)
@@ -105,6 +97,36 @@ class Sync < ApplicationRecord
         map[sync.syncable_id] = sync.sync_stats || {}
       end
     end
+
+    def for_family(family)
+      query = where(syncable_type: "Family", syncable_id: family.id)
+        .or(where(syncable_type: "Account", syncable_id: family.accounts.select(:id)))
+
+      family_syncable_associations.each do |association|
+        query = query.or(
+          where(
+            syncable_type: association.klass.name,
+            syncable_id: family.public_send(association.name).select(:id)
+          )
+        )
+      end
+
+      query
+    end
+
+    def any_incomplete_for?(family)
+      for_family(family).incomplete.exists?
+    end
+
+    private
+      def family_syncable_associations
+        Family.reflect_on_all_associations(:has_many).select do |association|
+          association.name.to_s.end_with?("_items") &&
+            association.klass.included_modules.include?(Syncable)
+        rescue NameError
+          false
+        end
+      end
   end
 
   def perform
