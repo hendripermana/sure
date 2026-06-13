@@ -677,7 +677,7 @@ GEM
       public_suffix
     vcr (6.3.1)
       base64
-    vernier (1.8.1)
+    vernier (1.10.1)
     view_component (4.9.0)
       actionview (>= 7.1.0)
       activesupport (>= 7.1.0)
