@@ -1,4 +1,28 @@
-  # Permoney Development Guide for AI Agents
+  # Sure Development Guide for AI Agents
+
+  ## Canonical Agent Instructions
+
+  `AGENTS.md` is the single source of truth for repository instructions.
+  `CLAUDE.md` and `.github/copilot-instructions.md` must remain symlinks to this
+  file so Codex, Claude Code, GitHub Copilot, and other agents follow the same
+  engineering rules.
+
+  ### Serena Workflow
+
+  - Activate the Sure project and read Serena's initial instructions at session start.
+  - Use Serena symbol overview, symbol search, and reference search before broad
+    file reads or repository-wide text searches.
+  - Keep `.serena/project.yml` aligned with the languages actually used by the app.
+  - Treat source code, `db/schema.rb`, dependency lockfiles, `DESIGN.md`, and this
+    file as authoritative. Serena memories are supporting context and may be stale.
+  - Preserve unrelated changes in a dirty worktree.
+
+  ### Instruction Precedence
+
+  1. User request and repository safety constraints.
+  2. This file and `DESIGN.md` for user-facing work.
+  3. Existing code patterns and tests.
+  4. Serena memories and historical documentation.
 
   # 🤖 AI Agents Documentation
 
@@ -69,14 +93,14 @@
      - not create simple version of something when you stuck on something you improve or fix must do PROPER and PERFECT way to achieve that
 
 
-  This document provides comprehensive guidance for AI agents working on the Permoney codebase. It combines essential development patterns, architectural decisions, and best practices.
+  This document provides comprehensive guidance for AI agents working on the Sure codebase. It combines essential development patterns, architectural decisions, and best practices.
 
   ## Project Overview
 
-  Permoney is a personal finance application built with Ruby on Rails that helps users track net worth, manage budgets, and gain financial insights. The application supports both managed hosting and self-hosted deployments.
+  Sure is a personal finance application built with Ruby on Rails that helps users track net worth, manage budgets, and gain financial insights. The application supports both managed hosting and self-hosted deployments.
 
   ### Application Modes
-  - **Managed**: Permoney team operates servers for users (`Rails.application.config.app_mode = "managed"`)
+  - **Managed**: Sure team operates servers for users (`Rails.application.config.app_mode = "managed"`)
   - **Self Hosted**: Users host on their own infrastructure via Docker Compose (`Rails.application.config.app_mode = "self_hosted"`)
 
   ## Project Structure & Module Organization
@@ -118,12 +142,12 @@
 
   ### Isolated Test DB (Docker, never touch production DB/volumes)
   - Start disposable Postgres for tests (credentials from `.env`):\
-    `sudo docker run --rm -d --name permoney-test-pg -p 5544:5432 -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e POSTGRES_DB=permoney_test postgres:18`
+    `sudo docker run --rm -d --name Sure-test-pg -p 5544:5432 -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e POSTGRES_DB=Sure_test postgres:18`
   - Prepare test DB:\
-    `DB_HOST=127.0.0.1 DB_PORT=5544 POSTGRES_USER=$POSTGRES_USER POSTGRES_PASSWORD=$POSTGRES_PASSWORD POSTGRES_DB_TEST=permoney_test POSTGRES_DB=permoney_test RAILS_ENV=test bin/rails db:prepare`
+    `DB_HOST=127.0.0.1 DB_PORT=5544 POSTGRES_USER=$POSTGRES_USER POSTGRES_PASSWORD=$POSTGRES_PASSWORD POSTGRES_DB_TEST=Sure_test POSTGRES_DB=Sure_test RAILS_ENV=test bin/rails db:prepare`
   - Run tests (same env vars):\
-    `DB_HOST=127.0.0.1 DB_PORT=5544 POSTGRES_USER=$POSTGRES_USER POSTGRES_PASSWORD=$POSTGRES_PASSWORD POSTGRES_DB_TEST=permoney_test POSTGRES_DB=permoney_test RAILS_ENV=test bin/rails test`
-  - Cleanup after: `sudo docker rm -f permoney-test-pg`
+    `DB_HOST=127.0.0.1 DB_PORT=5544 POSTGRES_USER=$POSTGRES_USER POSTGRES_PASSWORD=$POSTGRES_PASSWORD POSTGRES_DB_TEST=Sure_test POSTGRES_DB=Sure_test RAILS_ENV=test bin/rails test`
+  - Cleanup after: `sudo docker rm -f Sure-test-pg`
 
   ### Safe Local Testing Workflow
   **ALWAYS ensure `.env.local` is configured correctly before running tests to prevent production DB access:**
@@ -132,8 +156,8 @@
      ```bash
      cp .env.local.example .env.local
      # Edit .env.local to set:
-     # POSTGRES_DB_DEVELOPMENT=permoney_development
-     # POSTGRES_DB_TEST=permoney_test
+     # POSTGRES_DB_DEVELOPMENT=Sure_development
+     # POSTGRES_DB_TEST=Sure_test
      # DB_HOST=127.0.0.1 (if running locally against Docker DB)
      ```
 
@@ -145,8 +169,8 @@
 
   3. **Troubleshooting "Aborting test database task"**:
      If you see warnings about "pointing to production database":
-     - Verify `.env.local` exists and has `POSTGRES_DB_TEST=permoney_test`.
-     - Ensure `POSTGRES_DB` env var is NOT set to `permoney_production` in your shell session.
+     - Verify `.env.local` exists and has `POSTGRES_DB_TEST=Sure_test`.
+     - Ensure `POSTGRES_DB` env var is NOT set to `Sure_production` in your shell session.
      - Use `RAILS_ENV=test` explicitly.
 
   ### Pre-Pull Request CI Workflow
@@ -194,7 +218,7 @@
   ## TailwindCSS Design System
 
   ### Design System Rules
-  - **Always reference `app/assets/tailwind/permoney-design-system.css`** for primitives and tokens
+  - **Always reference `app/assets/tailwind/Sure-design-system.css`** for primitives and tokens
   - **Use functional tokens** defined in design system:
     - `text-primary` instead of `text-white`
     - `bg-container` instead of `bg-white`
@@ -341,15 +365,17 @@
 
   ## Technology Stack
 
-  ### Current Versions (October 31, 2025)
+  ### Verified Runtime Baseline (June 6, 2026)
+  Verify versions from the runtime and lockfiles before making upgrade decisions.
+
   - **Ruby**: 3.4.7 (PRISM parser enabled, CVE-2025-61594 fixed)
   - **Bundler**: 2.7.2 (preparing for Bundler 4)
   - **RubyGems**: 3.7.2 (IMDSv2 support)
-  - **Rails**: 8.1.0 (Upgraded October 31, 2025)
-  - **Node.js**: Latest LTS recommended
+  - **Rails**: 8.1.3
+  - **Node.js**: 24.16.0
   - **PostgreSQL**: 18.x (latest stable)
   - **Redis**: 7.4.x (latest stable)
-  - **Turbo**: 2.0.17 (Enhanced frame handling)
+  - **Turbo Rails**: 2.0.23
   - **Stimulus**: 3.x (Improved event binding)
 
   ### Rails 8.1 New Features & Changes
@@ -458,7 +484,7 @@
   **Issue 5: connection_pool 3.x keyword-only API + Sidekiq positional calls**
   - **Problem**: connection_pool 3.x initializer and `TimedStack#pop` are keyword-only; Sidekiq and legacy code still pass positional args (e.g., `ConnectionPool.new(5)` or `TimedStack#pop(10)`), leading to stack overflows or `ArgumentError` in production.
   - **Solution**: Early boot shim in `config/boot.rb`:
-    - Guarded (`@__permoney_patched`) to avoid re-alias recursion.
+    - Guarded (`@__Sure_patched`) to avoid re-alias recursion.
     - Normalizes positional/Hash args to keywords before delegating to the original initializer via `bind_call`.
     - Patches `ConnectionPool::TimedStack#pop` to map positional timeout to keyword `timeout`.
   - **Upgrade note**: Keep this shim until Sidekiq/Redis clients are fully keyword-safe; revisit after upgrading connection_pool/Sidekiq to versions that no longer use positional APIs.
@@ -475,7 +501,7 @@
   - **Puma Worker Boot**: `on_worker_boot` deprecated in favor of `before_worker_boot`
 
   ### Stack Components
-  - **Backend**: Ruby on Rails 8.1.0
+  - **Backend**: Ruby on Rails 8.1.3
   - **Database**: PostgreSQL 18.x with UUID primary keys
   - **Frontend**: Hotwire (Turbo 2.0.17 + Stimulus 3.x)
   - **Styling**: TailwindCSS v4 with custom design system
@@ -532,7 +558,7 @@
 
   ### Performance Architecture
 
-  Permoney is optimized for blazing-fast performance with comprehensive improvements:
+  Sure is optimized for blazing-fast performance with comprehensive improvements:
 
   **Runtime Optimization:**
   - **YJIT Enabled**: 12-40% performance boost via JIT compilation
@@ -971,7 +997,7 @@
   - `app/helpers/application_helper.rb`: Global helpers (icon helper)
 
   ### Assets
-  - `app/assets/tailwind/permoney-design-system.css`: Design tokens (ALWAYS reference)
+  - `app/assets/tailwind/Sure-design-system.css`: Design tokens (ALWAYS reference)
   - `app/javascript/controllers/`: Stimulus controllers
   - `app/javascript/application.js`: Main JS entry point
 
@@ -986,7 +1012,7 @@
   When working on this codebase:
 
   1. **Always check existing patterns** before implementing new features
-  2. **Use the design system** (`app/assets/tailwind/permoney-design-system.css`) for styling
+  2. **Use the design system** (`app/assets/tailwind/Sure-design-system.css`) for styling
   3. **Follow Rails conventions** for file organization
   4. **Write tests** for new functionality using Minitest + fixtures
   5. **Update documentation** when adding features (update existing files, don't create new ones)
@@ -1015,358 +1041,4 @@
   # Debugging
   bin/rails console
   bin/rails tmp:cache:clear
-  ```
-
-
-  # Original File: .cursor/rules/general-rules.mdc
-
-  ```markdown
-  ---
-  description: Miscellaneous rules to get the AI to behave
-  globs: *
-  alwaysApply: true
-  ---
-  # General rules for AI
-
-  - Use `Current.user` for the current user. Do NOT use `current_user`.
-  - Use `Current.family` for the current family. Do NOT use `current_family`.
-  - Prior to generating any code, carefully read the project conventions and guidelines
-    - Read [project-design.mdc](#original-file-cursorrulesproject-designmdc) to understand the codebase
-    - Read [project-conventions.mdc](#original-file-cursorrulesproject-conventionsmdc) to understand _how_ to write code for the codebase
-    - Read [ui-ux-design-guidelines.mdc](#original-file-cursorrulesui-ux-design-guidelinesmdc) to understand how to implement frontend code specifically
-  - ActiveRecord migrations must inherit from `ActiveRecord::Migration[7.2]`. Do **not** use version 8.0 yet.
-
-  ## Prohibited actions
-
-  - Do not run `rails server` in your responses.
-  - Do not run `touch tmp/restart.txt`
-  - Do not run `rails credentials`
-  - Do not automatically run migrations
-  ```
-
-
-  ---
-
-  ## Original File: .cursor/rules/project-design.mdc
-
-  ```markdown
-  ---
-  description: This rule explains the system architecture and data flow of the Rails app
-  globs: *
-  alwaysApply: true
-  ---
-
-  This file outlines how the codebase is structured and how data flows through the app.
-
-  This is a personal finance application built in Ruby on Rails.  The primary domain entities for this app are outlined below.  For an authoritative overview of the relationships, [schema.rb](db/schema.rb) is the source of truth.
-
-  ## App Modes
-
-  The codebase runs in two distinct "modes", dictated by `Rails.application.config.app_mode`, which can be `managed` or `self_hosted`.
-
-  - "Managed" - in managed mode, a team operates and manages servers for users
-  - "Self Hosted" - in self hosted mode, users host the codebase on their own infrastructure, typically through Docker Compose.  We have an example [docker-compose.example.yml](docker-compose.example.yml) file that runs [Dockerfile](Dockerfile) for this mode.
-
-  ## Families and Users
-
-  - `Family` - all Stripe subscriptions, financial accounts, and the majority of preferences are stored at the [family.rb](app/models/family.rb) level.
-  - `User` - all [session.rb](app/models/session.rb) happen at the [user.rb](app/models/user.rb) level.  A user belongs to a `Family` and can either be an `admin` or a `member`.  Typically, a `Family` has a single admin, or "head of household" that manages finances while there will be several `member` users who can see the family's finances from varying perspectives.
-
-  ## Currency Preference
-
-  Each `Family` selects a currency preference.  This becomes the "main" currency in which all records are "normalized" to via [exchange_rate.rb](app/models/exchange_rate.rb) records so that the app can calculate metrics, historical graphs, and other insights in a single family currency.
-
-  ## Accounts
-
-  The center of the app's domain is the [account.rb](app/models/account.rb).  This represents a single financial account that has a `balance` and `currency`.  For example, an `Account` could be "Chase Checking", which is a single financial account at Chase Bank.  A user could have multiple accounts at a single institution (i.e. "Chase Checking", "Chase Credit Card", "Chase Savings") or an account could be a standalone account, such as "My Home" (a primary residence).
-
-  ### Accountables
-
-  In the app, [account.rb](app/models/account.rb) is a Rails "delegated type" with the following subtypes (separate DB tables).  Each account has a `classification` or either `asset` or `liability`.  While the types are a flat hierarchy, below, they have been organized by their classification:
-
-  - Asset accountables
-    - [depository.rb](app/models/depository.rb) - a typical "bank account" such as a savings or checking account
-    - [investment.rb](app/models/investment.rb) - an account that has "holdings" such as a brokerage, 401k, etc.
-    - [crypto.rb](app/models/crypto.rb) - an account that tracks the value of one or more crypto holdings
-    - [property.rb](app/models/property.rb) - an account that tracks the value of a physical property such as a house or rental property
-    - [vehicle.rb](app/models/vehicle.rb) - an account that tracks the value of a vehicle
-    - [other_asset.rb](app/models/other_asset.rb) - an asset that cannot be classified by the other account types.  For example, "jewelry".
-  - Liability accountables
-    - [credit_card.rb](app/models/credit_card.rb) - an account that tracks the debt owed on a credit card
-    - [loan.rb](app/models/loan.rb) - an account that tracks the debt owed on a loan (i.e. mortgage, student loan)
-    - [other_liability.rb](app/models/other_liability.rb) - a liability that cannot be classified by the other account types.  For example, "IOU to a friend"
-
-  ### Account Balances
-
-  An account [balance.rb](app/models/account/balance.rb) represents a single balance value for an account on a specific `date`.  A series of balance records is generated daily for each account and is how we show a user's historical balance graph.
-
-  - For simple accounts like a "Checking Account", the balance represents the amount of cash in the account for a date.
-  - For a more complex account like "Investment Brokerage", the `balance` represents the combination of the "cash balance" + "holdings value".  Each accountable type has different components that make up the "balance", but in all cases, the "balance" represents "How much the account is worth" (when `classification` is `asset`) or "How much is owed on the account" (when `classification` is `liability`)
-
-  All balances are calculated daily by [balance_calculator.rb](app/models/account/balance_calculator.rb).
-
-  ### Account Holdings
-
-  An account [holding.rb](app/models/holding.rb) applies to [investment.rb](app/models/investment.rb) type accounts and represents a `qty` of a certain [security.rb](app/models/security.rb) at a specific `price` on a specific `date`.
-
-  For investment accounts with holdings, [base_calculator.rb](app/models/holding/base_calculator.rb) is used to calculate the daily historical holding quantities and prices, which are then rolled up into a final "Balance" for the account in [base_calculator.rb](app/models/account/balance/base_calculator.rb).
-
-  ### Account Entries
-
-  An account [entry.rb](app/models/entry.rb) is also a Rails "delegated type".  `Entry` represents any record that _modifies_ an `Account` [balance.rb](app/models/account/balance.rb) and/or [holding.rb](app/models/holding.rb).  Therefore, every entry must have a `date`, `amount`, and `currency`.
-
-  The `amount` of an [entry.rb](app/models/entry.rb) is a signed value.  A _negative_ amount is an "inflow" of money to that account.  A _positive_ value is an "outflow" of money from that account.  For example:
-
-  - A negative amount for a credit card account represents a "payment" to that account, which _reduces_ its balance (since it is a `liability`)
-  - A negative amount for a checking account represents an "income" to that account, which _increases_ its balance (since it is an `asset`)
-  - A negative amount for an investment/brokerage trade represents a "sell" transaction, which _increases_ the cash balance of the account
-
-  There are 3 entry types, defined as [entryable.rb](app/models/entryable.rb) records:
-
-  - `Valuation` - an account [valuation.rb](app/models/valuation.rb) is an entry that says, "here is the value of this account on this date".  It is an absolute measure of an account value / debt.  If there is an `Valuation` of 5,000 for today's date, that means that the account balance will be 5,000 today.
-  - `Transaction` - an account [transaction.rb](app/models/transaction.rb) is an entry that alters the account balance by the `amount`.  This is the most common type of entry and can be thought of as an "income" or "expense".
-  - `Trade` - an account [trade.rb](app/models/trade.rb) is an entry that only applies to an investment account.  This represents a "buy" or "sell" of a holding and has a `qty` and `price`.
-
-  ### Account Transfers
-
-  A [transfer.rb](app/models/transfer.rb) represents a movement of money between two accounts.  A transfer has an inflow [transaction.rb](app/models/transaction.rb) and an outflow [transaction.rb](app/models/transaction.rb).  The codebase auto-matches transfers based on the following criteria:
-
-  - Must be from different accounts
-  - Must be within 4 days of each other
-  - Must be the same currency
-  - Must be opposite values
-
-  There are two primary forms of a transfer:
-
-  - Regular transfer - a normal movement of money between two accounts.  For example, "Transfer $500 from Checking account to Brokerage account".
-  - Debt payment - a special form of transfer where the _receiver_ of funds is a [loan.rb](app/models/loan.rb) type account.
-
-  Regular transfers are typically _excluded_ from income and expense calculations while a debt payment is considered an "expense".
-
-  ## Plaid Items
-
-  A [plaid_item.rb](app/models/plaid_item.rb) represents a "connection" maintained by our external data provider, Plaid in the "hosted" mode of the app.  An "Item" has 1 or more [plaid_account.rb](app/models/plaid_account.rb) records, which are each associated 1:1 with an internal app [account.rb](app/models/account.rb).
-
-  All relevant metadata about the item and its underlying accounts are stored on [plaid_item.rb](app/models/plaid_item.rb) and [plaid_account.rb](app/models/plaid_account.rb), while the "normalized" data is then stored on internal app domain models.
-
-  ## "Syncs"
-
-  The codebase has the concept of a [syncable.rb](app/models/concerns/syncable.rb), which represents any model which can have its data "synced" in the background.  "Syncables" include:
-
-  - `Account` - an account "sync" will sync account holdings, balances, and enhance transaction metadata
-  - `PlaidItem` - a Plaid Item "sync" fetches data from Plaid APIs, normalizes that data, stores it on internal app models, and then finally performs an "Account sync" for each of the underlying accounts created from the Plaid Item.
-  - `Family` - a Family "sync" loops through the family's Plaid Items and individual Accounts and "syncs" each of them.  A family is synced once per day, automatically through [auto_sync.rb](app/controllers/concerns/auto_sync.rb).
-
-  Each "sync" creates a [sync.rb](app/models/sync.rb) record in the database, which keeps track of the status of the sync, any errors that it encounters, and acts as an "audit table" for synced data.
-
-  Below are brief descriptions of each type of sync in more detail.
-
-  ### Account Syncs
-
-  The most important type of sync is the account sync.  It is orchestrated by the account's `sync_data` method, which performs a few important tasks:
-
-  - Auto-matches transfer records for the account
-  - Calculates daily [balance.rb](app/models/account/balance.rb) records for the account from `account.start_date` to `Date.current` using [base_calculator.rb](app/models/account/balance/base_calculator.rb)
-    - Balances are dependent on the calculation of [holding.rb](app/models/holding.rb), which uses [base_calculator.rb](app/models/account/holding/base_calculator.rb)
-  - Enriches transaction data if enabled by user
-
-  An account sync happens every time an [entry.rb](app/models/entry.rb) is updated.
-
-  ### Plaid Item Syncs
-
-  A Plaid Item sync is an ETL (extract, transform, load) operation:
-
-  1. [plaid_item.rb](app/models/plaid_item.rb) fetches data from the external Plaid API
-  2. [plaid_item.rb](app/models/plaid_item.rb) creates and loads this data to [plaid_account.rb](app/models/plaid_account.rb) records
-  3. [plaid_item.rb](app/models/plaid_item.rb) and [plaid_account.rb](app/models/plaid_account.rb) transform and load data to [account.rb](app/models/account.rb) and [entry.rb](app/models/entry.rb), the internal codebase representations of the data.
-
-  ### Family Syncs
-
-  A family sync happens once daily via [auto_sync.rb](app/controllers/concerns/auto_sync.rb).  A family sync is an "orchestrator" of Account and Plaid Item syncs.
-
-  ## Data Providers
-
-  The codebase utilizes several 3rd party data services to calculate historical account balances, enrich data, and more.  Since the app can be run in both "hosted" and "self hosted" mode, this means that data providers are _optional_ for self hosted users and must be configured.
-
-  Because of this optionality, data providers must be configured at _runtime_ through [registry.rb](app/models/provider/registry.rb) utilizing [setting.rb](app/models/setting.rb) for runtime parameters like API keys:
-
-  There are two types of 3rd party data in the codebase:
-
-  1. "Concept" data
-  2. One-off data
-
-  ### "Concept" data
-
-  Since the app is self hostable, users may prefer using different providers for generic data like exchange rates and security prices.  When data is generic enough where we can easily swap out different providers, we call it a data "concept".
-
-  Each "concept" has an interface defined in the `app/models/provider/concepts` directory.
-
-  ```plain
-  app/models/
-    exchange_rate/
-      provided.rb # <- Responsible for selecting the concept provider from the registry
-    provider.rb # <- Base provider class
-    provider/
-      registry.rb <- Defines available providers by concept
-      concepts/
-        exchange_rate.rb <- defines the interface required for the exchange rate concept
-  ```
-
-  ### One-off data
-
-  For data that does not fit neatly into a "concept", an interface is not required and the concrete provider may implement ad-hoc methods called directly in code.
-
-  ## "Provided" Concerns
-
-  In general, domain models should not be calling [registry.rb](app/models/provider/registry.rb) directly.  When 3rd party data is required for a domain model, we use the `Provided` concern within that model's namespace.  This concern is primarily responsible for:
-
-  - Choosing the provider to use for this "concept"
-  - Providing convenience methods on the model for accessing data
-
-  For example, [exchange_rate.rb](app/models/exchange_rate.rb) has a [provided.rb](app/models/exchange_rate/provided.rb) concern with the following convenience methods:
-
-  ```rb
-  module ExchangeRate::Provided
-    extend ActiveSupport::Concern
-
-    class_methods do
-      def provider
-        registry = Provider::Registry.for_concept(:exchange_rates)
-        registry.get_provider(:synth)
-      end
-
-      def find_or_fetch_rate(from:, to:, date: Date.current, cache: true)
-        # Implementation
-      end
-
-      def sync_provider_rates(from:, to:, start_date:, end_date: Date.current)
-        # Implementation
-      end
-    end
-  end
-  ```
-
-  This exposes a generic access pattern where the caller does not care _which_ provider has been chosen for the concept of exchange rates and can get a predictable response:
-
-  ```rb
-  def access_patterns_example
-    # Call exchange rate provider directly
-    ExchangeRate.provider.fetch_exchange_rate(from: "USD", to: "CAD", date: Date.current)
-
-    # Call convenience method
-    ExchangeRate.sync_provider_rates(from: "USD", to: "CAD", start_date: 2.days.ago.to_date)
-  end
-  ```
-
-  ## Concrete provider implementations
-
-  Each 3rd party data provider should have a class under the `Provider::` namespace that inherits from `Provider` and returns `with_provider_response`, which will return a `Provider::ProviderResponse` object:
-
-  ```rb
-  class ConcreteProvider < Provider
-    def fetch_some_data
-      with_provider_response do
-        ExampleData.new(
-          example: "data"
-        )
-      end
-    end
-  end
-  ```
-
-  The `with_provider_response` automatically catches provider errors, so concrete provider classes should raise when valid data is not possible:
-
-  ```rb
-  class ConcreteProvider < Provider
-    def fetch_some_data
-      with_provider_response do
-        data = nil
-
-        # Raise an error if data cannot be returned
-        raise ProviderError.new("Could not find the data you need") if data.nil?
-
-        data
-      end
-    end
-  end
-  ```
-  ```
-
-  ---
-
-  ## Original File: .cursor/rules/project-conventions.mdc
-
-  ```markdown
-  ---
-  description:
-  globs:
-  alwaysApply: true
-  ---
-  This rule serves as high-level documentation for how you should write code in this codebase.
-
-  ## Project Tech Stack
-
-  - Web framework: Ruby on Rails
-    - Minitest + fixtures for testing
-    - Propshaft for asset pipeline
-    - Hotwire Turbo/Stimulus for SPA-like UI/UX
-    - TailwindCSS for styles
-    - Lucide Icons for icons
-    - OpenAI for AI chat
-  - Database: PostgreSQL
-  - Jobs: Sidekiq + Redis
-  - External
-    - Payments: Stripe
-    - User bank data syncing: Plaid
-
-  ## Project conventions
-
-  These conventions should be used when writing code for the project.
-
-  ### Convention 1: Minimize dependencies, vanilla Rails is plenty
-
-  Dependencies are a natural part of building software, but we aim to minimize them when possible to keep this open-source codebase easy to understand, maintain, and contribute to.
-
-  - Push Rails to its limits before adding new dependencies
-  - When a new dependency is added, there must be a strong technical or business reason to add it
-  - When adding dependencies, you should favor old and reliable over new and flashy
-
-  ### Convention 2: Leverage POROs and concerns over "service objects"
-
-  This codebase adopts a "skinny controller, fat models" convention.  Furthermore, we put almost _everything_ directly in the `app/models/` folder and avoid separate folders for business logic such as `app/services/`.
-
-  - Organize large pieces of business logic into Rails concerns and POROs (Plain ole' Ruby Objects)
-  - While a Rails concern _may_ offer shared functionality (i.e. "duck types"), it can also be a "one-off" concern that is only included in one place for better organization and readability.
-  - When concerns are used for code organization, they should be organized around the "traits" of a model; not for simply moving code to another spot in the codebase.
-  - When possible, models should answer questions about themselves—for example, we might have a method, `account.balance_series` that returns a time-series of the account's most recent balances.  We prefer this over something more service-like such as `AccountSeries.new(account).call`.
-
-  ### Convention 3: Leverage Hotwire, write semantic HTML, CSS, and JS, prefer server-side solutions
-
-  - Native HTML is always preferred over JS-based components
-    - Example 1: Use `<dialog>` element for modals instead of creating a custom component
-    - Example 2: Use `<details><summary>...</summary></details>` for disclosures rather than custom components
-  - Leverage Turbo frames to break up the page over JS-driven client-side solutions
-    - Example 1: A good example of turbo frame usage is in [application.html.erb](app/views/layouts/application.html.erb) where we load [chats_controller.rb](app/controllers/chats_controller.rb) actions in a turbo frame in the global layout
-  - Leverage query params in the URL for state over local storage and sessions.  If absolutely necessary, utilize the DB for persistent state.
-  - Use Turbo streams to enhance functionality, but do not solely depend on it
-  - Format currencies, numbers, dates, and other values server-side, then pass to Stimulus controllers for display only
-  - Keep client-side code for where it truly shines.  For example, @bulk_select_controller.js is a case where server-side solutions would degrade the user experience significantly.  When bulk-selecting entries, client-side solutions are the way to go and Stimulus provides the right toolset to achieve this.
-  - Always use the `icon` helper in [application_helper.rb](app/helpers/application_helper.rb) for icons.  NEVER use `lucide_icon` helper directly.
-
-  The Hotwire suite (Turbo/Stimulus) works very well with these native elements and we optimize for this.
-
-  ### Convention 4: Optimize for simplicitly and clarity
-
-  All code should maximize readability and simplicity.
-
-  - Prioritize good OOP domain design over performance
-  - Only focus on performance for critical and global areas of the codebase; otherwise, don't sweat the small stuff.
-    - Example 1: be mindful of loading large data payloads in global layouts
-    - Example 2: Avoid N+1 queries
-
-  ### Convention 5: Use ActiveRecord for complex validations, DB for simple ones, keep business logic out of DB
-
-  - Enforce `null` checks, unique indexes, and other simple validations in the DB
-  - ActiveRecord validations _may_ mirror the DB level ones, but not 100% necessary.  These are for convenience when error handling in forms.  Always prefer client-side form validation when possible.
-  - Complex validations and business logic should remain in ActiveRecord
   ```

@@ -12,7 +12,7 @@ class LoanRemindersJob < ApplicationJob
         # Instrument notifications for observability; actual channel dispatch can be plugged here.
         notifications.each do |note|
           ActiveSupport::Notifications.instrument(
-            "permoney.loan.notification",
+            "sure.loan.notification",
             loan_id: loan.id,
             account_id: loan.account_id,
             title: note[:title],

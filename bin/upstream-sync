@@ -38,7 +38,7 @@ class UpstreamSync
     "app/controllers/loans_controller.rb",
     "app/controllers/personal_lendings_controller.rb",
     "app/controllers/pay_laters_controller.rb",
-    "app/assets/tailwind/permoney-design-system.css",
+    "app/assets/tailwind/Sure-design-system.css",
     "config/loan_settings.yml"
   ].freeze
 
@@ -48,7 +48,7 @@ class UpstreamSync
   end
 
   def run
-    puts "🚀 Permoney Upstream Sync Helper"
+    puts "🚀 Sure Upstream Sync Helper"
     puts "=" * 60
     puts
 
@@ -147,10 +147,10 @@ class UpstreamSync
     puts "  • Commits removing personal lending system"
     puts "  • Commits removing pay later/BNPL system"
     puts "  • Commits removing Indonesian finance features"
-    puts "  • Commits changing branding from Permoney to Sure"
+    puts "  • Commits changing product branding or design tokens"
     
     puts "\n\n📝 MANUAL INTEGRATION REQUIRED:"
-    puts "  • Design system updates (keep Permoney branding)"
+    puts "  • Design system updates (keep Sure branding)"
     puts "  • Configuration file merges (.env, Gemfile, etc.)"
     puts "  • Documentation updates (AGENTS.md, README.md)"
   end
@@ -291,8 +291,8 @@ class UpstreamSync
     
     puts "1. Design System Updates:"
     puts "   • Review: app/assets/tailwind/maybe-design-system.css"
-    puts "   • Apply improvements to: app/assets/tailwind/permoney-design-system.css"
-    puts "   • Keep Permoney branding and tokens\n"
+    puts "   • Apply improvements to: app/assets/tailwind/Sure-design-system.css"
+    puts "   • Keep Sure branding and tokens\n"
     
     puts "2. Configuration Files:"
     puts "   • Merge: .env.local.example (add Langfuse, AI_DEBUG_MODE vars)"
@@ -301,7 +301,7 @@ class UpstreamSync
     puts "   • Check: config/initializers/* for new settings\n"
     
     puts "3. Documentation:"
-    puts "   • Merge: AGENTS.md (keep Permoney-specific rules)"
+    puts "   • Merge: AGENTS.md (keep Sure-specific rules)"
     puts "   • Review: .github/copilot-instructions.md"
     puts "   • Update: README.md if needed\n"
     

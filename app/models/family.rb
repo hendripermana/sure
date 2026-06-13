@@ -36,7 +36,15 @@ class Family < ApplicationRecord
 
   has_many :llm_usages, dependent: :destroy
   has_many :recurring_transactions, dependent: :destroy
+  has_many :recurring_transaction_suppressions, dependent: :destroy
   has_many :subscription_plans, dependent: :destroy
+
+  def primary_user
+    users.where(active: true).order(
+      Arel.sql("CASE role WHEN 'super_admin' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END"),
+      :created_at
+    ).first
+  end
 
   validates :locale, inclusion: { in: I18n.available_locales.map(&:to_s) }
   validates :date_format, inclusion: { in: DATE_FORMATS.map(&:last) }
@@ -44,6 +52,11 @@ class Family < ApplicationRecord
   def assigned_merchants
     merchant_ids = transactions.where.not(merchant_id: nil).pluck(:merchant_id).uniq
     Merchant.where(id: merchant_ids)
+  end
+
+  def available_transaction_merchants
+    service_ids = subscription_plans.where.not(merchant_id: nil).select(:merchant_id)
+    Merchant.where(id: merchants.select(:id)).or(Merchant.where(id: service_ids)).alphabetically
   end
 
   def auto_categorize_transactions_later(transactions)

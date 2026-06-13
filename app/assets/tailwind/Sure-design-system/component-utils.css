@@ -1,0 +1,79 @@
+/* Button Backgrounds */
+@utility button-bg-primary {
+  @apply bg-gray-900 theme-dark:bg-white;
+  /* Maps to fg-primary light/dark */
+}
+
+@utility button-bg-primary-hover {
+  @apply bg-gray-800 theme-dark:bg-gray-50;
+  /* Maps to fg-primary-variant light/dark */
+}
+
+@utility button-bg-secondary {
+  @apply bg-gray-50 theme-dark:bg-gray-700;
+  /* Maps to fg-secondary light/dark */
+}
+
+@utility button-bg-secondary-hover {
+  @apply bg-gray-100 theme-dark:bg-gray-600;
+  /* Maps to fg-secondary-variant light/dark */
+}
+
+@utility button-bg-disabled {
+  @apply bg-gray-50 theme-dark:bg-gray-700;
+}
+
+@utility button-bg-destructive {
+  @apply bg-red-500 theme-dark:bg-red-400;
+}
+
+@utility button-bg-destructive-hover {
+  @apply bg-red-600 theme-dark:bg-red-500;
+}
+
+@utility button-bg-ghost-hover {
+  @apply bg-gray-50 theme-dark:bg-gray-800;
+}
+
+@utility button-bg-outline-hover {
+  @apply bg-gray-100 theme-dark:bg-gray-700;
+}
+
+/* Tab Styles */
+@utility tab-item-active {
+  @apply bg-white theme-dark:bg-gray-700;
+}
+
+@utility tab-item-hover {
+  @apply bg-gray-200 theme-dark:bg-gray-800;
+}
+
+@utility tab-bg-group {
+  @apply bg-gray-50 theme-dark:bg-alpha-black-700;
+}
+
+@utility bg-nav-indicator {
+  @apply bg-black theme-dark:bg-white;
+}
+
+/* Segmented Control */
+.segmented-control {
+  @apply inline-flex items-center gap-0.5 rounded-lg bg-gray-50 p-0.5 theme-dark:bg-gray-800;
+}
+
+.segmented-control__segment {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium
+         text-gray-500 transition-colors duration-150
+         hover:text-gray-700 hover:bg-white/60
+         theme-dark:text-gray-400 theme-dark:hover:text-gray-200 theme-dark:hover:bg-gray-700/60;
+}
+
+.segmented-control__segment--active {
+  @apply bg-white text-gray-900 shadow-sm
+         theme-dark:bg-gray-700 theme-dark:text-white;
+}
+
+/* Search input icon positioning */
+.search-input-icon-left {
+  @apply absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none;
+}

@@ -1,7 +1,7 @@
 class Provider::Lunchflow
   include HTTParty
 
-  headers "User-Agent" => "Permoney Finance Lunchflow Client"
+  headers "User-Agent" => "Sure Finance Lunchflow Client"
   default_options.merge!(verify: true, ssl_verify_mode: OpenSSL::SSL::VERIFY_PEER, timeout: 120)
 
   attr_reader :api_key, :base_url

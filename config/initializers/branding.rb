@@ -31,12 +31,12 @@ module Branding
 
     # Get app name from settings or environment
     def app_name
-      @app_name ||= safe_setting_access(:app_name) || ENV.fetch("APP_NAME", "Permoney")
+      @app_name ||= safe_setting_access(:app_name) || ENV.fetch("APP_NAME", "Sure")
     end
 
     # Get app short name from settings or environment
     def app_short_name
-      @app_short_name ||= safe_setting_access(:app_short_name) || ENV.fetch("APP_SHORT_NAME", "Permoney")
+      @app_short_name ||= safe_setting_access(:app_short_name) || ENV.fetch("APP_SHORT_NAME", "Sure")
     end
 
     # Get app description from settings or environment
@@ -51,7 +51,7 @@ module Branding
 
     # Get GitHub repository name from settings or environment
     def github_repo_name
-      @github_repo_name ||= safe_setting_access(:github_repo_name) || ENV.fetch("GITHUB_REPO_NAME", "permoney")
+      @github_repo_name ||= safe_setting_access(:github_repo_name) || ENV.fetch("GITHUB_REPO_NAME", "sure")
     end
 
     # Get GitHub repository branch from settings or environment

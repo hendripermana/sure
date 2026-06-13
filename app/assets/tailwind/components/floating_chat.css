@@ -234,8 +234,8 @@
 }
 
 [data-chat-target="input"]:focus {
-  border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(159, 232, 112, 0.25);
 }
 
 /* Button interactions - Send & Stop buttons */
@@ -328,14 +328,14 @@
   }
   
   [data-floating-chat-target="panel"] {
-    background-color: hsl(var(--container));
+    background-color: var(--color-white);
   }
 }
 
 /* Ensure proper contrast in light mode */
 @media (prefers-color-scheme: light) {
   [data-floating-chat-target="panel"] {
-    background-color: hsl(var(--container));
+    background-color: var(--color-gray-50);
   }
 }
 

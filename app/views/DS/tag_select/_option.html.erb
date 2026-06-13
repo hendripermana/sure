@@ -1,0 +1,15 @@
+<%# Tag select option partial - used by DS::TagSelect component %>
+<div class="filterable-item text-primary text-sm cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-container-inset-hover <%= "bg-container-inset" if selected %>"
+     role="option"
+     aria-selected="<%= selected %>"
+     data-action="click->tag-select#toggleOption"
+     data-tag-id="<%= tag.id %>"
+     data-tag-name="<%= tag.name %>"
+     data-filter-name="<%= tag.name %>">
+  <span class="check-icon <%= "hidden" unless selected %>">
+    <%= view_helpers.icon("check") %>
+  </span>
+  <% color = tag.respond_to?(:color) ? tag.color : "#737373" %>
+  <span class="inline-block shrink-0 size-2 rounded-full" style="background-color: <%= color %>;"></span>
+  <span><%= tag.name %></span>
+</div>

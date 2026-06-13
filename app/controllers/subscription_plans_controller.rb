@@ -1,7 +1,10 @@
 class SubscriptionPlansController < ApplicationController
+  include ActionView::RecordIdentifier
+  include Notifiable
+
   before_action :authenticate_user!
-  before_action :set_subscription_plan, only: %i[show edit update destroy pause resume cancel renew]
-  before_action :authorize_family_access, only: %i[show edit update destroy pause resume cancel renew]
+  before_action :set_subscription_plan, only: %i[show edit update destroy pause resume cancel undo_cancellation]
+  before_action :authorize_family_access, only: %i[show edit update destroy pause resume cancel undo_cancellation]
 
   # GET /subscription_plans
   def index
@@ -12,6 +15,8 @@ class SubscriptionPlansController < ApplicationController
 
     # Dashboard data
     @active_subscriptions = @subscription_plans.active
+    @paused_subscriptions = @subscription_plans.where(status: "paused")
+    @cancelled_subscriptions = @subscription_plans.where(status: "cancelled")
     @upcoming_renewals = @subscription_plans.upcoming_renewals
     @overdue_subscriptions = @subscription_plans.overdue
     @trial_ending = @subscription_plans.trial_ending
@@ -27,6 +32,8 @@ class SubscriptionPlansController < ApplicationController
 
   # GET /subscription_plans/1
   def show
+    @entries = Entry.where(id: @subscription_plan.subscription_renewals.where.not(entry_id: nil).pluck(:entry_id)).reverse_chronological
+    @timeline_events = @subscription_plan.audit_logs.reverse_chronological.limit(30)
     respond_to do |format|
       format.html
       format.json { render json: safe_subscription_json(@subscription_plan) }
@@ -40,8 +47,7 @@ class SubscriptionPlansController < ApplicationController
       started_at: Date.current,
       next_billing_at: 1.month.from_now.to_date
     )
-    @services = load_services
-    @accounts = Current.family.accounts
+    load_form_options
 
     respond_to do |format|
       format.html
@@ -62,8 +68,7 @@ class SubscriptionPlansController < ApplicationController
         }
         format.json { render json: safe_subscription_json(@subscription_plan), status: :created }
       else
-        @services = load_services
-        @accounts = Current.family.accounts
+        load_form_options
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @subscription_plan.errors, status: :unprocessable_entity }
       end
@@ -72,8 +77,7 @@ class SubscriptionPlansController < ApplicationController
 
   # GET /subscription_plans/1/edit
   def edit
-    @services = load_services
-    @accounts = Current.family.accounts
+    load_form_options
 
     respond_to do |format|
       format.html
@@ -91,8 +95,7 @@ class SubscriptionPlansController < ApplicationController
         }
         format.json { render json: safe_subscription_json(@subscription_plan) }
       else
-        @services = load_services
-        @accounts = Current.family.accounts
+        load_form_options
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @subscription_plan.errors, status: :unprocessable_entity }
       end
@@ -114,55 +117,81 @@ class SubscriptionPlansController < ApplicationController
 
   # PATCH /subscription_plans/1/pause
   def pause
-    @subscription_plan.pause!
+    success = @subscription_plan.pause!
 
     respond_to do |format|
       format.html {
         redirect_to subscription_plans_path,
-        notice: "Subscription plan paused!"
+          flash: success ? { notice: "Subscription plan paused!" } : { alert: @subscription_plan.errors.full_messages.to_sentence }
       }
-      format.json { render json: safe_subscription_json(@subscription_plan) }
+      format.json {
+        if success
+          render json: safe_subscription_json(@subscription_plan)
+        else
+          render json: { errors: @subscription_plan.errors.full_messages }, status: :unprocessable_entity
+        end
+      }
     end
   end
 
   # PATCH /subscription_plans/1/resume
   def resume
-    @subscription_plan.resume!
+    success = @subscription_plan.resume!
 
     respond_to do |format|
       format.html {
         redirect_to subscription_plans_path,
-        notice: "Subscription plan resumed!"
+          flash: success ? { notice: "Subscription plan resumed!" } : { alert: @subscription_plan.errors.full_messages.to_sentence }
       }
-      format.json { render json: safe_subscription_json(@subscription_plan) }
+      format.json {
+        if success
+          render json: safe_subscription_json(@subscription_plan)
+        else
+          render json: { errors: @subscription_plan.errors.full_messages }, status: :unprocessable_entity
+        end
+      }
     end
   end
 
   # PATCH /subscription_plans/1/cancel
   def cancel
-    @subscription_plan.cancel!
+    at_next_renewal = params[:timing] == "period_end"
+    success = @subscription_plan.cancel!(at_next_renewal: at_next_renewal)
+    notice = at_next_renewal ? "Subscription will cancel at the next renewal." : "Subscription plan cancelled!"
 
     respond_to do |format|
       format.html {
         redirect_to subscription_plans_path,
-        notice: "Subscription plan cancelled!"
+          flash: success ? { notice: notice } : { alert: @subscription_plan.errors.full_messages.to_sentence }
       }
-      format.json { render json: safe_subscription_json(@subscription_plan) }
+      format.json {
+        if success
+          render json: safe_subscription_json(@subscription_plan)
+        else
+          render json: { errors: @subscription_plan.errors.full_messages }, status: :unprocessable_entity
+        end
+      }
     end
   end
 
-  # PATCH /subscription_plans/1/renew
-  def renew
-    @subscription_plan.mark_as_renewed!
+  def undo_cancellation
+    success = @subscription_plan.undo_cancellation!
 
     respond_to do |format|
       format.html {
         redirect_to subscription_plans_path,
-        notice: "Subscription plan renewed!"
+          flash: success ? { notice: "Scheduled cancellation removed." } : { alert: @subscription_plan.errors.full_messages.to_sentence }
       }
-      format.json { render json: safe_subscription_json(@subscription_plan) }
+      format.json {
+        if success
+          render json: safe_subscription_json(@subscription_plan)
+        else
+          render json: { errors: @subscription_plan.errors.full_messages }, status: :unprocessable_entity
+        end
+      }
     end
   end
+
 
   # GET /subscription_plans/check_duplicate
   # Check if user already has a subscription for the given service
@@ -205,6 +234,7 @@ class SubscriptionPlansController < ApplicationController
       permitted = params.require(:subscription_plan).permit(
         :name, :description,
         :amount, :currency, :billing_cycle, :status,
+        :interval_count, :interval_unit,
         :started_at, :trial_ends_at, :next_billing_at,
         :auto_renew, :payment_method, :shared_within_family,
         :max_usage_allowed, :payment_notes
@@ -220,11 +250,6 @@ class SubscriptionPlansController < ApplicationController
         permitted[:merchant_id] = merchant_id if merchant_id.present?
       end
 
-      if params[:subscription_plan].key?(:service_id)
-        service_id = safe_service_id(params[:subscription_plan][:service_id])
-        permitted[:service_id] = service_id if service_id.present?
-      end
-
       permitted
     end
 
@@ -237,14 +262,7 @@ class SubscriptionPlansController < ApplicationController
     def safe_service_merchant_id(merchant_id)
       return if merchant_id.blank?
 
-      ServiceMerchant.where(id: merchant_id).pick(:id)
-    end
-
-    def safe_service_id(service_id)
-      return if service_id.blank?
-      return unless defined?(Service) && Service.table_exists?
-
-      Service.where(id: service_id).pick(:id)
+      ServiceMerchant.available_to(Current.family).where(id: merchant_id).pick(:id)
     end
 
     # Sanitize subscription data for JSON responses to prevent data exposure
@@ -273,20 +291,14 @@ class SubscriptionPlansController < ApplicationController
       hash
     end
 
-    # Load services from both ServiceMerchant and legacy Service tables
-    # Includes both popular services and user-created custom services
     def load_services
-      # Prefer ServiceMerchant, fallback to Service for backward compatibility
-      # Load ALL services (not just popular) to include user-created custom services
-      service_merchants = ServiceMerchant.order(:name)
+      ServiceMerchant.available_to(Current.family)
+    end
 
-      if service_merchants.any?
-        service_merchants
-      elsif defined?(Service) && Service.table_exists?
-        Service.order(:name)
-      else
-        []
-      end
+    def load_form_options
+      @services = load_services
+      @service_schedule_defaults = @services.to_h { |service| [ service.id, service.billing_schedule.to_h ] }
+      @accounts = Current.family.accounts
     end
 
     def track_subscription_created(subscription_plan)

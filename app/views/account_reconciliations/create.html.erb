@@ -1,0 +1,153 @@
+<%= render DS::Dialog.new do |dialog| %>
+  <% dialog.with_header(title: "Reconciliation Result") %>
+  <% dialog.with_body do %>
+    <div class="space-y-6">
+      <% if @error_message.present? %>
+        <div class="flex items-center gap-3 p-4 rounded-2xl bg-red-50/50 border border-red-200/40 text-red-700 theme-dark:bg-red-950/20 theme-dark:border-red-900/30 theme-dark:text-red-400">
+          <%= icon "alert-circle", class: "w-5 h-5 flex-shrink-0" %>
+          <div>
+            <p class="font-medium text-sm">Reconciliation Error</p>
+            <p class="text-xs opacity-90 mt-0.5"><%= @error_message %></p>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Balance Comparison Card %>
+      <div class="p-5 rounded-2xl border-2 <%= @is_synced ? "border-green-300 bg-green-50/30 theme-dark:bg-green-950/20 theme-dark:border-green-800" : "border-amber-300 bg-amber-50/30 theme-dark:bg-amber-950/20 theme-dark:border-amber-800" %>">
+        <div class="flex items-center gap-2 mb-4">
+          <% if @is_synced %>
+            <%= icon "check-circle", class: "w-6 h-6 text-green-500" %>
+            <h3 class="font-semibold text-green-700 theme-dark:text-green-400 text-lg">Balance is Synced! ✅</h3>
+          <% else %>
+            <%= icon "alert-triangle", class: "w-6 h-6 text-amber-500" %>
+            <h3 class="font-semibold text-amber-700 theme-dark:text-amber-400 text-lg">Balance Mismatch Found</h3>
+          <% end %>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-3 rounded-xl bg-container border border-primary">
+            <p class="text-xs text-secondary font-semibold uppercase tracking-wider">App Balance</p>
+            <p class="text-xl font-bold text-primary mt-1">
+              <%= format_money(Money.new(@current_balance, @account.currency)) %>
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-container border border-primary">
+            <p class="text-xs text-secondary font-semibold uppercase tracking-wider">Real Balance</p>
+            <p class="text-xl font-bold text-primary mt-1">
+              <%= format_money(Money.new(@real_balance, @account.currency)) %>
+            </p>
+          </div>
+        </div>
+
+        <% unless @is_synced %>
+          <div class="mt-4 p-4 rounded-xl bg-container border border-primary">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-semibold text-primary">Difference</p>
+              <p class="text-2xl font-bold <%= @difference > 0 ? "text-red-500" : "text-blue-500" %>">
+                <%= @difference > 0 ? "+" : "" %><%= format_money(Money.new(@difference, @account.currency)) %>
+              </p>
+            </div>
+            <p class="text-xs text-secondary mt-2">
+              <% if @difference > 0 %>
+                <span class="font-medium text-red-600 theme-dark:text-red-400">You have <strong><%= format_money(Money.new(@difference.abs, @account.currency)) %></strong> in expenses that are NOT recorded in the app.</span>
+                Check if you forgot to enter payments like rent, bills, or subscriptions.
+              <% else %>
+                <span class="font-medium text-blue-600 theme-dark:text-blue-400">You have <strong><%= format_money(Money.new(@difference.abs, @account.currency)) %></strong> in income that is NOT recorded in the app.</span>
+                Check if you received money (salary, refunds, transfers) that you didn't record.
+              <% end %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+
+      <% unless @is_synced %>
+        <%# Monthly Breakdown to pinpoint the issue %>
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <%= icon "calendar", class: "w-4 h-4 text-secondary" %>
+            <h3 class="text-sm font-semibold text-primary">Monthly Breakdown</h3>
+          </div>
+          <p class="text-xs text-secondary">Compare these totals with your bank statement to find which month has missing entries.</p>
+
+          <div class="bg-container border border-primary rounded-2xl overflow-hidden max-h-[300px] overflow-y-auto">
+            <table class="w-full text-left">
+              <thead class="sticky top-0">
+                <tr class="bg-surface-default border-b border-primary text-xs text-secondary font-medium uppercase">
+                  <th class="px-4 py-2.5">Month</th>
+                  <th class="px-4 py-2.5 text-right">Income</th>
+                  <th class="px-4 py-2.5 text-right">Expenses</th>
+                  <th class="px-4 py-2.5 text-right">Net</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @monthly_sums.each do |month, data| %>
+                  <% net = data[:inflows] - data[:outflows] %>
+                  <tr class="border-b border-primary last:border-b-0 hover:bg-surface-hover transition-colors">
+                    <td class="px-4 py-2.5 text-sm font-mono text-primary font-medium"><%= month %></td>
+                    <td class="px-4 py-2.5 text-sm text-right text-green-600 font-medium">
+                      +<%= number_to_currency(data[:inflows], unit: "", precision: 0, delimiter: ".") %>
+                    </td>
+                    <td class="px-4 py-2.5 text-sm text-right text-red-500 font-medium">
+                      -<%= number_to_currency(data[:outflows], unit: "", precision: 0, delimiter: ".") %>
+                    </td>
+                    <td class="px-4 py-2.5 text-sm text-right font-bold <%= net >= 0 ? "text-green-600" : "text-red-500" %>">
+                      <%= net >= 0 ? "+" : "-" %><%= number_to_currency(net.abs, unit: "", precision: 0, delimiter: ".") %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <%# Quick Fix Actions %>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-primary flex items-center gap-2">
+            <%= icon "wrench", class: "w-4 h-4 text-secondary" %>
+            Quick Fix Options
+          </h3>
+
+          <div class="grid gap-3">
+            <%# Option 1: Force set the correct balance %>
+            <%= styled_form_with url: account_reconciliation_path(@account), method: :post do |f| %>
+              <input type="hidden" name="reconciliation[real_balance]" value="<%= @real_balance %>">
+              <input type="hidden" name="reconciliation[date]" value="<%= @reconciliation_date %>">
+              <input type="hidden" name="reconciliation[apply]" value="true">
+
+              <button type="submit" class="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-blue-200 bg-blue-50/50 hover:bg-blue-100/50 transition-colors theme-dark:bg-blue-950/20 theme-dark:border-blue-800 theme-dark:hover:bg-blue-900/30 text-left group" data-confirm="This will create a reconciliation entry that sets your balance to <%= format_money(Money.new(@real_balance, @account.currency)) %> as of <%= @reconciliation_date.strftime("%B %d, %Y") %>. Continue?">
+                <div class="p-2.5 rounded-xl bg-blue-100 theme-dark:bg-blue-900/40 group-hover:bg-blue-200 transition-colors">
+                  <%= icon "zap", class: "w-5 h-5 text-blue-600 theme-dark:text-blue-400" %>
+                </div>
+                <div>
+                  <p class="font-semibold text-sm text-primary">Set Balance to <%= format_money(Money.new(@real_balance, @account.currency)) %></p>
+                  <p class="text-xs text-secondary mt-0.5">Creates a reconciliation entry for <%= @reconciliation_date.strftime("%B %d, %Y") %>. Use this if you can't find the missing entries.</p>
+                </div>
+              </button>
+            <% end %>
+
+            <%# Option 2: Go to transactions to add the missing entries %>
+            <a href="<%= account_path(@account) %>" class="flex items-center gap-3 p-4 rounded-2xl border-2 border-primary bg-container hover:bg-surface-hover transition-colors text-left group" data-turbo-frame="_top">
+              <div class="p-2.5 rounded-xl bg-surface-inset group-hover:bg-surface-hover transition-colors">
+                <%= icon "list-plus", class: "w-5 h-5 text-secondary" %>
+              </div>
+              <div>
+                <p class="font-semibold text-sm text-primary">Add Missing Entries Manually</p>
+                <p class="text-xs text-secondary mt-0.5">Go back to the account and add the missing transactions yourself. This is the most accurate way to fix the balance.</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @is_synced %>
+        <div class="p-4 rounded-2xl bg-surface-inset border border-primary text-center">
+          <p class="text-sm text-secondary">Your app balance matches your real bank balance. No action needed! 🎉</p>
+          <a href="<%= account_path(@account) %>" class="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-blue-600 hover:text-blue-700" data-turbo-frame="_top">
+            <%= icon "arrow-left", class: "w-4 h-4" %>
+            Back to Account
+          </a>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

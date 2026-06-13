@@ -1,4 +1,4 @@
-# Base Docker Compose configuration for Permoney development
+# Base Docker Compose configuration for Sure development
 # Uses standard Docker networking with service discovery (db, redis hostnames work)
 # For Gitpod-specific overrides, see docker-compose.gitpod.yml
 
@@ -53,7 +53,7 @@ services:
     volumes:
       - redis-data:/data
     restart: unless-stopped
-  
+
   db:
     image: postgres:latest
     volumes:

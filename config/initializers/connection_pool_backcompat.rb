@@ -6,14 +6,14 @@
 # "wrong number of arguments" crashes at boot.
 if defined?(ConnectionPool)
   class ConnectionPool
-    alias_method :__permoney_orig_initialize, :initialize
+    alias_method :__sure_orig_initialize, :initialize
 
     def initialize(*args, **kwargs, &block)
       if args.first.is_a?(Hash) && kwargs.empty?
         kwargs = args.shift.transform_keys { |k| k.respond_to?(:to_sym) ? k.to_sym : k }
       end
 
-      __permoney_orig_initialize(**kwargs, &block)
+      __sure_orig_initialize(**kwargs, &block)
     end
   end
 end

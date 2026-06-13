@@ -95,7 +95,7 @@ class Loan::ApplyExtraPayment
     end
     begin
       ActiveSupport::Notifications.instrument(
-        "permoney.loan.extra_payment.applied",
+        "sure.loan.extra_payment.applied",
         loan_id: @account.accountable_id,
         amount: @amount.to_s,
         mode: @allocation_mode,

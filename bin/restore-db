@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 🚀 Modern Database Restore Script for Permoney
+# Modern Database Restore Script for Sure
 # Intelligent encrypted PostgreSQL backup restore with smart GPG handling
 
 set -e
@@ -33,7 +33,7 @@ print_banner() {
     cat << "EOF"
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
-║              🚀 PERMONEY DATABASE RESTORE 🚀                 ║
+║                 SURE DATABASE RESTORE                        ║
 ║                   Modern & Intelligent                       ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
@@ -433,7 +433,7 @@ print_completion_summary() {
     print_dim "Rails console: ${CYAN}bin/rails console${NC}"
     echo ""
     
-    print_success "Your Permoney database is ready! 🚀"
+    print_success "Your Sure database is ready!"
     echo ""
 }
 

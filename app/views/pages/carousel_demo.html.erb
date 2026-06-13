@@ -9,8 +9,8 @@
   <!-- Hero Carousel -->
   <section class="bg-container py-12 rounded-xl shadow-border-xs">
     <div class="flex flex-col items-center justify-center space-y-8">
-      <h2 class="text-2xl font-semibold text-primary">Welcome to Permoney</h2>
-      
+      <h2 class="text-2xl font-semibold text-primary">Welcome to Sure</h2>
+
       <%= render BoxCarouselComponent.new(
         items: [
           { id: "1", type: "image", src: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&h=600&fit=crop", alt: "Financial Planning" },
@@ -29,15 +29,15 @@
         enable_drag: true,
         perspective: 1200
       ) %>
-      
+
       <div class="flex gap-4">
-        <button 
+        <button
           onclick="document.querySelector('[data-controller=box-carousel]').boxCarousel.prev()"
           class="px-4 py-2 text-sm border border-primary text-primary rounded-full cursor-pointer transition-all duration-300 ease-out hover:bg-gray-100 active:scale-95">
           <%= icon "arrow-left", class: "w-4 h-4" %>
           Previous
         </button>
-        <button 
+        <button
           onclick="document.querySelector('[data-controller=box-carousel]').boxCarousel.next()"
           class="px-4 py-2 text-sm border border-primary text-primary rounded-full cursor-pointer transition-all duration-300 ease-out hover:bg-gray-100 active:scale-95">
           Next
@@ -54,13 +54,13 @@
       <h3 class="text-lg font-semibold text-primary mb-2">Track Your Wealth</h3>
       <p class="text-sm text-secondary">Monitor your net worth across all accounts in real-time</p>
     </div>
-    
+
     <div class="bg-container p-6 rounded-xl shadow-border-xs">
       <%= icon "pie-chart", class: "w-8 h-8 text-blue-500 mb-4" %>
       <h3 class="text-lg font-semibold text-primary mb-2">Budget Insights</h3>
       <p class="text-sm text-secondary">Get detailed insights into your spending patterns</p>
     </div>
-    
+
     <div class="bg-container p-6 rounded-xl shadow-border-xs">
       <%= icon "shield-check", class: "w-8 h-8 text-purple-500 mb-4" %>
       <h3 class="text-lg font-semibold text-primary mb-2">Secure & Private</h3>
@@ -72,7 +72,7 @@
   <section class="bg-container py-12 rounded-xl shadow-border-xs">
     <div class="flex flex-col items-center justify-center space-y-8">
       <h2 class="text-2xl font-semibold text-primary">Vertical Carousel</h2>
-      
+
       <%= render BoxCarouselComponent.new(
         items: [
           { id: "1", type: "image", src: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&h=400&fit=crop", alt: "Analytics Dashboard" },
@@ -87,7 +87,7 @@
         enable_drag: true,
         perspective: 1000
       ) %>
-      
+
       <p class="text-sm text-secondary">Use arrow keys or drag to navigate</p>
     </div>
   </section>

@@ -115,7 +115,7 @@ class CommitAnalyzer
     end
 
     # Branding changes (DANGEROUS for us)
-    if files.any? { |f| f.include?("permoney") || f.include?("design-system") }
+    if files.any? { |f| f.downcase.include?("sure") || f.include?("design-system") }
       return { emoji: "🎨", name: "Branding Change", safe: false }
     end
 
@@ -173,7 +173,7 @@ class CommitAnalyzer
       "app/models/pay_later.rb",
       "app/components/loan/",
       "app/services/loan/",
-      "app/assets/tailwind/permoney-design-system.css"
+      "app/assets/tailwind/Sure-design-system.css"
     ]
 
     if files.any? { |f| protected_files.any? { |pf| f.include?(pf) } }
@@ -191,7 +191,7 @@ class CommitAnalyzer
     end
 
     if category[:name] == "Branding Change"
-      return "📝 MANUAL INTEGRATION - Keep Permoney branding, adopt improvements"
+      return "📝 MANUAL INTEGRATION - Keep Sure branding, adopt improvements"
     end
 
     if files.any? { |f| f.include?("design-system") }

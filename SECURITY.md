@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-We actively support security updates for the following versions of Permoney:
+We actively support security updates for the following versions of Sure:
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -16,11 +16,11 @@ We actively support security updates for the following versions of Permoney:
 
 ### How to Report
 
-We take security vulnerabilities seriously. If you discover a security issue in Permoney, please report it responsibly:
+We take security vulnerabilities seriously. If you discover a security issue in Sure, please report it responsibly:
 
 **🔒 For Security Issues:**
 - **Email:** [hendri@permana.icu](mailto:hendri@permana.icu)
-- **GitHub Security Advisory:** Use GitHub's [private vulnerability reporting](https://github.com/hendripermana/permoney/security/advisories/new)
+- **GitHub Security Advisory:** Use GitHub's [private vulnerability reporting](https://github.com/hendripermana/Sure/security/advisories/new)
 - **Alternative:** Create a private issue by emailing the maintainers directly
 
 ### What to Include
@@ -72,7 +72,7 @@ We are committed to responding to security reports promptly:
 
 ### Security Features
 
-Permoney includes several security features:
+Sure includes several security features:
 
 - **Data Encryption:** Sensitive data encryption at rest
 - **Secure Authentication:** Multi-factor authentication support
@@ -102,9 +102,9 @@ By reporting security vulnerabilities, you agree to:
 ### Contact
 
 For non-security related issues, please use:
-- **General Issues:** [GitHub Issues](https://github.com/hendripermana/permoney/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/hendripermana/permoney/discussions)
+- **General Issues:** [GitHub Issues](https://github.com/hendripermana/Sure/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/hendripermana/Sure/discussions)
 
 ---
 
-**Thank you for helping keep Permoney and our community safe!**
+**Thank you for helping keep Sure and our community safe!**
