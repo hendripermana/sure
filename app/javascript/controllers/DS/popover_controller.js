@@ -1,10 +1,4 @@
-import {
-  autoUpdate,
-  computePosition,
-  flip,
-  offset,
-  shift,
-} from "@floating-ui/dom";
+import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
@@ -78,8 +72,7 @@ export default class extends Controller {
   focusFirstElement() {
     const focusableElements =
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    const firstFocusableElement =
-      this.contentTarget.querySelectorAll(focusableElements)[0];
+    const firstFocusableElement = this.contentTarget.querySelectorAll(focusableElements)[0];
     if (firstFocusableElement) {
       firstFocusableElement.focus({ preventScroll: true });
     }
@@ -87,11 +80,7 @@ export default class extends Controller {
 
   startAutoUpdate() {
     if (!this._cleanup) {
-      this._cleanup = autoUpdate(
-        this.buttonTarget,
-        this.contentTarget,
-        this.boundUpdate,
-      );
+      this._cleanup = autoUpdate(this.buttonTarget, this.contentTarget, this.boundUpdate);
     }
   }
 

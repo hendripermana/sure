@@ -29,7 +29,7 @@ export default class extends Controller {
     this.selectedIds = new Set(
       this.optionTargets
         .filter((option) => option.getAttribute("aria-selected") === "true")
-        .map((option) => option.dataset.tagId),
+        .map((option) => option.dataset.tagId)
     );
     this.renderSelection();
     this.observeMenuResize();
@@ -57,11 +57,7 @@ export default class extends Controller {
     this.startAutoUpdate();
 
     requestAnimationFrame(() => {
-      this.menuTarget.classList.remove(
-        "opacity-0",
-        "-translate-y-1",
-        "pointer-events-none",
-      );
+      this.menuTarget.classList.remove("opacity-0", "-translate-y-1", "pointer-events-none");
       this.menuTarget.classList.add("opacity-100", "translate-y-0");
       this.updatePosition();
       if (focusOption) {
@@ -75,11 +71,7 @@ export default class extends Controller {
     this.stopAutoUpdate();
     this.buttonTarget.setAttribute("aria-expanded", "false");
     this.menuTarget.classList.remove("opacity-100", "translate-y-0");
-    this.menuTarget.classList.add(
-      "opacity-0",
-      "-translate-y-1",
-      "pointer-events-none",
-    );
+    this.menuTarget.classList.add("opacity-0", "-translate-y-1", "pointer-events-none");
 
     setTimeout(() => {
       if (!this.isOpen) this.menuTarget.classList.add("hidden");
@@ -185,13 +177,11 @@ export default class extends Controller {
     this.selectionContainerTarget.innerHTML = "";
 
     const selectedOptions = this.optionTargets.filter((option) =>
-      this.selectedIds.has(option.dataset.tagId),
+      this.selectedIds.has(option.dataset.tagId)
     );
 
     selectedOptions.forEach((option) => {
-      this.hiddenInputsElement.appendChild(
-        this.buildHiddenInput(option.dataset.tagId),
-      );
+      this.hiddenInputsElement.appendChild(this.buildHiddenInput(option.dataset.tagId));
       const badge = option.querySelector("[data-tag-select-badge]");
       if (badge) {
         this.selectionContainerTarget.appendChild(badge.cloneNode(true));
@@ -301,10 +291,7 @@ export default class extends Controller {
       return;
     }
 
-    if (
-      event.key === "Enter" &&
-      event.target.getAttribute("role") === "option"
-    ) {
+    if (event.key === "Enter" && event.target.getAttribute("role") === "option") {
       event.preventDefault();
       event.target.click();
     }
@@ -313,14 +300,9 @@ export default class extends Controller {
   syncActiveOption() {
     const options = this.visibleOptions;
     const current = this.activeOption;
-    const selected = options.find((option) =>
-      this.selectedIds.has(option.dataset.tagId),
-    );
+    const selected = options.find((option) => this.selectedIds.has(option.dataset.tagId));
 
-    this.setActiveOption(
-      options.includes(current) ? current : selected || options[0],
-      false,
-    );
+    this.setActiveOption(options.includes(current) ? current : selected || options[0], false);
   }
 
   moveActiveOption(delta) {
@@ -364,16 +346,12 @@ export default class extends Controller {
   }
 
   get visibleOptions() {
-    return this.optionTargets.filter(
-      (option) => !option.classList.contains("hidden"),
-    );
+    return this.optionTargets.filter((option) => !option.classList.contains("hidden"));
   }
 
   startAutoUpdate() {
     if (!this._cleanup && this.hasButtonTarget && this.hasMenuTarget) {
-      this._cleanup = autoUpdate(this.buttonTarget, this.menuTarget, () =>
-        this.updatePosition(),
-      );
+      this._cleanup = autoUpdate(this.buttonTarget, this.menuTarget, () => this.updatePosition());
     }
   }
 
@@ -419,9 +397,7 @@ export default class extends Controller {
     const placement = this.placementMode();
     const shouldOpenUp =
       placement === "up" ||
-      (placement === "auto" &&
-        spaceBelow < menuHeight &&
-        spaceAbove > spaceBelow);
+      (placement === "auto" && spaceBelow < menuHeight && spaceAbove > spaceBelow);
 
     this.menuTarget.style.left = "0";
     this.menuTarget.style.width = "100%";
