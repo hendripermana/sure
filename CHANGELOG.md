@@ -1,3 +1,20 @@
+## [0.23.4](https://github.com/hendripermana/sure/compare/v0.23.3...v0.23.4) (2026-06-13)
+
+### Other Changes
+
+- dependabot/npm_and_yarn/biomejs/biome-2.4.16 (f8276473)
+- dependabot/github_actions/docker/build-push-action-7.2.0 (71dacb41)
+- dependabot/npm_and_yarn/react-dom-19.2.7 (dc32b86c)
+- dependabot/npm_and_yarn/react-19.2.7 (b35e8f79)
+- dependabot/bundler/vernier-1.10.1 (7786c12f)
+- dependabot/bundler/sentry-sidekiq-6.6.0 (71fb61d5)
+- dependabot/bundler/security-4fb5f76ca3 (16b5a517)
+- dependabot/bundler/sidekiq-8.1.6 (d101dd9f)
+- dependabot/bundler/faraday-multipart-1.2.0 (a467b703)
+- dependabot/bundler/httparty-0.24.2 (5e51786a)
+- dependabot/bundler/stripe-19.2.0 (f13c05ee)
+- dependabot/bundler/stackprof-0.2.28 (e11e702f)
+
 ## [0.23.3](https://github.com/hendripermana/sure/compare/v0.23.2...v0.23.3) (2026-06-13)
 
 ### Other Changes
