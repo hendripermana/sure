@@ -1,3 +1,9 @@
+## [0.23.2](https://github.com/hendripermana/sure/compare/v0.23.1...v0.23.2) (2026-06-13)
+
+### Other Changes
+
+- deps-dev(deps-dev): bump webmock from 3.26.1 to 3.26.2 (#163) (f13d5618)
+
 ## [0.23.1](https://github.com/hendripermana/sure/compare/v0.23.0...v0.23.1) (2026-06-13)
 
 ### Other Changes
