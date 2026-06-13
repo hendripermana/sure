@@ -1,4 +1,5 @@
 <%= styled_form_with model: @service, url: @service.new_record? ? services_path : service_path(@service), class: "space-y-4" do |f| %>
+  <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
   <% if @service.errors.any? %>
     <%= render "shared/form_errors", model: @service %>
   <% end %>
@@ -11,10 +12,18 @@
         { prompt: "Select a category...", label: "Category" },
         { required: true } %>
 
-    <%= f.select :billing_frequency,
-        ServiceMerchant::BILLING_FREQUENCIES.map { |b| [b.humanize, b] },
-        { label: "Default Billing Frequency" },
-        { required: true } %>
+    <div class="grid grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)] gap-3">
+      <%= f.number_field :default_interval_count,
+          label: "Default repeat",
+          min: 1,
+          max: 365,
+          value: @service.default_interval_count %>
+      <%= f.select :default_interval_unit,
+          recurring_interval_unit_options,
+          { prompt: "No default", label: "Default interval" },
+          {} %>
+    </div>
+    <p class="text-xs text-secondary">Optional preset for new subscriptions, such as 14 days or 2 weeks. Each subscription can override it.</p>
   </section>
 
   <section class="section-card space-y-2">

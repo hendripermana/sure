@@ -59,7 +59,7 @@ README.md
 CHANGELOG*
 CONTRIBUTING.md
 LICENSE
-# Keep docs/onboarding/ for user guides (Permoney feature)
+# Keep docs/onboarding/ for user guides (Sure feature)
 # Exclude everything else in docs/
 docs/*
 !docs/onboarding/

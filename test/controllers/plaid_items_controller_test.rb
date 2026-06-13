@@ -4,6 +4,7 @@ require "ostruct"
 class PlaidItemsControllerTest < ActionDispatch::IntegrationTest
   setup do
     sign_in @user = users(:family_admin)
+    Setting.stubs(:plaid_enabled).returns(true)
   end
 
   test "create" do

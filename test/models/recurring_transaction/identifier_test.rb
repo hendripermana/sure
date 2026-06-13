@@ -166,6 +166,34 @@ class RecurringTransaction::IdentifierTest < ActiveSupport::TestCase
     assert_equal 0, @family.recurring_transactions.count
   end
 
+  test "identifies a weekly cadence without forcing day-of-month clustering" do
+    account = @family.accounts.first
+    merchant = merchants(:amazon)
+    dates = [ 21, 14, 7, 0 ].map { |days_ago| days_ago.days.ago.to_date }
+
+    dates.each do |date|
+      account.entries.create!(
+        date: date,
+        amount: 12,
+        currency: "USD",
+        name: "Weekly service",
+        entryable: Transaction.new(
+          merchant: merchant,
+          category: categories(:food_and_drink)
+        )
+      )
+    end
+
+    assert_difference "@family.recurring_transactions.count", 1 do
+      @identifier.identify_recurring_patterns
+    end
+
+    recurring = @family.recurring_transactions.first
+    assert_equal 1, recurring.schedule.count
+    assert_equal "week", recurring.schedule.unit
+    assert_equal dates.max + 1.week, recurring.next_expected_date
+  end
+
   test "updates existing recurring transaction when pattern is found again" do
     account = @family.accounts.first
     merchant = merchants(:amazon)  # Use different merchant to avoid fixture conflicts
@@ -206,6 +234,145 @@ class RecurringTransaction::IdentifierTest < ActiveSupport::TestCase
     assert_equal "active", recurring.status
     # Verify last_occurrence_date was updated
     assert recurring.last_occurrence_date >= 2.months.ago.to_date
+  end
+
+  test "identifies same merchant amount separately per account" do
+    merchant = merchants(:netflix)
+    accounts = [ accounts(:depository), accounts(:credit_card) ]
+
+    accounts.each do |account|
+      [ 0, 1, 2 ].each do |months_ago|
+        transaction = Transaction.create!(
+          merchant: merchant,
+          category: categories(:food_and_drink)
+        )
+        account.entries.create!(
+          date: months_ago.months.ago.beginning_of_month + 4.days,
+          amount: 15.99,
+          currency: "USD",
+          name: "Netflix Subscription",
+          entryable: transaction
+        )
+      end
+    end
+
+    assert_difference "@family.recurring_transactions.count", 2 do
+      @identifier.identify_recurring_patterns
+    end
+
+    detected_account_ids = @family.recurring_transactions.pluck(:account_id)
+    assert_equal accounts.map(&:id).sort, detected_account_ids.sort
+  end
+
+  test "does not recreate physically deleted suppressed recurring transaction" do
+    account = @family.accounts.first
+    merchant = merchants(:amazon)
+
+    [ 0, 1, 2 ].each do |months_ago|
+      transaction = Transaction.create!(
+        merchant: merchant,
+        category: categories(:food_and_drink)
+      )
+      account.entries.create!(
+        date: months_ago.months.ago.beginning_of_month + 14.days,
+        amount: 29.99,
+        currency: "USD",
+        name: "Amazon Purchase",
+        entryable: transaction
+      )
+    end
+
+    recurring = @family.recurring_transactions.create!(
+      account: account,
+      merchant: merchant,
+      amount: 29.99,
+      currency: "USD",
+      expected_day_of_month: 15,
+      last_occurrence_date: 2.months.ago.to_date,
+      next_expected_date: 1.month.ago.to_date,
+      occurrence_count: 2,
+      status: "active"
+    )
+
+    recurring.ignore!
+    recurring.destroy!
+
+    assert_no_difference "@family.recurring_transactions.count" do
+      @identifier.identify_recurring_patterns
+    end
+  end
+
+  test "does not reactivate inactive recurring transaction when pattern is found again" do
+    account = @family.accounts.first
+    merchant = merchants(:amazon)
+
+    existing = @family.recurring_transactions.create!(
+      merchant: merchant,
+      amount: 29.99,
+      currency: "USD",
+      expected_day_of_month: 15,
+      last_occurrence_date: 2.months.ago.to_date,
+      next_expected_date: 1.month.ago.to_date,
+      occurrence_count: 2,
+      status: "inactive"
+    )
+
+    [ 0, 1, 2 ].each do |months_ago|
+      transaction = Transaction.create!(
+        merchant: merchant,
+        category: categories(:food_and_drink)
+      )
+      account.entries.create!(
+        date: months_ago.months.ago.beginning_of_month + 14.days,
+        amount: 29.99,
+        currency: "USD",
+        name: "Amazon Purchase",
+        entryable: transaction
+      )
+    end
+
+    assert_no_difference "@family.recurring_transactions.count" do
+      @identifier.identify_recurring_patterns
+    end
+
+    assert_equal "inactive", existing.reload.status
+    assert existing.last_occurrence_date >= 2.months.ago.to_date
+  end
+
+  test "does not recreate ignored recurring transaction when pattern is found again" do
+    account = @family.accounts.first
+    merchant = merchants(:amazon)
+
+    ignored = @family.recurring_transactions.create!(
+      merchant: merchant,
+      amount: 29.99,
+      currency: "USD",
+      expected_day_of_month: 15,
+      last_occurrence_date: 2.months.ago.to_date,
+      next_expected_date: 1.month.ago.to_date,
+      occurrence_count: 2,
+      status: "ignored"
+    )
+
+    [ 0, 1, 2 ].each do |months_ago|
+      transaction = Transaction.create!(
+        merchant: merchant,
+        category: categories(:food_and_drink)
+      )
+      account.entries.create!(
+        date: months_ago.months.ago.beginning_of_month + 14.days,
+        amount: 29.99,
+        currency: "USD",
+        name: "Amazon Purchase",
+        entryable: transaction
+      )
+    end
+
+    assert_no_difference "@family.recurring_transactions.count" do
+      @identifier.identify_recurring_patterns
+    end
+
+    assert_equal "ignored", ignored.reload.status
   end
 
   test "circular_distance calculates correct distance for days near month boundary" do

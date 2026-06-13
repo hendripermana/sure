@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <style>
       body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
       .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -18,22 +18,23 @@
       <div class="header">
         <h1>📅 Subscription Renewal Reminder</h1>
       </div>
-      
+
       <div class="content">
-        <h2>Hello <%= @family&.primary_user&.first_name || 'there' %>!</h2>
-        
+        <h2>Hello <%= @family&.primary_user&.first_name || "there" %>!</h2>
+
         <p>This is a reminder that your subscription will renew soon:</p>
-        
+
         <div class="subscription-details">
-          <h3><%= @subscription.service&.category_icon || '📋' %> <%= @subscription.name %></h3>
-          <p><strong>Service:</strong> <%= @subscription.service&.name || 'Unknown Service' %></p>
+          <% service = @subscription.service_merchant %>
+          <h3><%= service&.category_icon || "📋" %> <%= @subscription.name %></h3>
+          <p><strong>Service:</strong> <%= service&.name || "Unknown Service" %></p>
           <p><strong>Amount:</strong> <%= number_to_currency(@subscription.amount, unit: @subscription.currency + " ") %> / <%= @subscription.billing_cycle %></p>
-          <p><strong>Next Billing Date:</strong> <%= @subscription.next_billing_at&.strftime("%B %d, %Y") || 'Not scheduled' %></p>
+          <p><strong>Next Billing Date:</strong> <%= @subscription.next_billing_at&.strftime("%B %d, %Y") || "Not scheduled" %></p>
           <% if @subscription.auto_renewal_enabled? %>
             <p><strong>Payment Method:</strong> <%= @subscription.payment_method&.humanize %></p>
           <% end %>
         </div>
-        
+
         <% if @days_until_renewal == 0 %>
           <div class="alert">
             <strong>⚡ Action Required Today!</strong><br>
@@ -47,7 +48,7 @@
         <% else %>
           <p><strong>📅 Renewal in <%= @days_until_renewal %> days</strong></p>
         <% end %>
-        
+
         <% if @subscription.auto_renewal_enabled? %>
           <p>Your subscription is set to auto-renew. No action is needed unless you want to:</p>
           <ul>
@@ -61,16 +62,16 @@
             Auto-renewal is disabled for this subscription. You'll need to manually renew it.
           </div>
         <% end %>
-        
+
         <div style="text-align: center; margin: 30px 0;">
-          <%= link_to "Manage Subscription", subscription_plan_url(@subscription, host: ENV.fetch('DOMAIN', 'localhost:3000')), class: "button" %>
+          <%= link_to "Manage Subscription", subscription_plan_url(@subscription, host: ENV.fetch("DOMAIN", "localhost:3000")), class: "button" %>
         </div>
-        
+
         <p>If you have any questions or need assistance, please don't hesitate to contact us.</p>
       </div>
-      
+
       <div class="footer">
-        <p>Best regards,<br>The Permoney Team</p>
+        <p>Best regards,<br>The Sure Team</p>
         <p>This is an automated message from your subscription manager.</p>
         <p>You're receiving this email because you have active subscriptions.</p>
       </div>

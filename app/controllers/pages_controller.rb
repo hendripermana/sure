@@ -13,6 +13,9 @@ class PagesController < ApplicationController
     @kpi_monthly_expenses = Current.family.kpi_monthly_expenses
     @kpi_savings_rate = Current.family.kpi_savings_rate
 
+    # Stale account detection for manual entry accounts
+    @stale_accounts = detect_stale_manual_accounts
+
     # Use the same period for all widgets (set by Periodable concern)
     family_currency = Current.family.currency
 
@@ -64,6 +67,27 @@ class PagesController < ApplicationController
   private
     def github_provider
       Provider::Registry.get_provider(:github)
+    end
+
+    # Detects manual entry accounts that haven't had new entries in 7+ days
+    # Uses a single efficient query to avoid N+1
+    def detect_stale_manual_accounts
+      stale_threshold = 7.days.ago.to_date
+
+      Current.family.accounts.visible.manual.select { |account|
+        last_entry = account.entries.maximum(:date)
+        next false unless last_entry # Skip accounts with no entries at all (newly created)
+
+        last_entry < stale_threshold
+      }.map { |account|
+        last_entry_date = account.entries.maximum(:date)
+        days_ago = (Date.current - last_entry_date).to_i
+        OpenStruct.new(
+          account: account,
+          last_entry_date: last_entry_date,
+          days_since_last_entry: days_ago
+        )
+      }.sort_by { |s| -s.days_since_last_entry }
     end
 
     def build_cashflow_sankey_data(income_totals, expense_totals, currency_symbol)

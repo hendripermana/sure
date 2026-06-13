@@ -1,4 +1,4 @@
-const CACHE_VERSION = "permoney-offline-v1";
+const CACHE_VERSION = "sure-offline-v1";
 const OFFLINE_ASSETS = ["/offline.html", "/logo-offline.svg"];
 
 // Install event - cache the offline page and assets

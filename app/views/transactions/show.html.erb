@@ -20,7 +20,7 @@
                     <p class="text-sm font-medium text-primary"><%= potential_match.name %></p>
                     <p class="text-xs text-secondary"><%= potential_match.date.strftime("%b %d, %Y") %> • <%= potential_match.account.name %></p>
                   </div>
-                  <p class="text-sm font-medium <%= potential_match.amount.negative? ? 'text-green-600' : 'text-primary' %>">
+                  <p class="text-sm font-medium <%= potential_match.amount.negative? ? "text-green-600" : "text-primary" %>">
                     <%= format_money(-potential_match.amount_money) %>
                   </p>
                 </div>
@@ -113,7 +113,7 @@
             <%= f.fields_for :entryable do |ef| %>
 
               <%= ef.collection_select :merchant_id,
-                    [@entry.transaction.merchant, *Current.family.merchants.alphabetically].compact,
+                    [@entry.transaction.merchant, *Current.family.available_transaction_merchants].compact,
                     :id, :name,
                     { include_blank: t(".none"),
                       label: t(".merchant_label"),

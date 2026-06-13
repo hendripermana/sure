@@ -1,4 +1,4 @@
-# Permoney Code Style & Conventions
+# Sure Code Style & Conventions
 
 ## Ruby Conventions
 
@@ -12,12 +12,12 @@
   - Views: `app/views/`
   - Components: `app/components/`
   - Jobs: `app/jobs/`
-  - Services: `app/services/`
+  - Domain collaborators: prefer POROs and concerns under `app/models/`
 
 ### Rails Conventions
 - **Controllers**: Skinny controllers - business logic belongs in models
 - **Models**: Fat models - contain domain business logic
-- **Validations**: 
+- **Validations**:
   - Simple validations (null checks, unique indexes) in DB
   - ActiveRecord validations for convenience
   - Complex logic and business rules in ActiveRecord
@@ -34,10 +34,9 @@ current_user
 current_family
 ```
 
-### Type Hints & Documentation
-- Use comments for complex logic
-- Document public methods
-- Explain "why" not "what"
+### Documentation
+- Add comments only where complex logic is not self-explanatory
+- Explain invariants and provider behavior, not line-by-line mechanics
 
 ## JavaScript/TypeScript Conventions
 
@@ -49,13 +48,12 @@ current_family
 ### Code Style
 - Use Biome for automated formatting
 - 2-space indentation
-- Single quotes for strings (enforced by Biome)
-- Semicolons at end of statements
+- Follow the repository's current Biome configuration
 
 ### Stimulus Controllers
 ```javascript
 // File: app/javascript/controllers/example_controller.js
-// Naming: kebab-case file name → camelCase class + Controller suffix
+// Naming: snake_case filename, registered as a hyphenated Stimulus identifier
 export default class ExampleController extends Controller {
   static targets = ["button", "content"];
   static values = { delay: Number };
@@ -68,9 +66,7 @@ export default class ExampleController extends Controller {
     // Clean up resources here
   }
 
-  private doSomething() {
-    // Private methods start with #
-  }
+  #doSomething() {}
 }
 ```
 
@@ -84,7 +80,7 @@ export default class ExampleController extends Controller {
 ## CSS/Styling Conventions
 
 ### TailwindCSS & Design System
-- **Always use design tokens** from `app/assets/tailwind/permoney-design-system.css`
+- **Always use design tokens** from `app/assets/tailwind/Sure-design-system.css`
 - Use functional tokens:
   - `text-primary` instead of `text-white`
   - `bg-container` instead of `bg-white`
@@ -207,7 +203,7 @@ end
 ### Rubocop
 - Configuration: `.rubocop.yml`
 - Run before PRs: `bin/rubocop -f github -a`
-- Covers Ruby, Rails, and RSpec style
+- Covers Ruby and Rails style
 
 ### Biome
 - Configuration: `biome.json`
