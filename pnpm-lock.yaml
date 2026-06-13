@@ -10,13 +10,13 @@ importers:
     dependencies:
       framer-motion:
         specifier: ^12.23.12
-        version: 12.40.0(react-dom@19.2.6(react@19.2.7))(react@19.2.7)
+        version: 12.40.0(react-dom@19.2.7(react@19.2.6))(react@19.2.6)
       react:
-        specifier: ^19.2.7
-        version: 19.2.7
-      react-dom:
         specifier: ^19.1.1
-        version: 19.2.6(react@19.2.7)
+        version: 19.2.6
+      react-dom:
+        specifier: ^19.2.7
+        version: 19.2.7(react@19.2.6)
       zod:
         specifier: ^4.1.5
         version: 4.4.3
@@ -104,13 +104,13 @@ packages:
   motion-utils@12.39.0:
     resolution: {integrity: sha512-8nadJAJjTtqRkmRF36FoJTrywK9nnFmnPwnSMyxaOCU7GDjN9RTMJIxx9De8ErM+vpPhMccr/6fo5WciyQLnMQ==}
 
-  react-dom@19.2.6:
-    resolution: {integrity: sha512-0prMI+hvBbPjsWnxDLxlCGyM8PN6UuWjEUCYmZhO67xIV9Xasa/r/vDnq+Xyq4Lo27g8QSbO5YzARu0D1Sps3g==}
+  react-dom@19.2.7:
+    resolution: {integrity: sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==}
     peerDependencies:
-      react: ^19.2.6
+      react: ^19.2.7
 
-  react@19.2.7:
-    resolution: {integrity: sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==}
+  react@19.2.6:
+    resolution: {integrity: sha512-sfWGGfavi0xr8Pg0sVsyHMAOziVYKgPLNrS7ig+ivMNb3wbCBw3KxtflsGBAwD3gYQlE/AEZsTLgToRrSCjb0Q==}
     engines: {node: '>=0.10.0'}
 
   scheduler@0.27.0:
@@ -159,14 +159,14 @@ snapshots:
   '@biomejs/cli-win32-x64@2.4.15':
     optional: true
 
-  framer-motion@12.40.0(react-dom@19.2.6(react@19.2.7))(react@19.2.7):
+  framer-motion@12.40.0(react-dom@19.2.7(react@19.2.6))(react@19.2.6):
     dependencies:
       motion-dom: 12.40.0
       motion-utils: 12.39.0
       tslib: 2.8.1
     optionalDependencies:
-      react: 19.2.7
-      react-dom: 19.2.6(react@19.2.7)
+      react: 19.2.6
+      react-dom: 19.2.7(react@19.2.6)
 
   motion-dom@12.40.0:
     dependencies:
@@ -174,12 +174,12 @@ snapshots:
 
   motion-utils@12.39.0: {}
 
-  react-dom@19.2.6(react@19.2.7):
+  react-dom@19.2.7(react@19.2.6):
     dependencies:
-      react: 19.2.7
+      react: 19.2.6
       scheduler: 0.27.0
 
-  react@19.2.7: {}
+  react@19.2.6: {}
 
   scheduler@0.27.0: {}
 
