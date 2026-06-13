@@ -113,6 +113,9 @@ scripts/*
 # AI Agents & IDE Skills Cache
 .agents/
 .claude/
+!.claude/
+.claude/*
+!.claude/settings.json
 .factory/
 .junie/
 .kilocode/
@@ -126,3 +129,12 @@ credentials.json
 *.pem
 *.key
 .credentials
+-e 
+# Development tooling
+.commandcode/
+
+# Catchup analysis (not for commit)
+docs/CATCHUP_SURE_COMMUNITY.md
+
+# Catchup analysis (not for commit)
+docs/CATCHUP_SURE_COMMUNITY.md

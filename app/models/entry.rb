@@ -41,6 +41,7 @@ class Entry < ApplicationRecord
   validate :split_child_date_matches_parent
 
   before_destroy :prevent_individual_child_deletion, if: :split_child?
+  after_commit :enqueue_recurring_reconciliation, on: %i[create update]
 
   scope :visible, -> {
     joins(:account).where(accounts: { status: [ "draft", "active" ] })
@@ -372,6 +373,13 @@ class Entry < ApplicationRecord
 
     ALLOWED_RECEIPT_TYPES = %w[image/jpeg image/png image/webp application/pdf].freeze
     MAX_RECEIPT_SIZE = 10.megabytes
+
+    def enqueue_recurring_reconciliation
+      return unless entryable_type == "Transaction"
+      return unless previous_changes.keys.intersect?(%w[id date amount currency account_id entryable_id])
+
+      ReconcileTransactionJob.perform_later(id)
+    end
 
     def receipt_content_type_valid
       unless receipt.content_type.in?(ALLOWED_RECEIPT_TYPES)

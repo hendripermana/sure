@@ -1,6 +1,6 @@
 class Demo::IdrGenerator < Demo::Generator
   # Generate comprehensive realistic demo data with IDR currency and Indonesian features
-  def generate_idr_data!(skip_clear: false, email: "user@permoney.id")
+  def generate_idr_data!(skip_clear: false, email: "user@sure.id")
     if skip_clear
       puts "⏭️  Skipping data clearing (appending new family)..."
     else
@@ -24,7 +24,7 @@ class Demo::IdrGenerator < Demo::Generator
   end
 
   # Generate IDR demo data with enhanced personal lending features
-  def generate_idr_personal_lending_data!(skip_clear: false, email: "user@permoney.id")
+  def generate_idr_personal_lending_data!(skip_clear: false, email: "user@sure.id")
     if skip_clear
       puts "⏭️  Skipping data clearing (appending new family)..."
     else
@@ -66,7 +66,7 @@ class Demo::IdrGenerator < Demo::Generator
       family.users.create!(
         email: email,
         first_name: "Demo (admin)",
-        last_name: "Permoney",
+        last_name: "Sure",
         role: "admin",
         password: "password",
         onboarded_at: onboarded ? Time.current : nil
@@ -76,7 +76,7 @@ class Demo::IdrGenerator < Demo::Generator
       family.users.create!(
         email: "partner_#{email}",
         first_name: "Demo (member)",
-        last_name: "Permoney",
+        last_name: "Sure",
         role: "member",
         password: "password",
         onboarded_at: onboarded ? Time.current : nil

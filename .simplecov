@@ -1,4 +1,4 @@
-# SimpleCov configuration for Permoney Rails application
+# SimpleCov configuration for Sure Rails application
 # This file configures test coverage reporting
 
 require 'simplecov'

@@ -43,11 +43,12 @@ class Family::SyncCompleteEvent
       )
     end
 
-    # Identify recurring transaction patterns after sync
+    # Debounce identification so overlapping provider syncs cannot analyze a
+    # partial transaction set or run the same family concurrently.
     begin
-      RecurringTransaction.identify_patterns_for(family)
+      RecurringTransaction.schedule_identification_for(family)
     rescue => e
-      Rails.logger.error("Family::SyncCompleteEvent recurring transaction identification failed: #{e.message}\n#{e.backtrace&.join("\n")}")
+      Rails.logger.error("Family::SyncCompleteEvent recurring transaction scheduling failed: #{e.message}\n#{e.backtrace&.join("\n")}")
     end
   end
 end

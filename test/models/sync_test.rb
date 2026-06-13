@@ -247,6 +247,45 @@ class SyncTest < ActiveSupport::TestCase
     assert_includes syncs, sync_account
   end
 
+  test "for_family includes every syncable provider item association" do
+    family = families(:dylan_family)
+    associations = Family.reflect_on_all_associations(:has_many).select do |association|
+      association.name.to_s.end_with?("_items") &&
+        association.klass.included_modules.include?(Syncable)
+    rescue NameError
+      false
+    end
+
+    syncs = associations.filter_map do |association|
+      syncable = family.public_send(association.name).first
+      Sync.create!(syncable: syncable, status: "completed") if syncable
+    end
+
+    assert syncs.any?
+    assert_equal syncs.map(&:id).sort, Sync.for_family(family).where(id: syncs.map(&:id)).pluck(:id).sort
+  end
+
+  test "any_incomplete_for detects family provider syncs" do
+    family = families(:dylan_family)
+    Sync.for_family(family).incomplete.destroy_all
+    provider_association = Family.reflect_on_all_associations(:has_many).find do |association|
+      association.name.to_s.end_with?("_items") &&
+        association.klass.included_modules.include?(Syncable) &&
+        family.public_send(association.name).exists?
+    rescue NameError
+      false
+    end
+
+    assert_not Sync.any_incomplete_for?(family)
+
+    provider_item = family.public_send(provider_association.name).first
+    sync = Sync.create!(syncable: provider_item, status: "pending")
+    assert Sync.any_incomplete_for?(family)
+
+    sync.update!(status: "completed")
+    assert_not Sync.any_incomplete_for?(family)
+  end
+
   test "retry! resets state and re-enqueues sync job" do
     sync = Sync.create!(syncable: accounts(:depository), status: "failed", error: "Fatal error", failed_at: Time.current)
 

@@ -21,7 +21,7 @@ rescue LoadError
   # Pagy not available in this environment
 end
 
-module Permoney
+module Sure
   class Application < Rails::Application
     # Initialize configuration defaults for Rails 8.1
     config.load_defaults 8.1
@@ -67,8 +67,8 @@ module Permoney
     # Rails metrics middleware for Prometheus (Phase 2 APM optimization)
     config.middleware.insert_after Rack::Deflater, RailsMetricsMiddleware
 
-    # Permoney: Dynamic branding configuration (used by helpers and mailers)
-    config.x.brand_name = ENV.fetch("BRAND_NAME", "Permoney")
+    # Sure: Dynamic branding configuration (used by helpers and mailers)
+    config.x.brand_name = ENV.fetch("BRAND_NAME", "Sure")
     config.x.product_name = ENV.fetch("PRODUCT_NAME", "Finance")
   end
 end

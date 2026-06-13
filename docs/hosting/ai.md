@@ -1,23 +1,23 @@
 # LLM Configuration Guide
 
-This document explains how Permoney uses Large Language Models (LLMs) for AI features and how to configure them for your deployment.
+This document explains how Sure uses Large Language Models (LLMs) for AI features and how to configure them for your deployment.
 
 ## Overview
 
-Permoney includes an AI assistant that can help users understand their financial data by answering questions about accounts, transactions, income, expenses, net worth, and more. The assistant uses LLMs to process natural language queries and provide insights based on the user's financial data.
+Sure includes an AI assistant that can help users understand their financial data by answering questions about accounts, transactions, income, expenses, net worth, and more. The assistant uses LLMs to process natural language queries and provide insights based on the user's financial data.
 
 ## Quickstart: OpenAI Token
 
-The easiest way to get started with AI features in Permoney is to use OpenAI:
+The easiest way to get started with AI features in Sure is to use OpenAI:
 
 1. Get an API key from [OpenAI](https://platform.openai.com/api-keys)
 2. Set the environment variable:
    ```bash
    OPENAI_ACCESS_TOKEN=sk-proj-...your-key-here...
    ```
-3. (Re-)Start Permoney (both `web` and `worker` services!) and the AI assistant will be available to use after you agree/allow via UI option
+3. (Re-)Start Sure (both `web` and `worker` services!) and the AI assistant will be available to use after you agree/allow via UI option
 
-That's it! Permoney will use OpenAI with a default model (currently `gpt-4.1`) for all AI operations.
+That's it! Sure will use OpenAI with a default model (currently `gpt-4.1`) for all AI operations.
 
 Optional overrides:
 
@@ -73,15 +73,15 @@ The amount of VRAM (GPU memory) you need depends on the model size:
 - **Minimum (8GB VRAM):** Can run 7B parameter models like `llama3.2:7b` or `gemma2:7b`
   - Works for basic chat functionality
   - May struggle with complex financial analysis
-  
+
 - **Recommended (16GB+ VRAM):** Can run 13B-14B parameter models like `llama3.1:13b` or `qwen2.5:14b`
   - Good balance of performance and hardware requirements
   - Handles most financial queries well
-  
+
 - **Ideal (24GB+ VRAM):** Can run 30B+ parameter models or run smaller models with higher precision
   - Best quality responses
   - Complex reasoning about financial data
-  
+
 **CPU-only inference:** Possible but extremely slow (10-100x slower). Not recommended for production use.
 
 **When to use:**
@@ -93,7 +93,7 @@ The amount of VRAM (GPU memory) you need depends on the model size:
 
 ## Cloud Providers
 
-Permoney supports any OpenAI-compatible API endpoint. Here are tested providers:
+Sure supports any OpenAI-compatible API endpoint. Here are tested providers:
 
 ### OpenAI (Primary Support)
 
@@ -159,10 +159,10 @@ Any service offering an OpenAI-compatible API should work:
    ```bash
    # macOS
    brew install ollama
-   
+
    # Linux
    curl -fsSL https://ollama.com/install.sh | sh
-   
+
    # Windows
    # Download from https://ollama.com/download
    ```
@@ -176,17 +176,17 @@ Any service offering an OpenAI-compatible API should work:
    ```bash
    # Smaller, faster (requires 8GB VRAM)
    ollama pull gemma2:7b
-   
+
    # Balanced (requires 16GB VRAM)
    ollama pull llama3.1:13b
-   
+
    # Larger, more capable (requires 24GB+ VRAM)
    ollama pull qwen2.5:32b
    ```
 
 ### Configuration
 
-Configure Permoney to use Ollama:
+Configure Sure to use Ollama:
 
 ```bash
 # Dummy token (Ollama doesn't need authentication)
@@ -206,7 +206,7 @@ OPENAI_MODEL=llama3.1:13b
 
 ### Docker Compose Example
 
-Permoney ships an example compose file that wires up Ollama (and optional Open WebUI) alongside the app:
+Sure ships an example compose file that wires up Ollama (and optional Open WebUI) alongside the app:
 
 ```bash
 cp compose.example.ai.yml compose.yml
@@ -275,7 +275,7 @@ For self-hosted deployments, you can configure AI settings through the web inter
 
 ## Observability with Langfuse
 
-Permoney includes built-in support for [Langfuse](https://langfuse.com/), an open-source LLM observability platform.
+Sure includes built-in support for [Langfuse](https://langfuse.com/), an open-source LLM observability platform.
 
 ### What is Langfuse?
 
@@ -293,14 +293,14 @@ Langfuse helps you:
 
 2. Get your API keys from the Langfuse dashboard
 
-3. Configure Permoney:
+3. Configure Sure:
    ```bash
    LANGFUSE_PUBLIC_KEY=pk-lf-...
    LANGFUSE_SECRET_KEY=sk-lf-...
    LANGFUSE_HOST=https://cloud.langfuse.com  # or your self-hosted URL
    ```
 
-4. Restart Permoney
+4. Restart Sure
 
 All LLM operations will now be logged to Langfuse, including:
 - Chat messages and responses
@@ -309,7 +309,7 @@ All LLM operations will now be logged to Langfuse, including:
 - Token usage and costs
 - Response times
 
-### Langfuse Features in Permoney
+### Langfuse Features in Sure
 
 - **Automatic tracing:** Every LLM call is automatically traced
 - **Session tracking:** Chat sessions are tracked with a unique session ID
@@ -350,7 +350,7 @@ All LLM operations will now be logged to Langfuse, including:
 
 Test your AI configuration:
 
-1. Go to the Chat interface in Permoney
+1. Go to the Chat interface in Sure
 2. Try these test prompts:
    - "Show me my total spending this month"
    - "What are my top 5 spending categories?"
@@ -363,7 +363,7 @@ Test your AI configuration:
 
 ### Automated Evaluation
 
-Permoney includes an internal eval system for LLM quality checks and optional Langfuse experiment uploads.
+Sure includes an internal eval system for LLM quality checks and optional Langfuse experiment uploads.
 
 Quickstart (local eval run):
 
@@ -465,7 +465,7 @@ CHAT_PROVIDER=openai
 CHAT_MODEL=gpt-4.1
 ```
 
-**Note:** Permoney currently uses a single provider for all operations, but this could be customized.
+**Note:** Sure currently uses a single provider for all operations, but this could be customized.
 
 ## Troubleshooting
 
@@ -517,7 +517,7 @@ ollama pull model-name  # Install a model
 **Fix:**
 1. Check `OPENAI_ACCESS_TOKEN` is set
 2. For custom providers, verify `OPENAI_URI_BASE` and `OPENAI_MODEL`
-3. Restart Permoney after changing environment variables
+3. Restart Sure after changing environment variables
 4. Check logs for specific error messages
 
 ### High Costs
@@ -539,7 +539,7 @@ ollama pull model-name  # Install a model
 
 ### Custom System Prompts
 
-Permoney's AI assistant uses a system prompt that defines its behavior. The prompt is defined in `app/models/assistant/configurable.rb`.
+Sure's AI assistant uses a system prompt that defines its behavior. The prompt is defined in `app/models/assistant/configurable.rb`.
 
 To customize:
 1. Fork the repository
@@ -593,13 +593,13 @@ end
 - [Ollama Documentation](https://github.com/ollama/ollama)
 - [OpenRouter Documentation](https://openrouter.ai/docs)
 - [Langfuse Documentation](https://langfuse.com/docs)
-- [Permoney GitHub Repository](https://github.com/hendripermana/permoney)
+- [Sure GitHub Repository](https://github.com/hendripermana/sure)
 
 ## Support
 
 For issues with AI features:
 1. Check this documentation first
-2. Search [existing GitHub issues](https://github.com/hendripermana/permoney/issues)
+2. Search [existing GitHub issues](https://github.com/hendripermana/sure/issues)
 3. Open a new issue with:
    - Your configuration (redact API keys!)
    - Error messages

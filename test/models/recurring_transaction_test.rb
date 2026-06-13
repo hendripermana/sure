@@ -60,6 +60,72 @@ class RecurringTransactionTest < ActiveSupport::TestCase
     end
   end
 
+  test "identify_patterns_for excludes transfer transactions" do
+    account = @family.accounts.first
+
+    [ 0, 1, 2 ].each do |months_ago|
+      transaction = Transaction.create!(
+        kind: "funds_movement",
+        merchant: @merchant,
+        category: categories(:food_and_drink)
+      )
+      account.entries.create!(
+        date: months_ago.months.ago.beginning_of_month + 5.days,
+        amount: 500,
+        currency: "USD",
+        name: "Monthly account transfer",
+        entryable: transaction
+      )
+    end
+
+    assert_no_difference "@family.recurring_transactions.count" do
+      RecurringTransaction.identify_patterns_for(@family)
+    end
+  end
+
+  test "identity signature normalizes names, amounts, and currency" do
+    signature = RecurringTransaction.identity_signature_for(
+      account_id: accounts(:depository).id,
+      destination_account_id: nil,
+      merchant_id: nil,
+      name: "  Gym   Membership ",
+      amount: "25.0000",
+      currency: "usd"
+    )
+    equivalent_signature = RecurringTransaction.identity_signature_for(
+      account_id: accounts(:depository).id,
+      destination_account_id: nil,
+      merchant_id: nil,
+      name: "gym membership",
+      amount: "25.00",
+      currency: "USD"
+    )
+
+    assert_equal signature, equivalent_signature
+  end
+
+  test "identity signature distinguishes recurring transfer destinations" do
+    source = accounts(:depository)
+    common = {
+      account_id: source.id,
+      merchant_id: nil,
+      name: "Monthly transfer",
+      amount: 100,
+      currency: "USD"
+    }
+
+    credit_card_signature = RecurringTransaction.identity_signature_for(
+      **common,
+      destination_account_id: accounts(:credit_card).id
+    )
+    investment_signature = RecurringTransaction.identity_signature_for(
+      **common,
+      destination_account_id: accounts(:investment).id
+    )
+
+    assert_not_equal credit_card_signature, investment_signature
+  end
+
   test "calculate_next_expected_date handles end of month correctly" do
     recurring = @family.recurring_transactions.create!(
       merchant: @merchant,
@@ -139,6 +205,156 @@ class RecurringTransactionTest < ActiveSupport::TestCase
     assert_equal 4, recurring.occurrence_count
     assert_equal "active", recurring.status
     assert recurring.next_expected_date > new_date
+  end
+
+  test "ignore! suppresses recurring transaction without deleting detection memory" do
+    recurring = @family.recurring_transactions.create!(
+      merchant: merchants(:amazon),
+      amount: 45.99,
+      currency: "USD",
+      expected_day_of_month: 5,
+      last_occurrence_date: 1.month.ago.to_date,
+      next_expected_date: Date.current,
+      status: "active",
+      occurrence_count: 3
+    )
+
+    assert_no_difference "RecurringTransaction.count" do
+      recurring.ignore!
+    end
+
+    assert_equal "ignored", recurring.reload.status
+    assert_not_includes @family.recurring_transactions.visible, recurring
+  end
+
+  test "record_occurrence! does not reactivate ignored recurring transaction" do
+    recurring = @family.recurring_transactions.create!(
+      merchant: merchants(:amazon),
+      amount: 45.99,
+      currency: "USD",
+      expected_day_of_month: 5,
+      last_occurrence_date: 1.month.ago.to_date,
+      next_expected_date: Date.current,
+      status: "ignored",
+      occurrence_count: 3
+    )
+
+    assert_no_changes "recurring.reload.status" do
+      assert_equal false, recurring.record_occurrence!(Date.current)
+    end
+  end
+
+  test "create_subscription_plan! creates subscription and suppresses recurring candidate" do
+    account = @family.accounts.first
+    merchant = merchants(:amazon)
+
+    [ 0, 1, 2 ].each do |months_ago|
+      transaction = Transaction.create!(
+        merchant: merchant,
+        category: categories(:food_and_drink)
+      )
+      account.entries.create!(
+        date: months_ago.months.ago.beginning_of_month + 5.days,
+        amount: 45.99,
+        currency: "USD",
+        name: "Amazon Prime",
+        entryable: transaction
+      )
+    end
+
+    recurring = @family.recurring_transactions.create!(
+      merchant: merchant,
+      amount: 45.99,
+      currency: "USD",
+      expected_day_of_month: 5,
+      last_occurrence_date: Date.current,
+      next_expected_date: 1.month.from_now.to_date,
+      status: "active",
+      occurrence_count: 3
+    )
+
+    assert_difference "SubscriptionPlan.count", 1 do
+      @subscription_plan = recurring.create_subscription_plan!
+    end
+
+    assert_equal "ignored", recurring.reload.status
+    assert_equal account, @subscription_plan.account
+    assert_equal merchant, @subscription_plan.merchant
+    assert_equal "Amazon", @subscription_plan.name
+    assert_equal recurring.amount, @subscription_plan.amount
+    assert_equal recurring.next_expected_date, @subscription_plan.next_billing_at
+    assert_equal recurring.id, @subscription_plan.metadata.dig("source", "id")
+  end
+
+  test "create_subscription_plan! reuses existing matching subscription" do
+    merchant = merchants(:amazon)
+    existing = @family.subscription_plans.create!(
+      account: @family.accounts.first,
+      merchant: merchant,
+      name: "Amazon",
+      amount: 45.99,
+      currency: "USD",
+      billing_cycle: "monthly",
+      status: "active",
+      payment_method: "manual",
+      started_at: 1.month.ago.to_date,
+      next_billing_at: 1.month.from_now.to_date,
+      auto_renew: true
+    )
+
+    recurring = @family.recurring_transactions.create!(
+      merchant: merchant,
+      amount: 45.99,
+      currency: "USD",
+      expected_day_of_month: 5,
+      last_occurrence_date: Date.current,
+      next_expected_date: 1.month.from_now.to_date,
+      status: "active",
+      occurrence_count: 3
+    )
+
+    assert_no_difference "SubscriptionPlan.count" do
+      assert_equal existing, recurring.create_subscription_plan!
+    end
+
+    assert_equal "ignored", recurring.reload.status
+  end
+
+  test "create_subscription_plan! rejects recurring income" do
+    recurring = @family.recurring_transactions.create!(
+      merchant: merchants(:amazon),
+      amount: -1000.00,
+      currency: "USD",
+      expected_day_of_month: 5,
+      last_occurrence_date: Date.current,
+      next_expected_date: 1.month.from_now.to_date,
+      status: "active",
+      occurrence_count: 3
+    )
+
+    assert_no_difference "SubscriptionPlan.count" do
+      error = assert_raises(ArgumentError) { recurring.create_subscription_plan! }
+      assert_equal "Only recurring expenses can become subscription plans", error.message
+    end
+  end
+
+  test "create_subscription_plan! rejects recurring transfers" do
+    recurring = @family.recurring_transactions.create!(
+      account: accounts(:depository),
+      destination_account: accounts(:credit_card),
+      name: "Card payment",
+      amount: 100,
+      currency: "USD",
+      expected_day_of_month: 5,
+      last_occurrence_date: Date.current,
+      next_expected_date: 1.month.from_now.to_date,
+      status: "active",
+      occurrence_count: 1,
+      manual: true
+    )
+
+    assert_not recurring.subscription_candidate?
+    assert_raises(ArgumentError) { recurring.create_subscription_plan! }
   end
 
   test "identify_patterns_for preserves sign for income transactions" do
@@ -263,6 +479,91 @@ class RecurringTransactionTest < ActiveSupport::TestCase
     matches = recurring.matching_transactions
     assert_equal 3, matches.size
     assert matches.all? { |entry| entry.name == "Gym Membership" }
+  end
+
+  test "matching_transactions excludes transfer transactions with the same merchant and amount" do
+    account = @family.accounts.first
+    recurring = @family.recurring_transactions.create!(
+      account: account,
+      merchant: @merchant,
+      amount: 15.99,
+      currency: "USD",
+      expected_day_of_month: 5,
+      last_occurrence_date: Date.current,
+      next_expected_date: 1.month.from_now.to_date,
+      status: "active"
+    )
+
+    standard = Transaction.create!(merchant: @merchant, kind: "standard")
+    transfer = Transaction.create!(merchant: @merchant, kind: "funds_movement")
+
+    standard_entry = account.entries.create!(
+      date: Date.current.beginning_of_month + 4.days,
+      amount: 15.99,
+      currency: "USD",
+      name: "Netflix",
+      entryable: standard
+    )
+    account.entries.create!(
+      date: Date.current.beginning_of_month + 4.days,
+      amount: 15.99,
+      currency: "USD",
+      name: "Netflix",
+      entryable: transfer
+    )
+
+    assert_equal [ standard_entry.id ], recurring.matching_transactions.pluck(:id)
+  end
+
+  test "create_from_transfer stores both endpoints and matches the transfer pair" do
+    source = accounts(:depository)
+    destination = accounts(:credit_card)
+    date = Date.current.beginning_of_month + 4.days
+    outflow = source.entries.create!(
+      date: date,
+      amount: 250,
+      currency: "USD",
+      name: "Card payment",
+      entryable: Transaction.new(kind: "cc_payment")
+    )
+    inflow = destination.entries.create!(
+      date: date,
+      amount: -250,
+      currency: "USD",
+      name: "Card payment",
+      entryable: Transaction.new(kind: "funds_movement")
+    )
+    transfer = Transfer.create!(
+      outflow_transaction: outflow.entryable,
+      inflow_transaction: inflow.entryable,
+      status: "confirmed"
+    )
+
+    recurring = RecurringTransaction.create_from_transfer(transfer)
+
+    assert recurring.transfer?
+    assert_equal source, recurring.account
+    assert_equal destination, recurring.destination_account
+    assert_equal [ outflow.id ], recurring.matching_transactions.pluck(:id)
+    assert_equal source, recurring.projected_entry.source_account
+    assert_equal destination, recurring.projected_entry.destination_account
+  end
+
+  test "recurring transfer rejects identical endpoints" do
+    recurring = @family.recurring_transactions.build(
+      account: accounts(:depository),
+      destination_account: accounts(:depository),
+      name: "Invalid transfer",
+      amount: 100,
+      currency: "USD",
+      expected_day_of_month: 5,
+      last_occurrence_date: Date.current,
+      next_expected_date: 1.month.from_now.to_date,
+      manual: true
+    )
+
+    assert_not recurring.valid?
+    assert_includes recurring.errors[:destination_account], "cannot be the same as the source account"
   end
 
   test "validation requires either merchant or name" do

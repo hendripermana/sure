@@ -68,6 +68,20 @@ class SubscriptionMailer < ApplicationMailer
     mail(to: recipient, subject: "Your #{subscription.name} trial has expired")
   end
 
+  def recurring_anomaly(family, commitment, event)
+    @family = family
+    @commitment = commitment
+    @event_data = event.changeset
+
+    recipient = safe_recipient_email(family)
+    return unless recipient.present?
+
+    mail(
+      to: recipient,
+      subject: "Recurring payment needs attention: #{commitment.name}"
+    )
+  end
+
   # Subscription cancelled confirmation
   def subscription_cancelled(subscription)
     @subscription = subscription

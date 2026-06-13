@@ -9,6 +9,42 @@ class SubscriptionPlansControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get subscription_plans_url
     assert_response :success
+    assert_select "a[href='#{new_subscription_plan_path}'].bg-primary.text-on-primary", text: /Add Subscription/
+  end
+
+  test "index edit action uses full page navigation" do
+    get subscription_plans_url
+
+    assert_response :success
+    assert_select "a[href='#{edit_subscription_plan_path(@subscription_plan)}']", minimum: 1
+    assert_select "a[href='#{edit_subscription_plan_path(@subscription_plan)}'][data-turbo-frame='modal']", count: 0
+  end
+
+  test "index renders destructive menu confirmation for cancelled subscriptions" do
+    @subscription_plan.update!(status: "cancelled")
+
+    get subscription_plans_url
+    assert_response :success
+
+    row_id = ActionView::RecordIdentifier.dom_id(@subscription_plan, :row)
+    assert_select "tr##{row_id}" do
+      assert_select "[data-subscription-status='cancelled']", text: /Cancelled/
+      assert_select "[data-subscription-billing-state]", text: /Ended/
+    end
+    assert_select "[data-turbo-confirm='Are you sure you want to delete this subscription?']"
+  end
+
+  test "index renders paused lifecycle separately from billing state" do
+    @subscription_plan.update!(status: "paused")
+
+    get subscription_plans_url
+    assert_response :success
+
+    row_id = ActionView::RecordIdentifier.dom_id(@subscription_plan, :row)
+    assert_select "tr##{row_id}" do
+      assert_select "[data-subscription-status='paused']", text: /Paused/
+      assert_select "[data-subscription-billing-state]", text: /Renewal paused/
+    end
   end
 
   test "should get show" do
@@ -16,9 +52,55 @@ class SubscriptionPlansControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "show exposes record payment for active subscriptions" do
+    get subscription_plan_url(@subscription_plan)
+
+    assert_response :success
+    assert_select "a[href='#{new_subscription_plan_subscription_renewal_path(@subscription_plan)}'][data-turbo-frame='modal']", text: /Record Payment/
+  end
+
+  test "show hides record payment for paused subscriptions" do
+    @subscription_plan.update!(status: "paused")
+
+    get subscription_plan_url(@subscription_plan)
+
+    assert_response :success
+    assert_select "a[href='#{new_subscription_plan_subscription_renewal_path(@subscription_plan)}']", count: 0
+    assert_select "p", text: /matching charge.*unexpected renewal/i
+  end
+
+  test "show renders turbo patch lifecycle actions" do
+    get subscription_plan_url(@subscription_plan)
+    assert_response :success
+
+    assert_select "a[href='#{pause_subscription_plan_path(@subscription_plan)}'][data-turbo-method='patch']", text: /Pause/
+    assert_select "form[action='#{cancel_subscription_plan_path(@subscription_plan, timing: "period_end")}']" do
+      assert_select "button[data-turbo-confirm]", text: /Cancel at renewal/
+    end
+    assert_select "form[action='#{cancel_subscription_plan_path(@subscription_plan, timing: "immediate")}']" do
+      assert_select "button[data-turbo-confirm]", text: /Cancel now/
+    end
+    assert_select "a[data-method='patch']", count: 0
+  end
+
+  test "show renders turbo patch resume action when paused" do
+    @subscription_plan.update!(status: "paused")
+
+    get subscription_plan_url(@subscription_plan)
+    assert_response :success
+
+    assert_select "a[href='#{resume_subscription_plan_path(@subscription_plan)}'][data-turbo-method='patch']", text: /Resume/
+    assert_select "a[data-method='patch']", count: 0
+  end
+
   test "should get new" do
     get new_subscription_plan_url
     assert_response :success
+    assert_select "[data-controller~='subscription-schedule']"
+    assert_select "[data-subscription-schedule-target='count']"
+    assert_select "[data-subscription-schedule-target='unit']"
+    assert_select "[data-subscription-schedule-target='start']"
+    assert_select "[data-subscription-schedule-target='next']"
   end
 
   test "should get edit" do
@@ -63,6 +145,20 @@ class SubscriptionPlansControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Updated Netflix", @subscription_plan.name
   end
 
+  test "updates a flexible billing schedule" do
+    patch subscription_plan_url(@subscription_plan), params: {
+      subscription_plan: {
+        interval_count: 2,
+        interval_unit: "week"
+      }
+    }
+
+    assert_redirected_to subscription_plans_url
+    @subscription_plan.reload
+    assert_equal({ "count" => 2, "unit" => "week" }, @subscription_plan.metadata["schedule"])
+    assert_equal "Every 2 weeks", @subscription_plan.formatted_billing_cycle
+  end
+
   test "should archive subscription plan on destroy" do
     delete subscription_plan_url(@subscription_plan)
     assert_redirected_to subscription_plans_url
@@ -92,11 +188,46 @@ class SubscriptionPlansControllerTest < ActionDispatch::IntegrationTest
     assert_equal "cancelled", @subscription_plan.status
   end
 
-  test "should renew subscription plan" do
-    original_next_billing = @subscription_plan.next_billing_at
-    patch renew_subscription_plan_url(@subscription_plan)
+  test "should schedule cancellation at next renewal" do
+    patch cancel_subscription_plan_url(@subscription_plan), params: { timing: "period_end" }
+
     assert_redirected_to subscription_plans_url
     @subscription_plan.reload
-    assert @subscription_plan.next_billing_at > original_next_billing
+    assert_equal "active", @subscription_plan.status
+    assert @subscription_plan.pending_cancellation?
+    assert_not @subscription_plan.auto_renew
+  end
+
+  test "index exposes immediate and period end cancellation choices" do
+    get subscription_plans_url
+
+    assert_response :success
+    assert_select "form[action='#{cancel_subscription_plan_path(@subscription_plan, timing: "period_end")}']" do
+      assert_select "button", text: /Cancel at renewal/
+    end
+    assert_select "form[action='#{cancel_subscription_plan_path(@subscription_plan, timing: "immediate")}']" do
+      assert_select "button", text: /Cancel now/
+    end
+  end
+
+  test "undoes scheduled cancellation" do
+    @subscription_plan.update!(cancel_at_period_end: true, auto_renew: false)
+
+    patch undo_cancellation_subscription_plan_url(@subscription_plan)
+
+    assert_redirected_to subscription_plans_url
+    assert_not @subscription_plan.reload.cancel_at_period_end
+    assert @subscription_plan.auto_renew
+  end
+
+  test "index exposes keep subscription for pending cancellation" do
+    @subscription_plan.update!(cancel_at_period_end: true, auto_renew: false)
+
+    get subscription_plans_url
+
+    assert_response :success
+    assert_select "form[action='#{undo_cancellation_subscription_plan_path(@subscription_plan)}']" do
+      assert_select "button", text: /Keep subscription/
+    end
   end
 end

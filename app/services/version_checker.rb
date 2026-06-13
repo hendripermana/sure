@@ -3,8 +3,8 @@
 # Service untuk check latest version dari GitHub releases
 # Implements proper caching dan rate limiting
 class VersionChecker
-  GITHUB_REPO = "hendripermana/permoney"
-  CACHE_KEY = "permoney:latest_release"
+  GITHUB_REPO = "hendripermana/sure"
+  CACHE_KEY = "sure:latest_release"
   CACHE_DURATION = 24.hours
   GITHUB_API_URL = "https://api.github.com/repos/#{GITHUB_REPO}/releases/latest"
 
@@ -17,7 +17,7 @@ class VersionChecker
       latest = latest_release
       return false unless latest
 
-      Semver.new(latest[:version]) > Semver.new(Permoney.version.to_s)
+      Semver.new(latest[:version]) > Semver.new(Sure.version.to_s)
     end
 
     def latest_version
@@ -63,7 +63,7 @@ class VersionChecker
 
         request = Net::HTTP::Get.new(uri)
         request["Accept"] = "application/vnd.github.v3+json"
-        request["User-Agent"] = "Permoney/#{Permoney.version}"
+        request["User-Agent"] = "Sure/#{Sure.version}"
 
         response = http.request(request)
 

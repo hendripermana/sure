@@ -115,6 +115,53 @@ class Settings::SyncMonitorsController < ApplicationController
     end
   end
 
+  def diagnose_account
+    @account = Current.family.accounts.find(params[:account_id])
+    strategy = @account.linked? ? :reverse : :forward
+
+    # 1. Force rebuild of all balances
+    Balance::Materializer.new(
+      @account,
+      strategy: strategy,
+      window_start_date: nil
+    ).materialize_balances
+
+    # 2. Get valuations
+    @valuations = @account.entries.where(entryable_type: "Valuation").order(date: :asc)
+
+    # 3. Find duplicate entries on the exact same date and amount
+    all_txs = @account.entries.excluding_split_parents.where(entryable_type: "Transaction").to_a
+    @duplicates = all_txs.group_by { |e| [ e.date, e.amount.to_f.abs ] }
+                         .select { |key, list| list.size > 1 }
+
+    # 4. Find close duplicates (within 2 days with same amount)
+    @close_duplicates = []
+    sorted_txs = all_txs.sort_by(&:date)
+    (0...sorted_txs.size).each do |i|
+      e1 = sorted_txs[i]
+      ((i+1)...sorted_txs.size).each do |j|
+        e2 = sorted_txs[j]
+        break if (e2.date - e1.date) > 2
+        if e1.amount.to_f.abs == e2.amount.to_f.abs && e1.id != e2.id
+          if e1.date != e2.date
+            @close_duplicates << { entry1: e1, entry2: e2, amount: e1.amount.to_f.abs }
+          end
+        end
+      end
+    end
+
+    # 5. Monthly transaction sums (excluding valuations)
+    @monthly_sums = Hash.new(0)
+    all_txs.each do |e|
+      next if e.valuation?
+      month = e.date.strftime("%Y-%m")
+      @monthly_sums[month] += e.amount.to_f
+    end
+    @monthly_sums = @monthly_sums.sort_by { |k, v| k }.reverse
+
+    render partial: "settings/sync_monitors/diagnose_result"
+  end
+
   private
 
     def ensure_admin

@@ -1,5 +1,6 @@
 netflix_subscription:
   family: dylan_family
+  account: depository
   merchant: netflix
   amount: 15.99
   currency: USD
@@ -8,9 +9,11 @@ netflix_subscription:
   next_expected_date: <%= 5.days.from_now.to_date %>
   status: active
   occurrence_count: 3
+  identity_signature: fixture-netflix-subscription
 
 inactive_subscription:
   family: dylan_family
+  account: credit_card
   merchant: amazon
   amount: 9.99
   currency: USD
@@ -19,3 +22,4 @@ inactive_subscription:
   next_expected_date: <%= 2.months.ago.to_date %>
   status: inactive
   occurrence_count: 2
+  identity_signature: fixture-inactive-subscription
