@@ -5,8 +5,8 @@
 @import "./geist-font.css";
 @import "./geist-mono-font.css";
 
-@plugin "@tailwindcss/typography";
-@plugin "@tailwindcss/forms";
+@import "@tailwindcss/typography";
+@import "@tailwindcss/forms";
 
 /* Performance-optimized third-party styles */
 @import "./simonweb_pickr.css";

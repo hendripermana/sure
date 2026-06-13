@@ -55,3 +55,25 @@
 @utility bg-nav-indicator {
   @apply bg-black theme-dark:bg-white;
 }
+
+/* Segmented Control */
+.segmented-control {
+  @apply inline-flex items-center gap-0.5 rounded-lg bg-gray-50 p-0.5 theme-dark:bg-gray-800;
+}
+
+.segmented-control__segment {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium
+         text-gray-500 transition-colors duration-150
+         hover:text-gray-700 hover:bg-white/60
+         theme-dark:text-gray-400 theme-dark:hover:text-gray-200 theme-dark:hover:bg-gray-700/60;
+}
+
+.segmented-control__segment--active {
+  @apply bg-white text-gray-900 shadow-sm
+         theme-dark:bg-gray-700 theme-dark:text-white;
+}
+
+/* Search input icon positioning */
+.search-input-icon-left {
+  @apply absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none;
+}
