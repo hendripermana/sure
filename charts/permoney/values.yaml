@@ -1,4 +1,4 @@
-# Default values for the Permoney Helm chart.
+# Default values for the Sure Helm chart.
 # These defaults target a small multi-node self-hosted cluster (for example, k3s with 3 nodes)
 # with in-cluster Postgres and Redis managed by operators. For true single-node setups or
 # external DB/Redis, see the README "Installation profiles" section and provide an override
@@ -8,7 +8,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 image:
-  repository: ghcr.io/hendripermana/permoney
+  repository: ghcr.io/hendripermana/sure
   tag: "latest"
   pullPolicy: IfNotPresent
   # Optional: imagePullSecrets to pull from private registries
@@ -186,7 +186,7 @@ redisOperator:
   affinity: {}
   topologySpreadConstraints: []
   workloadResources: {}      # resources for Redis pods created by the CR (data-plane, not operator controller)
-  # Permoney-managed Redis via Operator CR (works with or without installing the subchart if operator is cluster-wide)
+  # Sure-managed Redis via Operator CR (works with or without installing the subchart if operator is cluster-wide)
   managed:
     enabled: true           # default to in-cluster HA Redis via operator
     # Optional scheduling knobs for managed RedisReplication (preferred location)

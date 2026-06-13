@@ -2,7 +2,8 @@
 
 <div class="wise-form">
   <%= styled_form_with model: entry, url: transactions_path, class: "space-y-4", data: {
-        controller: "new-transaction-split",
+        controller: "new-transaction-split current-date",
+        current_date_timezone_value: Current.family.timezone.presence || Time.zone.name,
         "new_transaction_split_i18n_value": {
           name_label: t(".split_row_name_label"),
           name_placeholder: t(".split_row_name_placeholder"),
@@ -67,7 +68,8 @@
                              required: true,
                              min: Entry.min_supported_date,
                              max: Date.current,
-                             value: (entry.date || Date.current) %>
+                             value: (entry.date || Date.current),
+                             data: { current_date_target: "input" } %>
           </div>
         <% else %>
           <div class="form-field" data-controller="custom-select">
@@ -140,7 +142,8 @@
                              required: true,
                              min: Entry.min_supported_date,
                              max: Date.current,
-                             value: (entry.date || Date.current) %>
+                             value: (entry.date || Date.current),
+                             data: { current_date_target: "input" } %>
           </div>
         <% end %>
 
@@ -294,7 +297,7 @@
                         </button>
                       </div>
 
-                      <% [entry.entryable.merchant, *Current.family.merchants.alphabetically].compact.uniq.each do |merchant| %>
+                      <% [entry.entryable.merchant, *Current.family.available_transaction_merchants].compact.uniq.each do |merchant| %>
                         <div class="filterable-item flex items-center border-none rounded-lg px-2 py-1.5 group w-full hover:bg-container-inset-hover" data-filter-name="<%= merchant.name %>">
                           <button type="button"
                                   class="flex w-full items-center gap-2 cursor-pointer focus:outline-none"

@@ -7,7 +7,7 @@ class EntriesSplitGroupTest < ActionView::TestCase
   end
 
   test "renders account transaction link with legacy tab parameter and stop propagation actions" do
-    split_group = SplitGroup.new(parent: @parent_entry, children: [])
+    split_group = EntriesHelper::SplitGroup.new(parent: @parent_entry, children: [])
 
     render partial: "entries/split_group", locals: { split_group: split_group, view_ctx: "global" }
 
@@ -20,7 +20,7 @@ class EntriesSplitGroupTest < ActionView::TestCase
       assert_match(/click->split-group#stop/, desktop_link["data-action"])
       assert_match(/keydown\.enter->split-group#stop/, desktop_link["data-action"])
       assert_match(/keydown\.space->split-group#stop/, desktop_link["data-action"])
-      assert_match(/turbo_frame=_top/, desktop_link.to_s)
+      assert_equal "_top", desktop_link["data-turbo-frame"]
 
       # Check mobile link has same attributes
       mobile_link = elements.last
@@ -30,7 +30,7 @@ class EntriesSplitGroupTest < ActionView::TestCase
   end
 
   test "renders account name in link text" do
-    split_group = SplitGroup.new(parent: @parent_entry, children: [])
+    split_group = EntriesHelper::SplitGroup.new(parent: @parent_entry, children: [])
 
     render partial: "entries/split_group", locals: { split_group: split_group, view_ctx: "global" }
 
@@ -38,7 +38,7 @@ class EntriesSplitGroupTest < ActionView::TestCase
   end
 
   test "renders split badge with count" do
-    split_group = SplitGroup.new(parent: @parent_entry, children: [])
+    split_group = EntriesHelper::SplitGroup.new(parent: @parent_entry, children: [])
 
     render partial: "entries/split_group", locals: { split_group: split_group, view_ctx: "global" }
 

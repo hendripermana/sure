@@ -73,4 +73,22 @@ class PreciousMetalTest < ActiveSupport::TestCase
 
     assert_includes @precious_metal.errors[:manual_price_currency], "is not a valid currency"
   end
+
+  test "auto revaluation uses the configured market source" do
+    @precious_metal.update!(
+      auto_revalue: true,
+      price_source: "antam",
+      metal_type: "gold",
+      manual_price_currency: "IDR"
+    )
+    GoldPrice.create!(
+      date: Date.new(2026, 6, 7),
+      source: "antam",
+      price_per_gram: 2_888_000,
+      currency: "IDR"
+    )
+
+    assert @precious_metal.apply_auto_revaluation!(as_of: Date.new(2026, 6, 7))
+    assert_equal 2_888_000, @precious_metal.reload.manual_price
+  end
 end

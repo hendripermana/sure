@@ -7,6 +7,8 @@ class PreciousMetal < ApplicationRecord
 
   ACCOUNT_STATUSES = %w[active closed].freeze
   SCHEME_TYPES = %w[conventional sharia].freeze
+  PRICE_SOURCES = GoldPrice::SOURCES.freeze
+  METAL_TYPES = GoldPrice::METAL_TYPES.freeze
 
   UNITS = {
     "g" => { short: "g", long: "Grams" }
@@ -35,6 +37,8 @@ class PreciousMetal < ApplicationRecord
   validates :manual_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :manual_price_currency, presence: true, if: -> { manual_price.present? }
   validate :manual_price_currency_valid, if: -> { manual_price_currency.present? }
+  validates :price_source, inclusion: { in: PRICE_SOURCES }, allow_blank: true
+  validates :metal_type, inclusion: { in: METAL_TYPES }, allow_blank: true
 
   after_commit :sync_account_balance, on: :update, if: :should_sync_account_balance?
 
@@ -93,6 +97,37 @@ class PreciousMetal < ApplicationRecord
 
   def estimated_value_money
     value_in
+  end
+
+  # Fetch the latest gold price from the gold_prices table for this metal type
+  def latest_market_price(as_of: Date.current)
+    GoldPrice.price_on(
+      as_of,
+      metal_type: metal_type.presence || "gold",
+      source: price_source.presence,
+      currency: manual_price_currency.presence || account&.currency || "IDR"
+    )
+  end
+
+  # Apply auto-revaluation from gold_prices table
+  # Updates manual_price which triggers the existing sync_account_balance callback
+  # Returns true if price was updated, false if no price available or not enabled
+  def apply_auto_revaluation!(as_of: Date.current)
+    return false unless auto_revalue?
+
+    gold_price = latest_market_price(as_of: as_of)
+    return false if gold_price.nil?
+
+    # Don't update if the price hasn't changed
+    return false if manual_price == gold_price.price_per_gram &&
+                     manual_price_currency == gold_price.currency
+
+    self.balance_sync_date = as_of
+    update!(
+      manual_price: gold_price.price_per_gram,
+      manual_price_currency: gold_price.currency
+    )
+    true
   end
 
   def apply_quantity_delta!(delta, effective_date: nil)

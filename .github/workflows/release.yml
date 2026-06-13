@@ -105,10 +105,10 @@ jobs:
           if latest_tag.empty?
             # Initial release or no tags found
             commits_raw = `git log --pretty=format:"%s (%h)" -n 50`
-            compare_url = "https://github.com/hendripermana/permoney/compare/#{tag_name}"
+            compare_url = "https://github.com/hendripermana/sure/compare/#{tag_name}"
           else
             commits_raw = `git log #{latest_tag}..HEAD --pretty=format:"%s (%h)"`
-            compare_url = "https://github.com/hendripermana/permoney/compare/#{latest_tag}...#{tag_name}"
+            compare_url = "https://github.com/hendripermana/sure/compare/#{latest_tag}...#{tag_name}"
           end
           
           commits = commits_raw.split("\n")
@@ -224,4 +224,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

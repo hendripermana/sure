@@ -1,14 +1,15 @@
 <%= styled_form_with model: @subscription_plan, class: "space-y-4",
     data: {
-      controller: "subscription-duplicate",
+      controller: "subscription-duplicate subscription-schedule",
       subscription_duplicate_check_url_value: check_duplicate_subscription_plans_path,
-      subscription_duplicate_exclude_id_value: @subscription_plan.persisted? ? @subscription_plan.id : nil
+      subscription_duplicate_exclude_id_value: @subscription_plan.persisted? ? @subscription_plan.id : nil,
+      subscription_schedule_service_defaults_value: @service_schedule_defaults
     } do |f| %>
   <% if @subscription_plan.errors.any? %>
     <%= render "shared/form_errors", model: @subscription_plan %>
   <% end %>
 
-  <section class="section-card space-y-2">
+  <section class="section-card space-y-2 relative z-20">
     <%= f.text_field :name, label: "Subscription Name", placeholder: "e.g., Netflix Premium", required: true %>
 
     <div class="flex items-center gap-2">
@@ -25,7 +26,7 @@
         variant: "ghost",
         size: "sm",
         icon: "plus",
-        href: new_service_path,
+        href: new_service_path(return_to: request.fullpath),
         frame: :modal
       ) %>
     </div>
@@ -43,19 +44,54 @@
   <section class="section-card space-y-2">
     <%= f.money_field :amount, label: "Amount", required: true, default_currency: Current.family.currency %>
 
-    <%= f.select :billing_cycle, billing_cycle_options, { label: "Billing Cycle" }, { required: true } %>
+    <div class="grid grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)] gap-3">
+      <div data-subscription-schedule-target="countContainer">
+        <%= f.number_field :interval_count,
+            label: "Repeat every",
+            min: 1,
+            max: 365,
+            required: true,
+            value: @subscription_plan.interval_count,
+            data: {
+              subscription_schedule_target: "count",
+              action: "input->subscription-schedule#scheduleChanged"
+            } %>
+      </div>
+      <%= f.select :interval_unit,
+          recurring_interval_unit_options,
+          { label: "Interval" },
+          {
+            required: true,
+            data: {
+              subscription_schedule_target: "unit",
+              action: "change->subscription-schedule#scheduleChanged"
+            }
+          } %>
+    </div>
+    <p class="text-xs text-secondary">Examples: 3 days, 2 weeks, 1 month, or 1 year.</p>
 
     <%= f.select :payment_method, payment_method_options, { label: "Payment Method" }, { required: true } %>
 
-    <%= f.select :status, status_options, { label: "Status" }, { required: true } %>
+    <%= f.select :status, status_options, { label: "Status" }, {
+      required: true,
+      data: { subscription_schedule_target: "status" }
+    } %>
   </section>
 
   <section class="section-card space-y-2">
-    <%= f.date_field :started_at, label: "Start Date", required: true %>
+    <%= f.date_field :started_at, label: "Start Date", required: true, data: {
+      subscription_schedule_target: "start",
+      action: "change->subscription-schedule#scheduleChanged"
+    } %>
 
-    <%= f.date_field :next_billing_at, label: "Next Billing Date", required: true %>
+    <%= f.date_field :next_billing_at, label: "Next Billing Date", required: true, data: {
+      subscription_schedule_target: "next"
+    } %>
 
-    <%= f.date_field :trial_ends_at, label: "Trial Ends (optional)" %>
+    <%= f.date_field :trial_ends_at, label: "Trial Ends (optional)", data: {
+      subscription_schedule_target: "trial",
+      action: "change->subscription-schedule#trialChanged"
+    } %>
   </section>
 
   <section class="section-card space-y-2">

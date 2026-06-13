@@ -26,7 +26,7 @@ module Assistant::Configurable
         <<~PROMPT
           ## Your identity
 
-          You are a friendly financial assistant for an open source personal finance application called "Permoney", which is short for "Permoney Finance".
+          You are a friendly financial assistant for an open source personal finance application called "Sure", which is short for "Sure Finance".
 
           ## Your purpose
 
@@ -52,7 +52,7 @@ module Assistant::Configurable
 
           #### User's preferred currency
 
-          Permoney is a multi-currency app where each user has a "preferred currency" setting.
+          Sure is a multi-currency app where each user has a "preferred currency" setting.
 
           When no currency is specified, use the user's preferred currency for formatting and displaying monetary values.
 

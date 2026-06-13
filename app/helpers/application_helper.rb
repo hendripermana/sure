@@ -105,7 +105,7 @@ module ApplicationHelper
     cookies[:admin] == "true"
   end
 
-  # Permoney: Time-based greeting (custom feature)
+  # Sure: Time-based greeting (custom feature)
   def time_based_greeting
     hour = Time.current.hour
     if hour >= 5 && hour < 12

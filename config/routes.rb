@@ -43,6 +43,8 @@ Rails.application.routes.draw do
   resource :registration, only: %i[new create]
 
   # Subscription Manager routes
+  get "/recurring", to: "recurring#index", as: :recurring
+
   resources :subscription_plans do
     collection do
       get :check_duplicate
@@ -51,8 +53,9 @@ Rails.application.routes.draw do
       patch :pause
       patch :resume
       patch :cancel
-      patch :renew
+      patch :undo_cancellation
     end
+    resources :subscription_renewals, only: %i[index new create show]
   end
 
   # Services management
@@ -120,6 +123,7 @@ Rails.application.routes.draw do
       post :dismiss_sync, on: :member
       post :dismiss_all_stale, on: :collection
       post :sync_all, on: :collection
+      post :diagnose_account, on: :collection
     end
   end
 
@@ -159,7 +163,9 @@ Rails.application.routes.draw do
 
   resources :family_merchants, only: %i[index new create edit update destroy]
 
-  resources :transfers, only: %i[new create destroy show update]
+  resources :transfers, only: %i[new create destroy show update] do
+    post :mark_as_recurring, on: :member
+  end
 
   resources :imports, only: %i[index new show create destroy] do
     member do
@@ -215,6 +221,10 @@ Rails.application.routes.draw do
 
     member do
       post :toggle_status
+      post :create_subscription
+      post :restore
+      post :confirm
+      post :mark_transfer
     end
   end
 
@@ -261,6 +271,8 @@ Rails.application.routes.draw do
     collection do
       post :sync_all
     end
+
+    resource :reconciliation, only: [ :new, :create ], controller: "account_reconciliations"
   end
 
   # Convenience routes for polymorphic paths

@@ -1,0 +1,212 @@
+<div class="mx-auto max-w-[1240px] px-4 py-6 lg:px-8">
+  <%= render "recurring/navigation", current: "overview" %>
+
+  <header class="mb-8">
+    <p class="text-sm font-semibold text-secondary">Recurring money control</p>
+    <h1 class="mt-2 text-4xl font-black leading-none text-primary lg:text-5xl">Recurring</h1>
+    <p class="mt-3 max-w-3xl text-base text-secondary lg:text-lg">
+      Review detected patterns, manage subscription lifecycles, and track scheduled transfers from one workspace.
+    </p>
+  </header>
+
+  <section class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4" aria-label="Recurring summary">
+    <%= link_to subscription_plans_path, class: "rounded-[24px] bg-container p-5 shadow-border-xs transition-colors hover:bg-surface-hover" do %>
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-secondary">Monthly subscriptions</span>
+        <%= icon "wallet-cards", class: "h-5 w-5 text-secondary" %>
+      </div>
+      <p class="mt-3 text-3xl font-black text-primary"><%= number_to_currency(@monthly_commitment, unit: "#{Current.family.currency} ") %></p>
+      <p class="mt-2 text-xs text-secondary"><%= @active_subscriptions.count %> active subscriptions</p>
+    <% end %>
+
+    <%= link_to recurring_transactions_path, class: "rounded-[24px] bg-container p-5 shadow-border-xs transition-colors hover:bg-surface-hover" do %>
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-secondary">Detected patterns</span>
+        <%= icon "search", class: "h-5 w-5 text-secondary" %>
+      </div>
+      <p class="mt-3 text-3xl font-black text-primary"><%= @detected_count %></p>
+      <p class="mt-2 text-xs text-secondary">Ready for review</p>
+    <% end %>
+
+    <%= link_to recurring_transactions_path(kind: "transfers"), class: "rounded-[24px] bg-container p-5 shadow-border-xs transition-colors hover:bg-surface-hover" do %>
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-secondary">Recurring transfers</span>
+        <%= icon "arrow-left-right", class: "h-5 w-5 text-secondary" %>
+      </div>
+      <p class="mt-3 text-3xl font-black text-primary"><%= @transfer_count %></p>
+      <p class="mt-2 text-xs text-secondary">Between your accounts</p>
+    <% end %>
+
+    <%= link_to recurring_transactions_path(kind: "ignored"), class: "rounded-[24px] bg-container p-5 shadow-border-xs transition-colors hover:bg-surface-hover" do %>
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-secondary">Ignored patterns</span>
+        <%= icon "eye-off", class: "h-5 w-5 text-secondary" %>
+      </div>
+      <p class="mt-3 text-3xl font-black text-primary"><%= @ignored_count %></p>
+      <p class="mt-2 text-xs text-secondary">Suppressed from detection</p>
+    <% end %>
+  </section>
+
+  <section class="mt-8 grid grid-cols-1 gap-4 xl:grid-cols-2">
+    <div class="overflow-hidden rounded-[24px] bg-container shadow-border-xs">
+      <div class="flex items-center justify-between border-b border-primary px-6 py-5">
+        <div>
+          <h2 class="text-xl font-semibold text-primary">Upcoming subscriptions</h2>
+          <p class="mt-1 text-sm text-secondary">Next managed billing dates</p>
+        </div>
+        <%= link_to "View all", subscription_plans_path, class: "text-sm font-semibold text-link hover:underline" %>
+      </div>
+      <div class="divide-y divide-tertiary">
+        <% @upcoming_subscriptions.each do |subscription| %>
+          <%= link_to subscription_plan_path(subscription), class: "flex items-center justify-between gap-4 px-6 py-4 hover:bg-surface-hover" do %>
+            <div class="min-w-0">
+              <p class="truncate font-medium text-primary"><%= subscription.name %></p>
+              <p class="mt-1 text-xs text-secondary"><%= subscription.formatted_billing_cycle %></p>
+            </div>
+            <div class="shrink-0 text-right">
+              <p class="font-semibold text-primary"><%= subscription.formatted_amount %></p>
+              <p class="mt-1 text-xs text-secondary"><%= subscription.next_billing_at.strftime("%b %d, %Y") %></p>
+            </div>
+          <% end %>
+        <% end %>
+        <% if @upcoming_subscriptions.empty? %>
+          <p class="px-6 py-10 text-center text-sm text-secondary">No upcoming subscription billing.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-[24px] bg-container shadow-border-xs">
+      <div class="flex items-center justify-between border-b border-primary px-6 py-5">
+        <div>
+          <h2 class="text-xl font-semibold text-primary">Expected recurring activity</h2>
+          <p class="mt-1 text-sm text-secondary">Detected payments and transfers</p>
+        </div>
+        <%= link_to "Review", recurring_transactions_path, class: "text-sm font-semibold text-link hover:underline" %>
+      </div>
+      <div class="divide-y divide-tertiary">
+        <% @upcoming_patterns.each do |recurring_transaction| %>
+          <%= link_to recurring_transactions_path(kind: recurring_transaction.transfer? ? "transfers" : nil),
+              class: "flex items-center justify-between gap-4 px-6 py-4 hover:bg-surface-hover" do %>
+            <div class="min-w-0">
+              <p class="truncate font-medium text-primary"><%= recurring_transaction.name %></p>
+              <p class="mt-1 text-xs text-secondary"><%= recurring_transaction.transfer? ? "Transfer" : "Detected pattern" %></p>
+            </div>
+            <div class="shrink-0 text-right">
+              <p class="font-semibold text-primary"><%= format_money(-recurring_transaction.amount_money) %></p>
+              <p class="mt-1 text-xs text-secondary"><%= recurring_transaction.next_expected_date.strftime("%b %d, %Y") %></p>
+            </div>
+          <% end %>
+        <% end %>
+        <% if @upcoming_patterns.empty? %>
+          <p class="px-6 py-10 text-center text-sm text-secondary">No recurring activity detected yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-8 grid grid-cols-1 gap-4 xl:grid-cols-[1.35fr_0.65fr]">
+    <div class="overflow-hidden rounded-[24px] bg-container shadow-border-xs">
+      <div class="flex items-center justify-between border-b border-primary px-6 py-5">
+        <div>
+          <h2 class="text-xl font-semibold text-primary">30-day cash-flow forecast</h2>
+          <p class="mt-1 text-sm text-secondary">Actual transactions are excluded to prevent double counting.</p>
+        </div>
+        <p class="text-lg font-black text-primary">
+          <%= number_to_currency(@forecast.projected_outflow, unit: "#{Current.family.currency} ") %>
+        </p>
+      </div>
+
+      <div class="divide-y divide-tertiary">
+        <% @forecast_items.each do |item| %>
+          <div class="flex items-center justify-between gap-4 px-6 py-4">
+            <div class="flex min-w-0 items-center gap-3">
+              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-container-inset text-secondary">
+                <%= icon item.kind == "transfer" ? "arrow-left-right" : "calendar-clock", class: "h-4 w-4" %>
+              </div>
+              <div class="min-w-0">
+                <p class="truncate font-medium text-primary"><%= item.commitment.name %></p>
+                <p class="mt-1 text-xs text-secondary"><%= item.kind.humanize %> · <%= item.date.strftime("%b %d") %></p>
+              </div>
+            </div>
+            <p class="shrink-0 font-semibold text-primary">
+              <%= number_to_currency(item.amount, unit: "#{item.currency} ") %>
+            </p>
+          </div>
+        <% end %>
+        <% if @forecast_items.empty? %>
+          <p class="px-6 py-10 text-center text-sm text-secondary">No projected recurring outflow in the next 30 days.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-[24px] bg-container shadow-border-xs">
+      <div class="border-b border-primary px-6 py-5">
+        <h2 class="text-xl font-semibold text-primary">Attention feed</h2>
+        <p class="mt-1 text-sm text-secondary">Reconciliation and lifecycle history</p>
+      </div>
+
+      <div class="divide-y divide-tertiary">
+        <% @recent_events.each do |event| %>
+          <% metadata = event.changeset.fetch("metadata", {}) %>
+          <% commitment = event.auditable %>
+          <div class="px-6 py-4" data-recurring-event>
+            <div class="flex items-start gap-3">
+              <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full <%= event.changeset["severity"] == "warning" ? "bg-warning" : "bg-success" %>"></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-primary">
+                  <%= event.changeset["title"] || event.event.humanize %>
+                  <% if commitment.present? %>
+                    <span class="text-secondary">·</span>
+                    <%= commitment.name %>
+                  <% end %>
+                </p>
+                <p class="mt-1 text-xs text-secondary"><%= event.changeset["detail"] %></p>
+                <% if metadata["expected_date"].present? || metadata["expected_amount"].present? %>
+                  <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                    <% if metadata["expected_date"].present? %>
+                      <div>
+                        <dt class="text-secondary">Expected date</dt>
+                        <dd class="mt-0.5 font-medium text-primary"><%= l(Date.parse(metadata["expected_date"].to_s), format: :short) %></dd>
+                      </div>
+                    <% end %>
+                    <% if metadata["expected_amount"].present? %>
+                      <div>
+                        <dt class="text-secondary">Expected</dt>
+                        <dd class="mt-0.5 font-medium text-primary">
+                          <%= number_to_currency(metadata["expected_amount"], unit: "#{commitment&.currency || Current.family.currency} ") %>
+                        </dd>
+                      </div>
+                    <% end %>
+                    <% if metadata["observed_amount"].present? %>
+                      <div>
+                        <dt class="text-secondary">Observed</dt>
+                        <dd class="mt-0.5 font-medium text-primary">
+                          <%= number_to_currency(metadata["observed_amount"], unit: "#{commitment&.currency || Current.family.currency} ") %>
+                        </dd>
+                      </div>
+                    <% elsif metadata["entry_count"].to_i > 1 %>
+                      <div>
+                        <dt class="text-secondary">Matched transactions</dt>
+                        <dd class="mt-0.5 font-medium text-primary"><%= metadata["entry_count"] %></dd>
+                      </div>
+                    <% end %>
+                    <% if commitment&.respond_to?(:account) && commitment.account.present? %>
+                      <div>
+                        <dt class="text-secondary">Account</dt>
+                        <dd class="mt-0.5 truncate font-medium text-primary"><%= commitment.account.name %></dd>
+                      </div>
+                    <% end %>
+                  </dl>
+                <% end %>
+                <p class="mt-2 text-xs text-secondary"><%= time_ago_in_words(event.created_at) %> ago</p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <% if @recent_events.empty? %>
+          <p class="px-6 py-10 text-center text-sm text-secondary">No recurring events recorded yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>

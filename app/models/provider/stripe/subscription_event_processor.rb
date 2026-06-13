@@ -2,6 +2,20 @@ class Provider::Stripe::SubscriptionEventProcessor < Provider::Stripe::EventProc
   Error = Class.new(StandardError)
 
   def process
+    if subscription_plan
+      if event_id.present? && event_created_at.present?
+        subscription_plan.apply_stripe_event!(
+          subscription,
+          event_id: event_id,
+          event_type: event_type,
+          event_created_at: event_created_at
+        )
+      else
+        subscription_plan.sync_from_stripe_subscription!(subscription)
+      end
+      return
+    end
+
     raise Error, "Family not found for Stripe customer ID: #{subscription.customer}" unless family
 
     family.subscription.update(
@@ -17,6 +31,10 @@ class Provider::Stripe::SubscriptionEventProcessor < Provider::Stripe::EventProc
   private
     def family
       Family.find_by(stripe_customer_id: subscription.customer)
+    end
+
+    def subscription_plan
+      @subscription_plan ||= SubscriptionPlan.unscoped.find_by(stripe_subscription_id: subscription.id)
     end
 
     def subscription_details

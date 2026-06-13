@@ -64,7 +64,7 @@ class Loan::PlanBuilder
     ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0) * 1000).round(1)
     begin
       ActiveSupport::Notifications.instrument(
-        "permoney.loan.plan.regenerate",
+        "sure.loan.plan.regenerate",
         loan_id: account.accountable_id,
         replaced_count: installments.size,
         ms: ms

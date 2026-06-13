@@ -17,7 +17,7 @@ class LoanPostInstallmentObservabilityTest < ActiveSupport::TestCase
   end
   test "fires notifications and Sentry spans when available" do
     events = []
-    sub = ActiveSupport::Notifications.subscribe("permoney.loan.installment.posted") { |*args| events << ActiveSupport::Notifications::Event.new(*args) }
+    sub = ActiveSupport::Notifications.subscribe("sure.loan.installment.posted") { |*args| events << ActiveSupport::Notifications::Event.new(*args) }
 
     # Provide a minimal Sentry shim if not present and ensure the shim is API-compatible
     unless defined?(::Sentry)
@@ -29,7 +29,7 @@ class LoanPostInstallmentObservabilityTest < ActiveSupport::TestCase
 
       def with_child_span(*_args, **_kwargs)
         self.span_called = true
-        span = __permoney_test_span
+        span = __sure_test_span
         if block_given?
           yield span
         else
@@ -40,20 +40,20 @@ class LoanPostInstallmentObservabilityTest < ActiveSupport::TestCase
       def add_breadcrumb(*); end
 
       def configure_scope(*_args, **_kwargs)
-        scope = __permoney_test_scope
+        scope = __sure_test_scope
         yield scope if block_given?
         scope
       end
 
       def get_current_scope(*_args, **_kwargs)
-        scope = __permoney_test_scope
+        scope = __sure_test_scope
         yield scope if block_given?
         scope
       end
 
       private
 
-      def __permoney_test_span
+      def __sure_test_span
         Object.new.tap do |span|
           span.define_singleton_method(:set_data) { |*_args, **_kwargs| }
           span.define_singleton_method(:set_description) { |*_args, **_kwargs| }
@@ -61,7 +61,7 @@ class LoanPostInstallmentObservabilityTest < ActiveSupport::TestCase
         end
       end
 
-      def __permoney_test_scope
+      def __sure_test_scope
         tx = Object.new
         tx.define_singleton_method(:set_measurement) { |*_args| }
 
