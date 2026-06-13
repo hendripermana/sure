@@ -282,7 +282,7 @@ GEM
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
     jmespath (1.6.2)
-    json (2.19.5)
+    json (2.19.7)
     json-jwt (1.17.0)
       activesupport (>= 4.2)
       aes_key_wrap
@@ -610,7 +610,7 @@ GEM
     sentry-sidekiq (6.5.0)
       sentry-ruby (~> 6.5.0)
       sidekiq (>= 5.0)
-    sidekiq (8.1.5)
+    sidekiq (8.1.6)
       connection_pool (>= 3.0.0)
       json (>= 2.16.0)
       logger (>= 1.7.0)
