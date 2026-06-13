@@ -1,3 +1,9 @@
+## [0.23.3](https://github.com/hendripermana/sure/compare/v0.23.2...v0.23.3) (2026-06-13)
+
+### Other Changes
+
+- deps-dev(deps-dev): bump debug from 1.11.0 to 1.11.1 (#166) (bab99575)
+
 ## [0.23.2](https://github.com/hendripermana/sure/compare/v0.23.1...v0.23.2) (2026-06-13)
 
 ### Other Changes
