@@ -24,6 +24,20 @@ namespace :db do
         production, set ALLOW_PRODUCTION_DB_TASKS=1 explicitly.
       MSG
     end
+
+    if env_name == "test" && target_db.present?
+      pattern_str = ENV["APPROVED_TEST_DATABASES_PATTERN"].presence || "_test$"
+      approved_pattern = Regexp.new(pattern_str)
+      unless target_db.match?(approved_pattern)
+        abort <<~MSG
+          Aborting test database task: '#{target_db}' is not an approved test database.
+
+          Test databases must match the pattern: #{pattern_str.inspect}
+          Set POSTGRES_DB_TEST to a database name matching this pattern, or override with
+          the APPROVED_TEST_DATABASES_PATTERN environment variable.
+        MSG
+      end
+    end
   end
 end
 

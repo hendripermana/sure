@@ -1,0 +1,352 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# bin/test-db — Disposable PostgreSQL 18 test database harness
+# ---------------------------------------------------------------------------
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# --- Configuration ---------------------------------------------------------
+HARNESS_DB_PORT="${TEST_DB_PORT:-5436}"
+HARNESS_DB_PASSWORD="${TEST_DB_PASSWORD:-$(openssl rand -hex 16 2>/dev/null || echo "test-$(date +%s)")}"
+HARNESS_DB_NAME="${POSTGRES_DB_TEST:-sure_test}"
+HARNESS_DB_USER="${POSTGRES_USER:-postgres}"
+HARNESS_DB_HOST="${TEST_DB_HOST:-127.0.0.1}"
+HARNESS_DB_CONTAINER="${TEST_DB_CONTAINER:-sure-test-db}"
+POSTGRES_IMAGE="postgres:18"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+ok()   { printf "  ${GREEN}✓${NC} %s\n" "$1"; }
+fail() { printf "  ${RED}✗${NC} %s\n" "$1"; }
+warn() { printf "  ${YELLOW}⚠${NC} %s\n" "$1"; }
+die()  { printf "${RED}ERROR:${NC} %s\n" "$1" >&2; exit 1; }
+
+# --- Usage ------------------------------------------------------------------
+usage() {
+  cat <<'EOF'
+Usage: bin/test-db [--keep] [--ci] [start|stop|status] [-- <command>]
+
+Manage a disposable PostgreSQL 18 test database.
+
+Commands:
+  start         Start container and print connection environment variables.
+  stop          Stop and remove the test container.
+  status        Show whether the test container is running.
+
+Options:
+  --keep        Keep the container running after the command completes.
+  --ci          Do not manage a container — assume PostgreSQL is already
+                available (for CI services-block workflows).
+  -- <command>  Run this command instead of 'bin/rails test'.
+
+Examples:
+  bin/test-db                           # Full lifecycle
+  bin/test-db -- bin/rails test:models  # Run only model tests
+  bin/test-db --keep -- bin/rails test  # Keep container for inspection
+  bin/test-db start                     # Start container, keep running
+  bin/test-db --ci -- bin/rails test    # CI mode: use external PostgreSQL
+EOF
+  exit 0
+}
+
+# --- Container lifecycle ----------------------------------------------------
+start_container() {
+  if docker ps --format '{{.Names}}' 2>/dev/null | grep -qxF "$HARNESS_DB_CONTAINER"; then
+    warn "Container '$HARNESS_DB_CONTAINER' is already running."
+    return 0
+  fi
+
+  if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qxF "$HARNESS_DB_CONTAINER"; then
+    warn "Container '$HARNESS_DB_CONTAINER' exists but is stopped. Removing..."
+    docker rm -f "$HARNESS_DB_CONTAINER" >/dev/null 2>&1 || true
+  fi
+
+  if command -v ss >/dev/null 2>&1; then
+    if ss -tln "sport = :$HARNESS_DB_PORT" 2>/dev/null | grep -q ":$HARNESS_DB_PORT"; then
+      die "Port $HARNESS_DB_PORT is already in use. Set TEST_DB_PORT to a different port."
+    fi
+  fi
+
+  echo "Starting disposable PostgreSQL 18 container..."
+  docker run -d \
+    --name "$HARNESS_DB_CONTAINER" \
+    --rm \
+    -p "127.0.0.1:${HARNESS_DB_PORT}:5432" \
+    --tmpfs /var/lib/postgresql \
+    --health-cmd pg_isready \
+    --health-interval 2s \
+    --health-timeout 5s \
+    --health-retries 10 \
+    -e "POSTGRES_USER=${HARNESS_DB_USER}" \
+    -e "POSTGRES_PASSWORD=${HARNESS_DB_PASSWORD}" \
+    -e "POSTGRES_DB=${HARNESS_DB_NAME}" \
+    "$POSTGRES_IMAGE" >/dev/null
+
+  ok "Container '$HARNESS_DB_CONTAINER' started on port $HARNESS_DB_PORT."
+}
+
+wait_for_postgres() {
+  local max_attempts=30
+  local attempt=1
+
+  while [ $attempt -le $max_attempts ]; do
+    if docker exec "$HARNESS_DB_CONTAINER" pg_isready -U "$HARNESS_DB_USER" -d "$HARNESS_DB_NAME" >/dev/null 2>&1; then
+      ok "PostgreSQL is ready (attempt ${attempt}/${max_attempts})."
+      return 0
+    fi
+    sleep 1
+    attempt=$((attempt + 1))
+  done
+
+  die "PostgreSQL did not become ready within ${max_attempts}s."
+}
+
+stop_container() {
+  if docker ps --format '{{.Names}}' 2>/dev/null | grep -qxF "$HARNESS_DB_CONTAINER"; then
+    echo "Stopping container '$HARNESS_DB_CONTAINER'..."
+    docker stop "$HARNESS_DB_CONTAINER" >/dev/null 2>&1
+    ok "Container stopped."
+  elif docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qxF "$HARNESS_DB_CONTAINER"; then
+    echo "Removing stopped container '$HARNESS_DB_CONTAINER'..."
+    docker rm -f "$HARNESS_DB_CONTAINER" >/dev/null 2>&1
+    ok "Container removed."
+  else
+    warn "Container '$HARNESS_DB_CONTAINER' not found."
+  fi
+}
+
+cleanup() {
+  if [ "${KEEP_CONTAINER:-0}" -eq 1 ]; then
+    warn "Container '$HARNESS_DB_CONTAINER' left running on port $HARNESS_DB_PORT (--keep)."
+    return
+  fi
+  stop_container
+}
+
+show_status() {
+  if docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' 2>/dev/null | grep -qF "$HARNESS_DB_CONTAINER"; then
+    echo "Container status:"
+    docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | head -1
+    docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep "$HARNESS_DB_CONTAINER"
+  else
+    warn "Container '$HARNESS_DB_CONTAINER' is not running."
+    return 1
+  fi
+}
+
+print_env() {
+  echo ""
+  echo "Connection environment variables:"
+  echo ""
+  echo "  export RAILS_ENV=test"
+  echo "  export DB_HOST=${HARNESS_DB_HOST}"
+  echo "  export DB_PORT=${HARNESS_DB_PORT}"
+  echo "  export POSTGRES_USER=${HARNESS_DB_USER}"
+  echo "  export POSTGRES_PASSWORD=${HARNESS_DB_PASSWORD}"
+  echo "  export POSTGRES_DB_TEST=${HARNESS_DB_NAME}"
+  echo ""
+}
+
+cmd_env() {
+  cat <<EOF
+export RAILS_ENV=test
+export DB_HOST=${HARNESS_DB_HOST}
+export DB_PORT=${HARNESS_DB_PORT}
+export POSTGRES_USER=${HARNESS_DB_USER}
+export POSTGRES_PASSWORD=${HARNESS_DB_PASSWORD}
+export POSTGRES_DB_TEST=${HARNESS_DB_NAME}
+EOF
+}
+
+# --- Boot probe (Ruby helper) -----------------------------------------------
+write_probe_script() {
+  local tmpfile="$1"
+  cat > "$tmpfile" <<'RUBY'
+c = ActiveRecord::Base.connection_db_config.configuration_hash
+puts "adapter=#{c[:adapter]}"
+puts "host=#{c[:host] || 'localhost'}"
+puts "port=#{c[:port] || 5432}"
+puts "database=#{c[:database]}"
+ActiveRecord::Base.connection.execute("SELECT 1")
+puts "ok=true"
+RUBY
+}
+
+boot_probe() {
+  echo ""
+  echo "--- Boot Probe ---"
+
+  local probe_script
+  probe_script=$(mktemp /tmp/sure-test-db-probe.XXXXXX.rb)
+  write_probe_script "$probe_script"
+
+  local probe_output
+  set +e
+  probe_output=$(cd "$PROJECT_ROOT" && \
+    ALLOW_PRODUCTION_DB_TASKS=1 \
+    RAILS_ENV=test \
+    DB_HOST="$HARNESS_DB_HOST" \
+    DB_PORT="$HARNESS_DB_PORT" \
+    POSTGRES_USER="$HARNESS_DB_USER" \
+    POSTGRES_PASSWORD="$HARNESS_DB_PASSWORD" \
+    POSTGRES_DB_TEST="$HARNESS_DB_NAME" \
+    bin/rails runner "$probe_script" 2>&1)
+  local probe_exit=$?
+  set -e
+
+  rm -f "$probe_script"
+
+  if [ "$probe_exit" -ne 0 ]; then
+    fail "Boot probe failed."
+    echo "$probe_output" >&2
+    die "Rails could not connect. Check that PostgreSQL is running and credentials are correct."
+  fi
+
+  local adapter host port database probe_ok
+  while IFS='=' read -r key value; do
+    case "$key" in
+      adapter)  adapter="$value" ;;
+      host)     host="$value" ;;
+      port)     port="$value" ;;
+      database) database="$value" ;;
+      ok)       probe_ok="$value" ;;
+    esac
+  done <<< "$probe_output"
+
+  if [ "${probe_ok:-}" != "true" ]; then
+    fail "Boot probe returned unexpected output."
+    echo "$probe_output" >&2
+    die "Probe failed."
+  fi
+
+  ok "adapter=${adapter}, host=${host}:${port}, database=${database}"
+}
+
+# --- Schema load ------------------------------------------------------------
+load_schema() {
+  echo ""
+  echo "--- Schema Load ---"
+
+  cd "$PROJECT_ROOT"
+
+  ALLOW_PRODUCTION_DB_TASKS=1 \
+    RAILS_ENV=test \
+    DB_HOST="$HARNESS_DB_HOST" \
+    DB_PORT="$HARNESS_DB_PORT" \
+    POSTGRES_USER="$HARNESS_DB_USER" \
+    POSTGRES_PASSWORD="$HARNESS_DB_PASSWORD" \
+    POSTGRES_DB_TEST="$HARNESS_DB_NAME" \
+    bin/rails db:schema:load || die "Schema load failed."
+
+  ok "Schema loaded into '${HARNESS_DB_NAME}'."
+}
+
+# --- Main -------------------------------------------------------------------
+
+KEEP_CONTAINER=0
+CI_MODE=0
+SUBCOMMAND=""
+CMD_ARGS=()
+PARSING_CMD=false
+
+while [ $# -gt 0 ]; do
+  if [ "$PARSING_CMD" = true ]; then
+    CMD_ARGS+=("$1")
+    shift
+    continue
+  fi
+
+  case "$1" in
+    --help|-h)  usage ;;
+    --keep)     KEEP_CONTAINER=1; shift ;;
+    --ci)       CI_MODE=1; shift ;;
+    start)      SUBCOMMAND="start"; shift ;;
+    stop)       SUBCOMMAND="stop"; shift ;;
+    status)     SUBCOMMAND="status"; shift ;;
+    env)        SUBCOMMAND="env"; shift ;;
+    --)         PARSING_CMD=true; shift ;;
+    *)          die "Unknown argument: $1. Run 'bin/test-db --help' for usage." ;;
+  esac
+done
+
+if [ ${#CMD_ARGS[@]} -eq 0 ] && [ -z "$SUBCOMMAND" ] && [ "$CI_MODE" -eq 0 ]; then
+  CMD_ARGS=(bin/rails test)
+fi
+
+case "$SUBCOMMAND" in
+  env)    cmd_env; exit 0 ;;
+  stop)   stop_container; exit 0 ;;
+  status) show_status; exit 0 ;;
+esac
+
+if [ "$CI_MODE" -eq 0 ]; then
+  command -v docker >/dev/null 2>&1 || die "Docker is not available. Install Docker or use --ci mode."
+  docker info >/dev/null 2>&1 || die "Docker daemon is not running. Start Docker or use --ci mode."
+fi
+
+if [ "$CI_MODE" -eq 1 ]; then
+  HARNESS_DB_PASSWORD="${POSTGRES_PASSWORD:-${HARNESS_DB_PASSWORD}}"
+  HARNESS_DB_HOST="${DB_HOST:-${HARNESS_DB_HOST}}"
+fi
+
+# --- Execute ----------------------------------------------------------------
+
+if [ "$SUBCOMMAND" = "start" ]; then
+  start_container
+  wait_for_postgres
+  print_env
+  exit 0
+fi
+
+echo ""
+echo "============================================"
+if [ "$CI_MODE" -eq 1 ]; then
+  echo "  Sure Test Harness — CI Mode (external PG)"
+else
+  echo "  Sure Test Harness — PostgreSQL 18"
+fi
+echo "============================================"
+echo ""
+
+if [ "$CI_MODE" -eq 0 ]; then
+  trap cleanup EXIT
+  start_container
+  wait_for_postgres
+fi
+
+boot_probe
+load_schema
+
+if [ ${#CMD_ARGS[@]} -gt 0 ]; then
+  echo ""
+  echo "Running: ${CMD_ARGS[*]}"
+  echo ""
+
+  cd "$PROJECT_ROOT"
+
+  ALLOW_PRODUCTION_DB_TASKS=1 \
+    RAILS_ENV=test \
+    DB_HOST="$HARNESS_DB_HOST" \
+    DB_PORT="$HARNESS_DB_PORT" \
+    POSTGRES_USER="$HARNESS_DB_USER" \
+    POSTGRES_PASSWORD="$HARNESS_DB_PASSWORD" \
+    POSTGRES_DB_TEST="$HARNESS_DB_NAME" \
+    "${CMD_ARGS[@]}"
+
+  exit_code=$?
+
+  echo ""
+  if [ $exit_code -eq 0 ]; then
+    ok "Command completed successfully."
+  else
+    fail "Command exited with code ${exit_code}."
+  fi
+
+  exit $exit_code
+fi
