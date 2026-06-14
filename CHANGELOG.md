@@ -1,3 +1,10 @@
+## [0.23.5](https://github.com/hendripermana/sure/compare/v0.23.4...v0.23.5) (2026-06-14)
+
+### Other Changes
+
+- Merge pull request #182 from hendripermana/dependabot/bundler/net-imap-0.6.4.1 (68ec3c1c)
+- deps(deps): bump net-imap from 0.6.4 to 0.6.4.1 (68d7c460)
+
 ## [0.23.4](https://github.com/hendripermana/sure/compare/v0.23.3...v0.23.4) (2026-06-13)
 
 ### Other Changes
