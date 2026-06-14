@@ -79,7 +79,7 @@ start_container() {
     --rm \
     -p "127.0.0.1:${HARNESS_DB_PORT}:5432" \
     --tmpfs /var/lib/postgresql \
-    --health-cmd pg_isready \
+    --health-cmd "pg_isready -U ${HARNESS_DB_USER} -d ${HARNESS_DB_NAME}" \
     --health-interval 2s \
     --health-timeout 5s \
     --health-retries 10 \
@@ -169,11 +169,29 @@ write_probe_script() {
   local tmpfile="$1"
   cat > "$tmpfile" <<'RUBY'
 c = ActiveRecord::Base.connection_db_config.configuration_hash
-puts "adapter=#{c[:adapter]}"
-puts "host=#{c[:host] || 'localhost'}"
-puts "port=#{c[:port] || 5432}"
-puts "database=#{c[:database]}"
+
+actual = {
+  adapter: c[:adapter].to_s,
+  host: (c[:host] || "localhost").to_s,
+  port: (c[:port] || 5432).to_i,
+  database: c[:database].to_s
+}
+expected = {
+  adapter: "postgresql",
+  host: ENV.fetch("DB_HOST"),
+  port: Integer(ENV.fetch("DB_PORT"), 10),
+  database: ENV.fetch("POSTGRES_DB_TEST")
+}
+
+mismatches = expected.filter_map do |key, expected_value|
+  actual_value = actual.fetch(key)
+  "#{key}=#{actual_value.inspect} (expected #{expected_value.inspect})" unless actual_value == expected_value
+end
+
+abort "Database configuration mismatch: #{mismatches.join(', ')}" if mismatches.any?
+
 ActiveRecord::Base.connection.execute("SELECT 1")
+actual.each { |key, value| puts "#{key}=#{value}" }
 puts "ok=true"
 RUBY
 }
@@ -189,7 +207,6 @@ boot_probe() {
   local probe_output
   set +e
   probe_output=$(cd "$PROJECT_ROOT" && \
-    ALLOW_PRODUCTION_DB_TASKS=1 \
     RAILS_ENV=test \
     DB_HOST="$HARNESS_DB_HOST" \
     DB_PORT="$HARNESS_DB_PORT" \
@@ -205,7 +222,7 @@ boot_probe() {
   if [ "$probe_exit" -ne 0 ]; then
     fail "Boot probe failed."
     echo "$probe_output" >&2
-    die "Rails could not connect. Check that PostgreSQL is running and credentials are correct."
+    die "Rails database probe failed. Review the configuration or connection error above."
   fi
 
   local adapter host port database probe_ok
@@ -235,8 +252,7 @@ load_schema() {
 
   cd "$PROJECT_ROOT"
 
-  ALLOW_PRODUCTION_DB_TASKS=1 \
-    RAILS_ENV=test \
+  RAILS_ENV=test \
     DB_HOST="$HARNESS_DB_HOST" \
     DB_PORT="$HARNESS_DB_PORT" \
     POSTGRES_USER="$HARNESS_DB_USER" \
@@ -275,6 +291,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+if [ "$CI_MODE" -eq 1 ]; then
+  HARNESS_DB_PASSWORD="${POSTGRES_PASSWORD:-}"
+  HARNESS_DB_HOST="${DB_HOST:-127.0.0.1}"
+  HARNESS_DB_PORT="${DB_PORT:-5432}"
+fi
+
 if [ ${#CMD_ARGS[@]} -eq 0 ] && [ -z "$SUBCOMMAND" ] && [ "$CI_MODE" -eq 0 ]; then
   CMD_ARGS=(bin/rails test)
 fi
@@ -288,11 +310,6 @@ esac
 if [ "$CI_MODE" -eq 0 ]; then
   command -v docker >/dev/null 2>&1 || die "Docker is not available. Install Docker or use --ci mode."
   docker info >/dev/null 2>&1 || die "Docker daemon is not running. Start Docker or use --ci mode."
-fi
-
-if [ "$CI_MODE" -eq 1 ]; then
-  HARNESS_DB_PASSWORD="${POSTGRES_PASSWORD:-${HARNESS_DB_PASSWORD}}"
-  HARNESS_DB_HOST="${DB_HOST:-${HARNESS_DB_HOST}}"
 fi
 
 # --- Execute ----------------------------------------------------------------
@@ -330,16 +347,16 @@ if [ ${#CMD_ARGS[@]} -gt 0 ]; then
 
   cd "$PROJECT_ROOT"
 
-  ALLOW_PRODUCTION_DB_TASKS=1 \
-    RAILS_ENV=test \
+  set +e
+  RAILS_ENV=test \
     DB_HOST="$HARNESS_DB_HOST" \
     DB_PORT="$HARNESS_DB_PORT" \
     POSTGRES_USER="$HARNESS_DB_USER" \
     POSTGRES_PASSWORD="$HARNESS_DB_PASSWORD" \
     POSTGRES_DB_TEST="$HARNESS_DB_NAME" \
     "${CMD_ARGS[@]}"
-
   exit_code=$?
+  set -e
 
   echo ""
   if [ $exit_code -eq 0 ]; then

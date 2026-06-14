@@ -4,7 +4,7 @@
 # production database while working locally. Set ALLOW_PRODUCTION_DB_TASKS=1 to
 # override this guard intentionally (e.g., initial provisioning).
 namespace :db do
-  task :ensure_safe_target do
+  task ensure_safe_target: :load_config do
     next if ENV["ALLOW_PRODUCTION_DB_TASKS"] == "1"
 
     env_name = ENV["RAILS_ENV"].presence || ENV["RACK_ENV"].presence || Rails.env
@@ -27,7 +27,12 @@ namespace :db do
 
     if env_name == "test" && target_db.present?
       pattern_str = ENV["APPROVED_TEST_DATABASES_PATTERN"].presence || "_test$"
-      approved_pattern = Regexp.new(pattern_str)
+      begin
+        approved_pattern = Regexp.new(pattern_str)
+      rescue RegexpError => error
+        abort "APPROVED_TEST_DATABASES_PATTERN is invalid: #{error.message}"
+      end
+
       unless target_db.match?(approved_pattern)
         abort <<~MSG
           Aborting test database task: '#{target_db}' is not an approved test database.
@@ -55,11 +60,7 @@ if defined?(Rake::Task)
   ].each do |task_name|
     begin
       task = Rake::Task[task_name]
-      prereqs = task.instance_variable_get(:@prerequisites) || []
-      unless prereqs.include?("db:ensure_safe_target")
-        prereqs.unshift("db:ensure_safe_target")
-        task.instance_variable_set(:@prerequisites, prereqs)
-      end
+      task.enhance([ "db:ensure_safe_target" ]) unless task.prerequisites.include?("db:ensure_safe_target")
     rescue RuntimeError
       # Ignore tasks that may not be defined in the current environment
     end
