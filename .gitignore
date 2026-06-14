@@ -136,5 +136,8 @@ credentials.json
 # Catchup analysis (not for commit)
 docs/CATCHUP_SURE_COMMUNITY.md
 
-# Catchup analysis (not for commit)
-docs/CATCHUP_SURE_COMMUNITY.md
+# Project planning artifacts (not for commit)
+CONTEXT.md
+docs/adr/
+docs/agents/
+issues/
