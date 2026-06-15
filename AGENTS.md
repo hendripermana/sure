@@ -7,6 +7,17 @@
   file so Codex, Claude Code, GitHub Copilot, and other agents follow the same
   engineering rules.
 
+  ### Companion Documents
+
+  - `CONTEXT.md` — canonical domain glossary (ubiquitous language). Use its terms
+    in code, tests, issues, and documentation. Do not introduce synonyms.
+  - `docs/adr/` — durable architectural decisions. Surface conflicts with existing
+    ADRs instead of silently overriding them.
+  - `docs/agents/` — agent harness, domain-doc rules, issue-tracker conventions,
+    and triage labels. Read `docs/agents/agent-harness.md` for the full execution
+    contract and feedback-loop commands.
+  - `DESIGN.md` — the authoritative design-system reference for all user-facing work.
+
   ### Serena Workflow
 
   - Activate the Sure project and read Serena's initial instructions at session start.
@@ -20,84 +31,50 @@
   ### Instruction Precedence
 
   1. User request and repository safety constraints.
-  2. This file and `DESIGN.md` for user-facing work.
-  3. Existing code patterns and tests.
-  4. Serena memories and historical documentation.
+  2. This file, `CONTEXT.md`, and `DESIGN.md` for user-facing work.
+  3. Relevant decisions under `docs/adr/`.
+  4. Existing code patterns and tests.
+  5. Serena memories and historical documentation.
 
-  # 🤖 AI Agents Documentation
+  ## ⚠️ CRITICAL: Development Philosophy
 
-  ## ⚠️ CRITICAL: Development Philosophy & Documentation Policy
+  ### Engineering Standard
 
-  ### 🚫 NO QUICK FIXES - ONLY PERMANENT SOLUTIONS
+  Every change must be **durable, grounded, and verified**.
 
-  **This project requires PROPER, COMPREHENSIVE, and PERMANENT solutions. NO shortcuts!**
+  **Durable** — Code must survive years of evolution. Design for
+  maintainability, adaptability, and clarity. Prefer deep domain
+  modeling over surface-level fixes. A proper permanent solution
+  always beats a fast temporary one.
 
-  #### Core Development Principles:
+  **Grounded** — Never guess at APIs, patterns, or behavior.
+  Use Context7, Firecrawl, or Exa MCP to verify current
+  documentation before writing code. Read existing code patterns
+  and `CONTEXT.md` vocabulary before introducing new ones.
+  When stuck on a bug, analyze the root cause — never disable
+  features, skip tests, or suggest workarounds.
 
-  1. **🎯 PRIORITY: Full latest ruby on rails Ecosystem + Shadcn/UI**
-     - ALWAYS use ruby on rails latest stable version
-     - ALWAYS use shadcn/ui latest stable version
-     - postgresql latest stable version
-     - redis latest stable version
-     - use latest stable versions of gems
-     - always upgrade if you find deprecated gems or anything to latest stable version
+  **Verified** — Every change must pass the full feedback loop
+  (see Pre-PR CI Workflow and `docs/agents/agent-harness.md`).
+  Work incrementally with small tested changes. Never leave
+  code in a broken state. If you cannot verify something works,
+  say so explicitly. Always use TDD workflow (`/tdd` skill) for
+  implementation work. For UI changes, record E2E verification
+  using Playwright or headless Chrome — screenshots or video —
+  before declaring work complete.
 
-  2. **🔍 ALWAYS USE FIRECRAWL, CONTEXT7 AND EXA MCP** - Use Firecrawl, exa, and Context7 MCP tool for up-to-date library documentation
-     - Get latest Ruby on Rails component documentation
-     - Get latest Shadcn/ui component documentation
-     - Verify API changes and best practices
-     - Never assume - always verify with official docs
-     - If need browsing use exa MCP
-
-  3. **🛠️ NO QUICK FIXES** - Every solution must be:
-     - ✅ **Proper**: Based on official Ruby on Rails & Shadcn/ui documentation
-     - ✅ **Comprehensive**: Addresses root cause, not just symptoms
-     - ✅ **Permanent**: Won't break in future or cause new issues
-     - ✅ **Well-analyzed**: Thoroughly investigated before implementation
-     - ✅ **Tested**: Verified to work correctly
-     - ❌ **NOT** a temporary workaround
-     - ❌ **NOT** a "quick fix" that creates technical debt
-     - **NOT** a Hardcoded - Always use Context7 MCP to verify ruby on rails/Shadcn and other stack in this project docs
-     -
-
-  4. **🐛 WHEN FACING BUGS**:
-     - ❌ **NEVER** disable features or tools when stuck
-     - ❌ **NEVER** give up or suggest "simple fixes"
-     - ✅ **ALWAYS** analyze the root cause thoroughly
-     - ✅ **ALWAYS** use Context7 MCP to verify ruby on rails/Shadcn and other stack in this project docs
-     - ✅ **ALWAYS** improve and optimize until bug is completely resolved
-     - ✅ **ALWAYS** be patient and work incrementally
-     - ✅ **ALWAYS** test thoroughly after each change
-
-  5. **📈 CONTINUOUS IMPROVEMENT**:
-     - Work incrementally with small, tested changes
-     - Each change should improve the codebase
-     - Never leave code in a broken state
-     - Always verify changes work before moving on
-     - Document complex logic with inline comments
-     - Leverage full ruby on rails ecosystem capabilities
-
-  6. **🎯 QUALITY OVER SPEED**:
-     - Take time to understand the problem deeply
-     - Research proper ruby on rails & Shadcn/ui solutions using Context7 and EXA MCP
-     - Implement carefully and test thoroughly
-     - A proper solution takes longer but saves time in the long run
-     - Use ruby on rails ecosystem to its full potential
-     - not hardcoded
-     - not workarounds
-     - not quick fixes
-     - not temporary solutions
-     - not "quick fixes" that create technical debt
-     - not "simple fixes" that don't improve the codebase
-     - not "temporary solutions" that don't improve the codebase
-     - not create simple version of something when you stuck on something you improve or fix must do PROPER and PERFECT way to achieve that
-
-
-  This document provides comprehensive guidance for AI agents working on the Sure codebase. It combines essential development patterns, architectural decisions, and best practices.
+  **Honest** — State what you know, what you assumed, and what
+  you could not verify. Flag uncertainty rather than presenting
+  guesses as facts. If a task exceeds your capability or context,
+  say so instead of producing plausible-looking but wrong output.
 
   ## Project Overview
 
-  Sure is a personal finance application built with Ruby on Rails that helps users track net worth, manage budgets, and gain financial insights. The application supports both managed hosting and self-hosted deployments.
+  Sure is a global personal finance product for a household to understand and
+  manage its shared financial life while preserving the financial practices of
+  the regions in which that household lives. See `CONTEXT.md` for canonical
+  domain language and `docs/adr/0012-global-core-with-regional-depth.md` for the
+  architectural framing.
 
   ### Application Modes
   - **Managed**: Sure team operates servers for users (`Rails.application.config.app_mode = "managed"`)
@@ -109,7 +86,8 @@
   - **Data**: `db/` (migrations, seeds), fixtures in `test/fixtures/`
   - **Tests**: `test/` mirroring `app/` structure (e.g., `test/models/*_test.rb`)
   - **Tooling**: `bin/` (project scripts), `docs/` (guides), `public/` (static), `lib/` (shared libs)
-  - **Components**: `app/components/` (ViewComponents with co-located Stimulus controllers)
+  - **Components**: `app/components/DS/` (Sure design system ViewComponents — the sole public component API per ADR-0008)
+  - **Planning**: `CONTEXT.md` (glossary), `docs/adr/` (decisions), `docs/agents/` (agent harness), `issues/` (issue specs)
 
   ## Core Domain Model
 
@@ -126,7 +104,9 @@
   **Assets**: Depository, Investment, Crypto, Property, Vehicle, Other Asset
   **Liabilities**: Credit Card, Loan (Person and Institute), Pay Later/BNPL, Personal Lending (borrowing), Other Liability
 
-  ### Indonesian Finance Features
+  ### Regional Coverage (Indonesia / Southeast Asia)
+  Indonesia and Southeast Asia are first-class markets, but country-specific
+  products must not leak into universal financial invariants (ADR-0012).
   - **Islamic Finance**: Sharia-compliant loans, credit cards, transaction types (Zakat, Infaq/Sadaqah)
   - **Personal Lending**: Qard Hasan, informal lending with tracking and reminders
   - **Fintech Integration**: Pinjol, P2P Lending, PayLater services
@@ -137,7 +117,7 @@
   - **Run app**: `bin/dev` — starts Rails server and asset/watchers via `Procfile.dev`
   - **Test suite**: `bin/rails test` — run all Minitest tests; add `TEST=test/models/user_test.rb` to target a file
   - **Lint Ruby**: `bin/rubocop` — style checks; add `-A` to auto-correct safe cops
-  - **Lint/format JS/CSS**: `npm run lint` and `npm run format` — uses Biome
+  - **Lint/format JS/CSS**: `pnpm run lint` and `pnpm run format` — uses Biome
   - **Security scan**: `bin/brakeman` — static analysis for common Rails issues
 
   ### Isolated Test DB (Docker, never touch production DB/volumes)
@@ -175,11 +155,17 @@
 
   ### Pre-Pull Request CI Workflow
   **ALWAYS run these commands before opening a pull request:**
-  1. **Tests** (Required): `bin/rails test` — Run all tests (always required)
-  2. **Linting** (Required): `bin/rubocop -f github -a` — Ruby linting with auto-correct
-  3. **Security** (Required): `bin/brakeman --no-pager` — Security analysis
+  1. `bin/rails zeitwerk:check` — Autoload verification
+  2. `bin/rubocop -f github` — Ruby linting
+  3. `pnpm install --frozen-lockfile && pnpm run lint` — JS linting
+  4. `bin/brakeman --no-pager` — Security analysis
+  5. `bin/importmap audit` — JS dependency audit
+  6. `RAILS_ENV=test bin/rails db:schema:load && bin/rails test` — Full test suite (every test, no skips)
+  7. For UI changes: record E2E verification via Playwright or headless Chrome (screenshot or video)
 
-  Only proceed with pull request creation if ALL checks pass.
+  Only proceed with pull request creation if ALL checks pass. "All tests pass"
+  means you ran the entire suite and can show the output — never claim green
+  without actually running it.
 
   ## General Development Rules
 
@@ -211,8 +197,8 @@
     - We pin `@hotwired/stimulus-loading` to a local shim at `app/javascript/stimulus-loading.js` via `config/importmap.rb`
     - Custom loading uses `Promise.all` for proper async controller registration
     - `app/javascript/controllers/index.js` eager‑loads controllers with `await` to ensure all controllers load before app initialization
-    - **ALL controllers MUST be in `app/javascript/controllers/`** - subdirectories like `controllers/shadcn/` and `controllers/DS/` are supported
-    - Controllers are registered with hyphenated identifiers: `shadcn/tabs_controller.js` → `shadcn--tabs`
+    - **ALL controllers MUST be in `app/javascript/controllers/`** — subdirectory `controllers/DS/` is supported
+    - Controllers are registered with hyphenated identifiers: `DS/tabs_controller.js` → `ds--tabs`
   - **After adding controllers or vendor JS**, restart `bin/dev` and consider `bin/rails tmp:cache:clear` if digests look stale
 
   ## TailwindCSS Design System
@@ -229,21 +215,18 @@
 
   ## Component Architecture
 
+  `DS::*` is the sole public component API (ADR-0008). Do not add components
+  outside the `DS::` namespace.
+
   ### ViewComponent vs Partials Decision Making
-  **Use ViewComponents when:**
-  - Element has complex logic or styling patterns
+  **Use DS:: ViewComponents when:**
+  - Element has complex logic, styling variants, or interactive behavior
   - Element will be reused across multiple views/contexts
-  - Element needs structured styling with variants/sizes
-  - Element requires interactive behavior or Stimulus controllers
-  - Element has configurable slots or complex APIs
   - Element needs accessibility features or ARIA support
 
   **Use Partials when:**
   - Element is primarily static HTML with minimal logic
   - Element is used in only one or few specific contexts
-  - Element is simple template content
-  - Element doesn't need variants, sizes, or complex configuration
-  - Element is more about content organization than reusable functionality
 
   ### Stimulus Controller Guidelines
   **Declarative Actions (Required):**
@@ -260,7 +243,7 @@
   - Use private methods and expose clear public API
   - Single responsibility or highly related responsibilities
   - **CRITICAL**: ALL Stimulus controllers MUST be in `app/javascript/controllers/` (Rails 8.1 requirement)
-  - Subdirectories are allowed: `app/javascript/controllers/shadcn/`, `app/javascript/controllers/DS/`
+  - Subdirectory `app/javascript/controllers/DS/` is used for design-system controllers
   - Pass data via `data-*-value` attributes, not inline JavaScript
   - Avoid `event.stopPropagation()` - let events bubble for Turbo navigation
 
@@ -316,11 +299,14 @@
   ## Background Processing
 
   Sidekiq handles asynchronous tasks:
-  - **Account syncing** (`SyncAccountsJob`)
-  - **Import processing** (`ImportDataJob`)
-  - **AI chat responses** (`CreateChatResponseJob`)
-  - **Scheduled maintenance** via sidekiq-cron
-  - **Market data imports** (`ImportMarketDataJob`)
+  - **Account syncing** (`SyncJob`, `SyncAllAccountsJob`, `SyncCleanupJob`)
+  - **Import processing** (`ImportJob`, `ImportMarketDataJob`)
+  - **AI chat responses** (`StreamingAssistantResponseJob`)
+  - **Scheduled maintenance** via sidekiq-cron (`config/schedule.yml`)
+  - **Recurring intelligence** (`RecurringIntelligenceJob`)
+  - **Subscription lifecycle** (`SubscriptionRenewalJob`)
+  - **Regional data** (`GoldPriceFetchJob`, `GoldAutoRevaluationJob`)
+  - **Monitoring** (`MemoryMonitoringJob`, `DatabasePoolMonitoringJob`, `CacheMonitoringJob`)
 
   ### Job Configuration
   - **Queues**: `scheduled`, `high_priority`, `medium_priority`, `low_priority`, `default`
@@ -440,60 +426,9 @@
   // });
   ```
 
-  ### Rails 8.1 Upgrade Issues & Fixes (October 31, 2025)
-
-  **Issue 1: Stimulus Controllers Not Loading from Subdirectories**
-  - **Problem**: Controllers in `app/components/shadcn/` and `app/components/DS/` were not being loaded by Importmap
-  - **Root Cause**: `pin_all_from "app/components"` was ineffective for nested directories
-  - **Solution**:
-    - Moved all Stimulus controllers to `app/javascript/controllers/` following Rails conventions
-    - Fixed async loading in `app/javascript/stimulus-loading.js` with `Promise.all` and `await`
-    - Updated `app/javascript/controllers/index.js` to properly await controller loading
-  - **Files Changed**:
-    - `config/importmap.rb`: Removed incorrect pin_all_from
-    - `app/javascript/stimulus-loading.js`: Fixed async controller registration
-    - `app/javascript/controllers/index.js`: Added await for eager loading
-    - Moved controllers from `app/components/` to `app/javascript/controllers/`
-
-  **Issue 2: Event Propagation Blocking Clicks**
-  - **Problem**: `event.stopPropagation()` in multiple controllers blocked event bubbling
-  - **Root Cause**: Overly aggressive event handling prevented Turbo navigation
-  - **Solution**: Removed `stopPropagation()` from tab and menu controllers, keeping only `preventDefault()` where needed
-  - **Files Changed**:
-    - `app/javascript/controllers/shadcn/tabs_controller.js`
-    - `app/javascript/controllers/DS/tabs_controller.js`
-    - `app/javascript/application.js`: Removed problematic `turbo:click` handler
-
-  **Issue 3: Dropdown Menu Items Not Navigating**
-  - **Problem**: Menu items inside Turbo Frame couldn't navigate to full pages
-  - **Root Cause**: User menu wrapped in `turbo_frame_tag` caused Turbo to load responses inside frame instead of full page navigation
-  - **Solution**: Added `data-turbo-frame="_top"` to menu link items to break out of parent frames
-  - **Files Changed**:
-    - `app/components/DS/menu_item.rb`: Added automatic `_top` frame for link items
-    - `app/javascript/controllers/DS/menu_controller.js`: Added `turbo:before-visit` handler for clean menu close
-
-  **Issue 4: ActiveSupport::Configurable Deprecation Flood**
-  - **Problem**: Rails 8.1 logs a warning every time `ActiveSupport::Configurable` autoloads (removed in 8.2)
-  - **Root Cause**: Dependencies (ViewComponent, OmniAuth helpers, etc.) still reference the deprecated module
-  - **Solution**: Provide our own drop-in implementation at `lib/active_support/configurable.rb` using `class_attribute` + `ActiveSupport::InheritableOptions`, and load it before `Bundler.require`
-  - **Files Changed**:
-    - `config/boot.rb`: Adds `lib` to `$LOAD_PATH` so our shim wins `require "active_support/configurable"`
-    - `config/application.rb`: Requires the shim before other gems boot
-    - `lib/active_support/configurable.rb`: Shim implementation maintained until upstream gems remove the dependency
-
-  **Issue 5: connection_pool 3.x keyword-only API + Sidekiq positional calls**
-  - **Problem**: connection_pool 3.x initializer and `TimedStack#pop` are keyword-only; Sidekiq and legacy code still pass positional args (e.g., `ConnectionPool.new(5)` or `TimedStack#pop(10)`), leading to stack overflows or `ArgumentError` in production.
-  - **Solution**: Early boot shim in `config/boot.rb`:
-    - Guarded (`@__Sure_patched`) to avoid re-alias recursion.
-    - Normalizes positional/Hash args to keywords before delegating to the original initializer via `bind_call`.
-    - Patches `ConnectionPool::TimedStack#pop` to map positional timeout to keyword `timeout`.
-  - **Upgrade note**: Keep this shim until Sidekiq/Redis clients are fully keyword-safe; revisit after upgrading connection_pool/Sidekiq to versions that no longer use positional APIs.
-
-  **Key Learnings:**
-  - Rails 8.1 requires stricter Stimulus controller location conventions
-  - Turbo Frames need explicit `_top` target to break out for full page navigation
-  - Event handling must allow proper bubbling for Turbo to work correctly
-  - Async controller loading must use `Promise.all` to ensure all controllers are registered
+  ### Rails 8.1 Upgrade Shims (still active)
+  - **ActiveSupport::Configurable shim** (`lib/active_support/configurable.rb`): Suppresses deprecation flood from ViewComponent/OmniAuth until upstream gems drop the dependency. Loaded early in `config/boot.rb`.
+  - **connection_pool 3.x shim** (`config/boot.rb`): Normalizes positional args to keywords for Sidekiq/Redis. Keep until Sidekiq is fully keyword-safe.
 
   ### Rails 8 Breaking Changes (from 7.x)
   - **RedisCacheStore Configuration**: Connection pool parameters changed from `pool_size:` and `pool_timeout:` to nested `pool: { size:, timeout: }` format
@@ -503,18 +438,19 @@
   ### Stack Components
   - **Backend**: Ruby on Rails 8.1.3
   - **Database**: PostgreSQL 18.x with UUID primary keys
-  - **Frontend**: Hotwire (Turbo 2.0.17 + Stimulus 3.x)
-  - **Styling**: TailwindCSS v4 with custom design system
-  - **Linting**: Biome 2.2.6 (JavaScript/TypeScript)
+  - **Frontend**: Hotwire (Turbo 2.0.23 + Stimulus 3.x)
+  - **Styling**: TailwindCSS v4 with Sure design system (`DS::*`, see `DESIGN.md`)
+  - **Linting**: Biome 2.4.16 (JavaScript/TypeScript), RuboCop (Ruby), Brakeman 8.0.5 (security)
   - **Testing**: Minitest + fixtures
-  - **Jobs**: Sidekiq + Redis 7.4.x
-  - **External APIs**: Plaid, OpenAI, Stripe
+  - **Jobs**: Sidekiq 8.1.6 + Redis 7.4.x
+  - **External APIs**: Plaid, OpenAI, Stripe 19.2.0
   - **Deployment**: Docker support for self-hosting
+  - **Package manager (JS)**: pnpm (not npm/yarn)
 
   ### Key Dependencies
-  - **aws-sdk-s3**: 1.200.0 (IMDSv2 support)
-  - **rubyzip**: 3.2 (enhanced security)
-  - **@biomejs/biome**: 2.2.6 (migrated from 1.9.4)
+  - **aws-sdk-s3**: 1.224.0 (IMDSv2 support)
+  - **rubyzip**: 3.2.2
+  - **@biomejs/biome**: 2.4.16
 
   ### Upgrade Policy
   - Always use latest stable versions
@@ -596,109 +532,12 @@
   - **Background Job Tracking**: Queue depths, slow jobs
 
   ### Performance Guidelines
-
-  **Database Queries:**
-  ```ruby
-  # ❌ AVOID: N+1 queries
-  @accounts.each { |a| a.entries.count }
-
-  # ✅ USE: Eager loading
-  @accounts = Account.includes(:entries)
-
-  # ✅ USE: Counter caches
-  @accounts.each { |a| a.entries_count }
-
-  # ✅ USE: Efficient loading concern
-  @accounts = Account.for_list.with_common_associations
-  ```
-
-  **Caching:**
-  ```ruby
-  # ✅ USE: Fragment caching for expensive operations
-  Rails.cache.fetch("key", expires_in: 1.hour) do
-    expensive_calculation
-  end
-
-  # ✅ USE: Model-level caching helpers
-  Account.fetch_cached("balance_series") do
-    calculate_balance_series
-  end
-  ```
-
-  **Background Jobs:**
-  ```ruby
-  # ❌ AVOID: Inline processing of slow operations
-  def create
-    @account.sync_transactions  # Slow!
-  end
-
-  # ✅ USE: Background jobs
-  def create
-    SyncAccountJob.perform_later(@account.id)
-  end
-
-  # ✅ USE: Batch processing
-  Account.in_efficient_batches(batch_size: 1000) do |account|
-    process(account)
-  end
-  ```
-
-  **Memory Management:**
-  ```ruby
-  # ❌ AVOID: Loading all records
-  Account.all.each { |a| process(a) }
-
-  # ✅ USE: Batch iteration
-  Account.find_each(batch_size: 1000) { |a| process(a) }
-
-  # ✅ USE: Pluck for simple data
-  Account.pluck(:id)  # Not Account.all.map(&:id)
-  ```
-
-  ### Performance Monitoring
-
-  **Key Metrics:**
-  - Response time: Target <200ms p95
-  - Throughput: Requests per second
-  - Memory usage: Per process
-  - Database pool: Connection usage
-  - Cache hit rate: Target >80%
-  - Background jobs: Queue depths
-
-  **Monitoring Tools:**
-  - Sentry: Performance traces, errors, custom metrics
-  - Sidekiq Dashboard: `/sidekiq` for job monitoring
-  - Rails logs: Query logs, cache logs
-  - PostgreSQL: Slow query logs
-
-  ### Performance Testing
-
-  ```bash
-  # Load testing
-  hey -n 1000 -c 50 http://localhost:3000/accounts
-
-  # Benchmarking
-  bundle exec derailed bundle:mem
-  bundle exec derailed exec perf:test
-  ```
-
-  ### Configuration Files
-
-  - `.env.local.example`: All performance environment variables
-  - `config/puma.rb`: Application server configuration
-  - `config/sidekiq.yml`: Background job configuration
-  - `config/database.yml`: Database connection pooling
-  - `config/environments/production.rb`: Redis cache store
-  - `config/initializers/sentry.rb`: Comprehensive monitoring
-  - `docs/PERFORMANCE_GUIDE.md`: Complete performance documentation
-
-  ### Expected Results
-
-  - **Response Time**: 50-70% reduction
-  - **Throughput**: 3-5x increase
-  - **Memory Usage**: 30-40% reduction
-  - **Database Load**: 40-60% reduction
-  - **Background Jobs**: 3-5x faster processing
+  - Use `includes` / `preload` to avoid N+1 queries; use `pluck` for simple data
+  - Use `find_each` / `in_batches` instead of `Account.all.each`
+  - Use `Rails.cache.fetch` with TTL for expensive calculations
+  - Move slow operations to background jobs (`perform_later`)
+  - Target <200ms p95 response time, >80% cache hit rate
+  - Monitor via Sentry APM, Sidekiq Dashboard (`/sidekiq`), PostgreSQL slow query logs
 
   ## Security Best Practices (Rails 8.1)
 
@@ -869,70 +708,6 @@
   }
   ```
 
-  ## Common Patterns
-
-  ### Account Balance Calculation
-  ```ruby
-  # Daily balances calculated from entries
-  account.balances.order(:date)
-
-  # Current balance
-  account.current_balance
-
-  # Balance on specific date
-  account.balance_on(date)
-  ```
-
-  ### Entry Management
-  ```ruby
-  # Create transaction
-  account.transactions.create!(
-    amount: -100, # Negative for expense
-    currency: "USD",
-    date: Date.current
-  )
-
-  # Create transfer
-  Transfer.create!(
-    from_account: checking,
-    to_account: savings,
-    amount: 500
-  )
-  ```
-
-  ### Family Management
-  ```ruby
-  # Current family context
-  Current.family
-
-  # Family members
-  family.users
-
-  # Family accounts
-  family.accounts
-  ```
-
-  ### Indonesian Finance Examples
-  ```ruby
-  # Islamic finance transaction
-  transaction.update!(kind: "zakat_payment", is_sharia_compliant: true)
-
-  # Personal lending
-  personal_lending = PersonalLending.create!(
-    counterparty_name: "Ahmad",
-    lending_direction: "lending_out",
-    lending_type: "qard_hasan",
-    relationship: "friend"
-  )
-
-  # Pinjol loan
-  loan = Loan.create!(
-    compliance_type: "conventional",
-    fintech_type: "pinjol",
-    counterparty_name: "Kredivo"
-  )
-  ```
-
   ## Documentation Guidelines
 
   ### ⚠️ CRITICAL: NO NEW DOCUMENTATION FILES
@@ -993,7 +768,7 @@
 
   ### Views & Components
   - `app/views/layouts/application.html.erb`: Main layout
-  - `app/components/`: ViewComponents (prefer over partials)
+  - `app/components/DS/`: Sure design system ViewComponents (sole public component API)
   - `app/helpers/application_helper.rb`: Global helpers (icon helper)
 
   ### Assets
@@ -1011,21 +786,18 @@
 
   When working on this codebase:
 
-  1. **Always check existing patterns** before implementing new features
-  2. **Use the design system** (`app/assets/tailwind/Sure-design-system.css`) for styling
-  3. **Follow Rails conventions** for file organization
-  4. **Write tests** for new functionality using Minitest + fixtures
-  5. **Update documentation** when adding features (update existing files, don't create new ones)
-  6. **Consider both managed and self-hosted modes** in your implementations
-  7. **Respect the AGPLv3 license** and attribution requirements
-  8. **Use `Current.user` and `Current.family`** instead of `current_user`/`current_family`
-  9. **Prioritize Indonesian finance features** when relevant (Islamic finance, personal lending, local categories)
-  10. **Always use `icon` helper** instead of `lucide_icon` directly
-  11. **Keep controllers skinny** - business logic belongs in models
-  12. **Use ViewComponents** for complex UI, partials for simple content
-  13. **Prefer semantic HTML** over custom JavaScript components
-  14. **Test critical paths only** - don't test ActiveRecord functionality
-  15. **Run pre-PR checks**: tests, linting, security scan
+  1. **Read `CONTEXT.md`** for canonical domain vocabulary before writing code
+  2. **Use `DS::*` components and `DESIGN.md`** for all UI work
+  3. **Use `Current.user` and `Current.family`** — never `current_user`/`current_family`
+  4. **Always use `icon` helper** in `application_helper.rb` — never `lucide_icon` directly
+  5. **Keep controllers skinny** — business logic belongs in models
+  6. **Global core, regional depth** — country-specific products must not leak into universal invariants
+  7. **Consider both managed and self-hosted modes** in implementations
+  8. **Always use TDD** — invoke `/tdd` skill for every implementation task
+  9. **Run the full feedback loop** before declaring work complete (see Pre-PR CI Workflow) — show actual test output, never claim passing without running
+  10. **Record UI verification** — use Playwright or headless Chrome for E2E evidence on UI changes
+  11. **Use pnpm** as the JavaScript package manager — not npm or yarn
+  12. **Product identity is Sure** — do not introduce other product names (ADR-0002)
 
   ### Quick Reference Commands
   ```bash
@@ -1033,10 +805,13 @@
   cp .env.local.example .env.local && bin/setup
   bin/dev
 
-  # Testing and quality
-  bin/rails test
-  bin/rubocop -f github -a
+  # Full feedback loop (run before PRs)
+  bin/rails zeitwerk:check
+  bin/rubocop -f github
+  pnpm install --frozen-lockfile && pnpm run lint
   bin/brakeman --no-pager
+  bin/importmap audit
+  RAILS_ENV=test bin/rails test
 
   # Debugging
   bin/rails console
