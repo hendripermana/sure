@@ -1,3 +1,14 @@
+## [0.23.12](https://github.com/hendripermana/sure/compare/v0.23.11...v0.23.12) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #192 from hendripermana/dependabot/bundler/propshaft-1.3.2 (1af8019e)
+- Merge pull request #191 from hendripermana/dependabot/bundler/jbuilder-2.15.1 (83b87919)
+- Merge pull request #190 from hendripermana/dependabot/bundler/skylight-7.1.1 (08c5931f)
+- deps(deps): bump propshaft from 1.3.1 to 1.3.2 (51b27907)
+- deps(deps): bump jbuilder from 2.15.0 to 2.15.1 (4bcbe34b)
+- deps(deps): bump skylight from 7.0.0 to 7.1.1 (4866f730)
+
 ## [0.23.11](https://github.com/hendripermana/sure/compare/v0.23.10...v0.23.11) (2026-06-15)
 
 ### Other Changes
