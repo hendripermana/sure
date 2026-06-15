@@ -62,10 +62,30 @@ ENV["API_RATE_LIMITING_ENABLED"] ||= "true"
 # Fixes Segfaults on M1 Macs when running tests in parallel (temporary workaround)
 ENV["PGGSSENCMODE"] = "disable"
 
+# Defense-in-depth: never let the suite (and the schema maintenance triggered by
+# `rails/test_help`) run against a production database, even when conflicting
+# POSTGRES_DB / POSTGRES_DB_PRODUCTION shell variables leak in (issue 003 AC#4).
+require_relative "support/database_safety_guard"
+DatabaseSafetyGuard.enforce!(
+  rails_env: Rails.env,
+  configured_database: ActiveRecord::Base.connection_db_config.database,
+  production_database: ENV["POSTGRES_DB_PRODUCTION"].presence ||
+    ENV["POSTGRES_DB"].presence || "permoney_production"
+)
+
 require "rails/test_help"
 require "minitest/autorun"
 require "mocha/minitest"
 require "aasm/minitest"
+
+# turbo-rails only mixes Turbo::Broadcastable::TestHelper (which provides
+# `capture_turbo_stream_broadcasts`) into ActiveSupport::TestCase from inside an
+# `on_load(:action_cable)` hook. ActionCable loads lazily, so in any parallel
+# worker where it has not been loaded before the test runs, the helper is
+# missing and tests fail with an order-dependent NoMethodError. Touching
+# ActionCable::Server::Base here fires the load hook in the parent process,
+# before parallel workers fork, so the helper is present everywhere. (issue 003)
+ActionCable::Server::Base.config
 
 VCR.configure do |config|
   config.cassette_library_dir = "test/vcr_cassettes"

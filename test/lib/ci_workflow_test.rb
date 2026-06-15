@@ -71,4 +71,40 @@ class CiWorkflowTest < ActiveSupport::TestCase
     assert_match(/\Apnpm@\d+\.\d+\.\d+\z/, package["packageManager"].to_s,
       "package.json must pin an exact pnpm version via packageManager")
   end
+
+  # Guards the issue 003 contract: the full Minitest suite is a blocking CI check
+  # that runs against a freshly loaded PostgreSQL 18 database via the disposable
+  # harness — never a narrowed subset, never permissive.
+  test "the full Minitest suite runs as a blocking job on the clean PostgreSQL 18 path" do
+    test_job = @jobs.values.find do |job|
+      Array(job["steps"]).any? { |step| step["run"].to_s.include?("bin/rails test") }
+    end
+    assert test_job, "CI must run the full Minitest suite (`bin/rails test`)"
+
+    refute test_job["continue-on-error"],
+      "The test job must block on failure; remove continue-on-error"
+
+    suite_cmd = Array(test_job["steps"]).filter_map { |step| step["run"] }
+                     .find { |cmd| cmd.include?("bin/rails test") }
+    assert_includes suite_cmd, "bin/test-db",
+      "The suite must run through the disposable-database harness (bin/test-db) for a clean schema load"
+    refute_match(%r{bin/rails test\s+\S}, suite_cmd,
+      "CI must run the entire suite, not a narrowed subset of files")
+
+    postgres_image = test_job.dig("services", "postgres", "image").to_s
+    assert_equal "postgres:18", postgres_image,
+      "The suite must run against a clean PostgreSQL 18 service"
+  end
+
+  test "the test suite job is reached on pull requests" do
+    pr_workflow = YAML.safe_load(File.read(Rails.root.join(".github/workflows/pr.yml")), aliases: true)
+    triggers = pr_workflow["on"] || pr_workflow[true]
+    assert triggers.key?("pull_request"),
+      "pr.yml must trigger on pull_request so the blocking suite runs before merge"
+
+    calls_ci = pr_workflow.fetch("jobs").values.any? do |job|
+      job["uses"].to_s.include?(".github/workflows/ci.yml")
+    end
+    assert calls_ci, "pr.yml must invoke ci.yml (which contains the blocking test suite)"
+  end
 end
