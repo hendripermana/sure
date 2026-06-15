@@ -676,8 +676,7 @@ GEM
     validate_url (1.0.15)
       activemodel (>= 3.0.0)
       public_suffix
-    vcr (6.3.1)
-      base64
+    vcr (6.4.0)
     vernier (1.10.1)
     view_component (4.9.0)
       actionview (>= 7.1.0)
