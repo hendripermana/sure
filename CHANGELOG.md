@@ -1,3 +1,10 @@
+## [0.23.11](https://github.com/hendripermana/sure/compare/v0.23.10...v0.23.11) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #189 from hendripermana/dependabot/bundler/doorkeeper-5.9.2 (79daf826)
+- deps(deps): bump doorkeeper from 5.9.1 to 5.9.2 (84d03388)
+
 ## [0.23.10](https://github.com/hendripermana/sure/compare/v0.23.9...v0.23.10) (2026-06-15)
 
 ### Other Changes
