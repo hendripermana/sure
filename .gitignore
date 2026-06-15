@@ -136,5 +136,5 @@ credentials.json
 # Catchup analysis (not for commit)
 docs/CATCHUP_SURE_COMMUNITY.md
 
-# Catchup analysis (not for commit)
-docs/CATCHUP_SURE_COMMUNITY.md
+# WIP issue specs (not ready to ship)
+issues/
