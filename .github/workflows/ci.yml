@@ -97,3 +97,42 @@ jobs:
 
       - name: Lint/Format js code
         run: pnpm run lint
+
+  test:
+    name: Test Suite (PostgreSQL 18)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [lint, lint_js]
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: sure_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sure_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run test suite
+        run: bin/test-db --ci -- bin/rails test
+        env:
+          RAILS_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB_TEST: sure_test
