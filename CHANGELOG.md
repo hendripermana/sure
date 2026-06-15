@@ -1,3 +1,10 @@
+## [0.23.8](https://github.com/hendripermana/sure/compare/v0.23.7...v0.23.8) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #186 from hendripermana/dependabot/bundler/simplecov-cobertura-3.2.0 (c8a0f333)
+- deps-dev(deps-dev): bump simplecov-cobertura from 3.1.0 to 3.2.0 (ef193a80)
+
 ## [0.23.7](https://github.com/hendripermana/sure/compare/v0.23.6...v0.23.7) (2026-06-15)
 
 ### Other Changes
