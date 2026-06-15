@@ -1,3 +1,10 @@
+## [0.23.10](https://github.com/hendripermana/sure/compare/v0.23.9...v0.23.10) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #188 from hendripermana/dependabot/bundler/aws-sdk-s3-1.225.1 (20f532cc)
+- deps(deps): bump aws-sdk-s3 from 1.224.0 to 1.225.1 (48b3f374)
+
 ## [0.23.9](https://github.com/hendripermana/sure/compare/v0.23.8...v0.23.9) (2026-06-15)
 
 ### Other Changes
