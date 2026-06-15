@@ -107,7 +107,7 @@ scripts/*
 .taskmasterconfig
 .windsurfrules
 .cursor/rules/dev_workflow.mdc
-.cursor/rules/taskmaster.mdc.trae/
+.cursor/rules/taskmaster.mdc
 .serena/project.yml
 
 # AI Agents & IDE Skills Cache
