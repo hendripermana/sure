@@ -1,3 +1,10 @@
+## [0.23.17](https://github.com/hendripermana/sure/compare/v0.23.16...v0.23.17) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #198 from hendripermana/chore/restore-full-minitest-baseline (33f38675)
+- Restore and harden the full Minitest baseline (226e3bb5)
+
 ## [0.23.16](https://github.com/hendripermana/sure/compare/v0.23.15...v0.23.16) (2026-06-15)
 
 ### Other Changes
