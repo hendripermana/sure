@@ -1,3 +1,13 @@
+## [0.23.6](https://github.com/hendripermana/sure/compare/v0.23.5...v0.23.6) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #184 from hendripermana/feature/test-harness (9869f6d0)
+- Make AI controller tests deterministic (4023b012)
+- Fix PostgreSQL test harness safety (e4aacf01)
+- Add project planning artifacts to .gitignore (4f78e2d3)
+- Add reproducible PostgreSQL 18 test harness (07981c52)
+
 ## [0.23.5](https://github.com/hendripermana/sure/compare/v0.23.4...v0.23.5) (2026-06-14)
 
 ### Other Changes
