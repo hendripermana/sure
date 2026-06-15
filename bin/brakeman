@@ -11,9 +11,10 @@ rescue StandardError
   warn "[brakeman] Skipping --ensure-latest because latest version lookup failed"
 end
 
-# Add --no-exit-on-warn unless --exit-on-warn is explicitly specified
-unless ARGV.include?("--exit-on-warn")
-  ARGV.unshift("--no-exit-on-warn")
+# Security findings must block by default. Exit non-zero on warnings unless the
+# caller explicitly opts out with --no-exit-on-warn (e.g. for interactive triage).
+unless ARGV.include?("--no-exit-on-warn")
+  ARGV.unshift("--exit-on-warn")
 end
 
 load Gem.bin_path("brakeman", "brakeman")
