@@ -1,3 +1,12 @@
+## [0.23.13](https://github.com/hendripermana/sure/compare/v0.23.12...v0.23.13) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #194 from hendripermana/dependabot/bundler/posthog-ruby-3.11.0 (ca674ccc)
+- Merge pull request #193 from hendripermana/dependabot/bundler/i18n-tasks-1.1.2 (2cc8d2a5)
+- deps(deps): bump posthog-ruby from 3.3.3 to 3.11.0 (e80c8792)
+- deps-dev(deps-dev): bump i18n-tasks from 1.0.15 to 1.1.2 (9988e28f)
+
 ## [0.23.12](https://github.com/hendripermana/sure/compare/v0.23.11...v0.23.12) (2026-06-15)
 
 ### Other Changes
