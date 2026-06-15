@@ -1,3 +1,10 @@
+## [0.23.14](https://github.com/hendripermana/sure/compare/v0.23.13...v0.23.14) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #195 from hendripermana/dependabot/bundler/vcr-6.4.0 (50b763e3)
+- deps-dev(deps-dev): bump vcr from 6.3.1 to 6.4.0 (ead64ce3)
+
 ## [0.23.13](https://github.com/hendripermana/sure/compare/v0.23.12...v0.23.13) (2026-06-15)
 
 ### Other Changes
