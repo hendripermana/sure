@@ -1,3 +1,11 @@
+## [0.23.16](https://github.com/hendripermana/sure/compare/v0.23.15...v0.23.16) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #197 from hendripermana/chore/make-ci-quality-and-security-blocking (460f0ad6)
+- Stop tracking .trae IDE workspace directory (c37ca1a7)
+- Make CI quality and security checks merge-blocking (b9c34312)
+
 ## [0.23.15](https://github.com/hendripermana/sure/compare/v0.23.14...v0.23.15) (2026-06-15)
 
 ### Other Changes
