@@ -1,3 +1,10 @@
+## [0.23.7](https://github.com/hendripermana/sure/compare/v0.23.6...v0.23.7) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #185 from hendripermana/dependabot/npm_and_yarn/biomejs/biome-2.5.0 (8d3fce2d)
+- deps-dev(deps-dev): bump @biomejs/biome from 2.4.16 to 2.5.0 (c357eb51)
+
 ## [0.23.6](https://github.com/hendripermana/sure/compare/v0.23.5...v0.23.6) (2026-06-15)
 
 ### Other Changes
