@@ -1,6 +1,7 @@
 # Force managed mode for tests (self-hosted guards disable subscriptions/invitations)
 ENV["SELF_HOSTED"] = "false"
 ENV["SELF_HOSTING_ENABLED"] = "false"
+ENV["OPENAI_ACCESS_TOKEN"] = "test-openai-token" if ENV["OPENAI_ACCESS_TOKEN"].to_s.empty?
 
 if ENV["COVERAGE"] == "true"
   require "simplecov"
