@@ -1,3 +1,10 @@
+## [0.23.15](https://github.com/hendripermana/sure/compare/v0.23.14...v0.23.15) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #196 from hendripermana/docs/refresh-agent-instructions (ba28fa02)
+- Refresh agent instructions and add planning artifacts (c1b65f7e)
+
 ## [0.23.14](https://github.com/hendripermana/sure/compare/v0.23.13...v0.23.14) (2026-06-15)
 
 ### Other Changes
