@@ -12,7 +12,6 @@ jobs:
     name: Scan Security (Ruby)
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -24,7 +23,7 @@ jobs:
           bundler-cache: true
 
       - name: Scan for security vulnerabilities in Ruby dependencies
-        run: bin/brakeman --no-pager --no-exit-on-warn
+        run: bin/brakeman --no-pager --exit-on-warn
 
   scan_js:
     name: Scan Security (JavaScript)
@@ -42,6 +41,23 @@ jobs:
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bin/importmap audit
+
+  autoload:
+    name: Verify Autoloading (Zeitwerk)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Verify Zeitwerk autoloading
+        run: bin/rails zeitwerk:check
 
   lint:
     name: Lint Code (Ruby)
@@ -92,7 +108,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
         shell: bash
 
       - name: Lint/Format js code
@@ -102,7 +118,7 @@ jobs:
     name: Test Suite (PostgreSQL 18)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [lint, lint_js]
+    needs: [autoload, lint, lint_js]
     services:
       postgres:
         image: postgres:18

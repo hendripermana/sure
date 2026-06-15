@@ -297,7 +297,7 @@ class UpstreamSync
     puts "2. Configuration Files:"
     puts "   • Merge: .env.local.example (add Langfuse, AI_DEBUG_MODE vars)"
     puts "   • Review: Gemfile and Gemfile.lock"
-    puts "   • Review: package.json and package-lock.json"
+    puts "   • Review: package.json and pnpm-lock.yaml"
     puts "   • Check: config/initializers/* for new settings\n"
     
     puts "3. Documentation:"
