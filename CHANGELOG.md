@@ -1,3 +1,10 @@
+## [0.23.9](https://github.com/hendripermana/sure/compare/v0.23.8...v0.23.9) (2026-06-15)
+
+### Other Changes
+
+- Merge pull request #187 from hendripermana/dependabot/bundler/web-console-4.3.0 (c7b1466b)
+- deps-dev(deps-dev): bump web-console from 4.2.1 to 4.3.0 (0b87616f)
+
 ## [0.23.8](https://github.com/hendripermana/sure/compare/v0.23.7...v0.23.8) (2026-06-15)
 
 ### Other Changes
