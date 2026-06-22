@@ -24,7 +24,7 @@ gem "stimulus-rails"
 gem "turbo-rails"
 gem "view_component"
 
-gem "lookbook", "~> 2.3.13"
+gem "lookbook", "~> 2.3.14"
 
 gem "hotwire_combobox"
 
