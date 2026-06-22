@@ -46,7 +46,7 @@ gem "prometheus-client"
 gem "prometheus_exporter"
 
 # Active Storage
-gem "aws-sdk-s3", "~> 1.225.1", require: false
+gem "aws-sdk-s3", "~> 1.226.0", require: false
 gem "image_processing", ">= 1.2"
 
 # Other
