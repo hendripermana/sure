@@ -36,7 +36,7 @@ class FamilyExportsController < ApplicationController
 
       if url.present?
         parsed_url = URI.parse(url)
-        allowed_hosts = %w[cloudflare.com r2.cloudflarestorage.com s3.amazonaws.com amazonaws.com]
+        allowed_hosts = %w[cloudflare.com r2.cloudflarestorage.com s3.amazonaws.com amazonaws.com localhost]
         if parsed_url.host.present? && parsed_url.scheme.present? && allowed_hosts.any? { |host| parsed_url.host.end_with?(host) }
           redirect_to url, allow_other_host: false
         else
