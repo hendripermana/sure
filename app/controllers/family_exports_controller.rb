@@ -36,15 +36,15 @@ class FamilyExportsController < ApplicationController
 
       if url.present?
         parsed_url = URI.parse(url)
-        allowed_hosts = %w[cloudflare.com r2.cloudflarestorage.com s3.amazonaws.com amazonaws.com localhost]
-        Rails.logger.debug "[FamilyExports] URL: #{url}, Host: #{parsed_url.host}, Scheme: #{parsed_url.scheme}"
+        allowed_hosts = %w[cloudflare.com r2.cloudflarestorage.com s3.amazonaws.com amazonaws.com]
+        allowed_hosts += %w[localhost www.example.com] if Rails.env.test? || Rails.env.development?
+
         if parsed_url.host.present? && parsed_url.scheme.present? && allowed_hosts.any? { |host| parsed_url.host.end_with?(host) }
           redirect_to url, allow_other_host: false
         else
           redirect_to imports_path, alert: "Export not ready for download"
         end
       else
-        Rails.logger.debug "[FamilyExports] URL is nil/blank"
         redirect_to imports_path, alert: "Export not ready for download"
       end
     else
