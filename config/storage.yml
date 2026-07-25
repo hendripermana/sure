@@ -20,8 +20,13 @@ cloudflare:
   secret_access_key: <%= ENV['CLOUDFLARE_SECRET_ACCESS_KEY'] %>
   region: auto
   bucket: <%= ENV['CLOUDFLARE_BUCKET'] %>
+  public_url: https://cloud.permana.icu
+  prefix: "active_storage"
+  force_path_style: true
   request_checksum_calculation: "when_required"
   response_checksum_validation: "when_required"
+
+
 
 generic_s3:
   service: S3
