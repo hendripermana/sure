@@ -150,8 +150,9 @@
             <%# Display receipt thumbnail or icon %>
             <% if @entry.receipt.content_type.start_with?("image/") %>
               <div class="relative group">
-                <%= link_to rails_blob_path(@entry.receipt, disposition: "inline"), target: "_blank", class: "block" do %>
-                  <%= image_tag url_for(@entry.receipt.variant(:display)),
+                <% receipt_url = @entry.safe_receipt_url(:display, disposition: :inline) %>
+                <%= link_to receipt_url, target: "_blank", class: "block" do %>
+                  <%= image_tag @entry.safe_receipt_url(:display, disposition: :inline),
                                 alt: "Receipt",
                                 class: "rounded-lg max-w-full max-h-48 object-contain border border-primary" %>
                   <span class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center text-white text-sm font-medium">
@@ -167,7 +168,7 @@
                   <p class="text-sm font-medium text-primary truncate"><%= @entry.receipt.filename %></p>
                   <p class="text-xs text-tertiary"><%= number_to_human_size(@entry.receipt.byte_size) %></p>
                 </div>
-                <%= link_to rails_blob_path(@entry.receipt, disposition: "attachment"),
+                <%= link_to @entry.safe_receipt_url(nil, disposition: :attachment),
                             class: "btn btn--outline btn--sm" do %>
                   <%= lucide_icon "download", class: "w-4 h-4" %>
                   <%= t(".download", default: "Download") %>

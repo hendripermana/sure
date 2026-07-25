@@ -106,6 +106,16 @@ class Entry < ApplicationRecord
     amount.negative? ? "income" : "expense"
   end
 
+  def safe_receipt_url(variant = nil, disposition: :inline, filename: nil)
+    ActiveStorage::SecureUrlService.for_attachment(
+      receipt,
+      variant: variant,
+      expires_in: 5.minutes,
+      disposition: disposition,
+      filename: filename || receipt.filename
+    )
+  end
+
   def lock_saved_attributes!
     super
     entryable.lock_saved_attributes!

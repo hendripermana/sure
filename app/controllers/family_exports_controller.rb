@@ -27,10 +27,18 @@ class FamilyExportsController < ApplicationController
 
   def download
     if @export.downloadable?
-      send_data @export.export_file.download,
-                filename: @export.filename,
-                type: "application/zip",
-                disposition: "attachment"
+      url = ActiveStorage::SecureUrlService.for_attachment(
+        @export.export_file,
+        expires_in: 5.minutes,
+        disposition: :attachment,
+        filename: @export.filename
+      )
+
+      if url.present?
+        redirect_to url, allow_other_host: true
+      else
+        redirect_to imports_path, alert: "Export not ready for download"
+      end
     else
       redirect_to imports_path, alert: "Export not ready for download"
     end
