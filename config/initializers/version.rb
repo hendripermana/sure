@@ -34,7 +34,7 @@ module Sure
         return git_version if git_version.present?
 
         # Priority 3: Fallback to hardcoded version for offline/disconnected environments
-        "0.23.17"
+        "0.23.18"
       end
 
       def read_version_from_git_tag
