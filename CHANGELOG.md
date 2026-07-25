@@ -1,3 +1,9 @@
+## [0.23.19](https://github.com/hendripermana/sure/compare/v0.23.18...v0.23.19) (2026-07-25)
+
+### Other Changes
+
+- Harden signed attachment URLs (#221) (809f8f12)
+
 ## [0.23.18](https://github.com/hendripermana/sure/compare/v0.23.17...v0.23.18) (2026-07-25)
 
 ### Other Changes
