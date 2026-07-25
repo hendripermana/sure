@@ -110,18 +110,18 @@ class User < ApplicationRecord
     true
   end
 
-  # Safe avatar URL helper - handles missing files gracefully
-  # This prevents 500 errors when profile images exist in DB but not in storage
-  # (e.g., after migration from local to R2 storage)
-  # Uses .url instead of .processed.url to avoid synchronous processing
-  # (variants are already preprocessed via has_one_attached config)
+  # Safe avatar URL helper - handles missing files gracefully.
+  # This avoids 500 errors when profile images exist in DB but not in storage
+  # (e.g., after migration from local to R2 storage) and uses signed URLs
+  # with a short expiry so file access is controlled rather than public by default.
   def safe_avatar_url(variant = :small)
-    return nil unless profile_image.attached?
-
-    profile_image.variant(variant).url
-  rescue ActiveStorage::FileNotFoundError, ActiveStorage::InvariableError => e
-    Rails.logger.warn "[ActiveStorage] Profile image not found for user #{id}: #{e.message}"
-    nil
+    ActiveStorage::SecureUrlService.for_attachment(
+      profile_image,
+      variant: variant,
+      expires_in: 5.minutes,
+      disposition: :inline,
+      filename: profile_image.filename
+    )
   end
 
   def ai_available?

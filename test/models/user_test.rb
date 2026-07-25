@@ -139,6 +139,17 @@ class UserTest < ActiveSupport::TestCase
     assert_match %r{issuer=Sure}, user.provisioning_uri
   end
 
+  test "safe_avatar_url returns a signed URL when profile image exists" do
+    image = Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/files/profile_image.png"), "image/png")
+    @user.profile_image.attach(image)
+
+    url = @user.safe_avatar_url(:small)
+
+    assert_not_nil url
+    assert_includes url, "https://"
+    assert_match %r{/rails/active_storage/}, url
+  end
+
   test "ai_available? returns true when openai access token set in settings" do
     Rails.application.config.app_mode.stubs(:self_hosted?).returns(true)
     previous = Setting.openai_access_token

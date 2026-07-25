@@ -27,10 +27,26 @@ class FamilyExportsController < ApplicationController
 
   def download
     if @export.downloadable?
-      send_data @export.export_file.download,
-                filename: @export.filename,
-                type: "application/zip",
-                disposition: "attachment"
+      url = ActiveStorage::SecureUrlService.for_attachment(
+        @export.export_file,
+        expires_in: 5.minutes,
+        disposition: :attachment,
+        filename: @export.filename
+      )
+
+      if url.present?
+        parsed_url = URI.parse(url)
+        allowed_hosts = %w[cloudflare.com r2.cloudflarestorage.com s3.amazonaws.com amazonaws.com]
+        allowed_hosts += %w[localhost www.example.com] if Rails.env.test? || Rails.env.development?
+
+        if parsed_url.host.present? && parsed_url.scheme.present? && allowed_hosts.any? { |host| parsed_url.host.end_with?(host) }
+          redirect_to url, allow_other_host: false
+        else
+          redirect_to imports_path, alert: "Export not ready for download"
+        end
+      else
+        redirect_to imports_path, alert: "Export not ready for download"
+      end
     else
       redirect_to imports_path, alert: "Export not ready for download"
     end
