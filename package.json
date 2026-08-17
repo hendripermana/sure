@@ -14,7 +14,7 @@
   "author": "",
   "license": "AGPL-3.0",
   "dependencies": {
-    "framer-motion": "^12.23.12",
+    "framer-motion": "^13.1.0",
     "react": "^19.1.1",
     "react-dom": "^19.2.7",
     "zod": "^4.1.5"
